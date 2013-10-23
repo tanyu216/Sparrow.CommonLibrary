@@ -10,7 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Sparrow.CommonLibrary.Logging;
-using Sparrow.CommonLibrary.TransientFault;
+using Sparrow.CommonLibrary.Retrying;
 
 namespace Sparrow.CommonLibrary.Utility
 {

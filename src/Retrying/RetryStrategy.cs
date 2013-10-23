@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sparrow.CommonLibrary.TransientFault
+namespace Sparrow.CommonLibrary.Retrying
 {
     /// <summary>
     /// 重试策略
