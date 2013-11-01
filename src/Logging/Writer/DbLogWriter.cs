@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using Sparrow.CommonLibrary.Utility;
-using Sparrow.CommonLibrary.Data.Database;
+using Sparrow.CommonLibrary.Database;
 
 namespace Sparrow.CommonLibrary.Logging.Writer
 {

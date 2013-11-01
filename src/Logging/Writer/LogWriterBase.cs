@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Logging.Writer
             var enumerator = ex.Data.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                str.Append(indent).Append("Exception.Data:[").Append(enumerator.Key).Append(']').Append(enumerator.Value).AppendLine();
+                str.Append(indent).Append("Exception.Database:[").Append(enumerator.Key).Append(']').Append(enumerator.Value).AppendLine();
             }
 
             str.Append(ExceptionDetail(ex.InnerException, ++depth));

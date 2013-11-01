@@ -278,15 +278,27 @@ namespace Sparrow.CommonLibrary.Utility.Extenssions
         }
 
         /// <summary>
+        /// 判断是否为浮点数字
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsDouble(this string str)
+        {
+            return Regex.IsMatch(str, @"^\d+(\.\d+)?$");
+        }
+
+        /// <summary>
         /// 随机打乱集合的顺序
         /// </summary>
         /// <param name="list"></param>
         public static void RandomList(this IList list)
         {
             var random = new Random();
-            for (int i = list.Count - 1; i >= 0; i--)
+            var len = list.Count / 2;
+            var max = list.Count;
+            for (int i = 0; i <= len; i++)
             {
-                int rnd = random.Next(i);
+                int rnd = random.Next(i + 1, max);
                 object val = list[i];
                 list[i] = list[rnd];
                 list[rnd] = val;
@@ -300,9 +312,11 @@ namespace Sparrow.CommonLibrary.Utility.Extenssions
         public static void RandomList(this object[] arrary)
         {
             var random = new Random();
-            for (int i = arrary.Length - 1; i >= 0; i--)
+            var len = arrary.Length / 2;
+            var max = arrary.Length;
+            for (int i = 0; i <= len; i++)
             {
-                int rnd = random.Next(i);
+                int rnd = random.Next(i + 1, max);
                 object val = arrary[i];
                 arrary[i] = arrary[rnd];
                 arrary[rnd] = val;
