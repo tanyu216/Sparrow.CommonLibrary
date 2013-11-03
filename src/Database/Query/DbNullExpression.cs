@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Database.Query
 {
-    public class DbNullExpression : Expression
+    public class DbNullExpression : SqlExpression
     {
-        public static readonly DbNullExpression DbNull;
+        public static readonly DbNullExpression Instance;
 
         static DbNullExpression()
         {
-            DbNull = new DbNullExpression();
+            Instance = new DbNullExpression();
         }
 
         private DbNullExpression()

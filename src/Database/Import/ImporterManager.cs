@@ -56,8 +56,6 @@ namespace Sparrow.CommonLibrary.Database.Import
             if (executer == null)
                 throw new ArgumentNullException("executer");
 
-            Importer importer;
-
             var type = GetImporterTypeFromConfig(executer.ConnName);
             if (type != null)
                 return CreateImporter(type, executer);

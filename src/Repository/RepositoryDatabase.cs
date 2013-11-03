@@ -14,11 +14,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Sparrow.CommonLibrary.Mapper.Converter;
 using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Extenssions;
 
 namespace Sparrow.CommonLibrary.Repository
 {
     /// <summary>
-    /// 
+    /// 基于数据库的<see cref="IRepository"/>实现
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class RepositoryDatabase<T> : IRepository<T> where T : class
@@ -28,7 +29,6 @@ namespace Sparrow.CommonLibrary.Repository
         protected DatabaseHelper Database { get { return _database; } }
 
         private readonly IMapper<T> mapper;
-        private IMetaFieldInfo[] fields;
 
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
@@ -49,15 +49,11 @@ namespace Sparrow.CommonLibrary.Repository
 
         protected string FieldName(Expression<Func<T, object>> field)
         {
-            if (fields == null)
-                fields = mapper.MetaInfo.GetFields();
-            //
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            foreach (var fieldMap in fields)
-            {
-                if (fieldMap.PropertyInfo == propertyInfo)
-                    return fieldMap.FieldName;
-            }
+            var fieldMap = mapper.MetaInfo[propertyInfo];
+            if (fieldMap != null)
+                return fieldMap.FieldName;
+
             throw new ArgumentException("参数不支持作为查询条件，因为无法获取该属性所映射的成员字段。");
         }
 
@@ -297,27 +293,31 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IList<T> GetList()
         {
-            throw new NotImplementedException();
+            return _database.ExecuteList<T>(SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), SqlOptions.NoLock));
         }
 
         public IList<T> GetList(CompareExpression condition)
         {
-            throw new NotImplementedException();
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+
+            return _database.ExecuteList<T>(condition, SqlOptions.NoLock);
         }
 
         public IList<T> GetList(ConditionExpression condition)
         {
-            var paramters = CreateParamterCollection();
-            var sql = SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), condition, paramters, SqlOptions.NoLock);
-            using (var source = _database.ExecuteReader(sql, paramters))
-            {
-                return MapperManager.Map<T, IDataReader>(source);
-            }
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+
+            return _database.ExecuteList<T>(condition, SqlOptions.NoLock);
         }
 
         public T Get(CompareExpression condition)
         {
-            throw new NotImplementedException();
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+
+            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
         }
 
         public T Get(object id)
@@ -329,13 +329,8 @@ namespace Sparrow.CommonLibrary.Repository
             if (mapper.MetaInfo.KeyCount != 1)
                 throw new ArgumentException("复合主键的实体对象，无法使用该方法。");
 
-            var condition = Sparrow.CommonLibrary.Database.Query.Expression.Equal(Sparrow.CommonLibrary.Database.Query.Expression.Field(mapper.MetaInfo.GetKeys()[0]), Sparrow.CommonLibrary.Database.Query.Expression.Constant(id));
-            var parameter = _database.CreateParamterCollection();
-            var sql = SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), condition, parameter, SqlOptions.NoLock);
-            using (var source = _database.ExecuteReader(sql, parameter, null))
-            {
-                return DataConverter.CreateConverter<T>(mapper, source).Next();
-            }
+            var condition = SqlExpression.Equal(mapper.MetaInfo.GetKeys()[0], id);
+            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
         }
 
         public T Get(ConditionExpression condition)
@@ -343,12 +338,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            var parameter = _database.CreateParamterCollection();
-            var sql = SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), condition, parameter, SqlOptions.NoLock);
-            using (var source = _database.ExecuteReader(sql, parameter, null))
-            {
-                return DataConverter.CreateConverter<T>(mapper, source).Next();
-            }
+            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
         }
 
         public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
@@ -362,7 +352,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public TValue Sum<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Sum(field)
+                .Where(condition)
+                .OutputSqlString(parameters);
+            return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
@@ -386,7 +381,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public TValue Min<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Min(field)
+                .Where(condition)
+                .OutputSqlString(parameters);
+            return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Min<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
@@ -410,7 +410,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public TValue Max<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Max(field)
+                .Where(condition)
+                .OutputSqlString(parameters);
+            return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Max<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
@@ -434,7 +439,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public TValue Avg<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Avg(field)
+                .Where(condition)
+                .OutputSqlString(parameters);
+            return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Avg<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
@@ -458,7 +468,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public TValue Count<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Count(field)
+                .Where(condition)
+                .OutputSqlString(parameters);
+            return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Count<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
@@ -473,17 +488,46 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(groupby)
+                .Count(field)
+                .GroupBy(groupby)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
         }
 
         public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, CompareExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(groupby)
+                .Count(field)
+                .Where(condition)
+                .GroupBy(groupby)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
         }
 
         public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, ConditionExpression condition)
         {
-            throw new NotImplementedException();
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(groupby)
+                .Count(field)
+                .Where(condition)
+                .GroupBy(groupby)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
         }
 
         #endregion

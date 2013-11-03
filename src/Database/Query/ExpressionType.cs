@@ -19,6 +19,10 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// </summary>
         AndAlso,
         /// <summary>
+        /// 别名
+        /// </summary>
+        Alias,
+        /// <summary>
         /// 介于两者之间
         /// </summary>
         Between,

@@ -8,11 +8,11 @@ namespace Sparrow.CommonLibrary.Database.Query
     /// <summary>
     /// 条件比较表达式
     /// </summary>
-    public abstract class CompareExpression : Expression
+    public abstract class CompareExpression : SqlExpression
     {
-        public Expression Left { get; protected set; }
+        public SqlExpression Left { get; protected set; }
 
-        public Expression Right { get; protected set; }
+        public SqlExpression Right { get; protected set; }
 
         protected abstract string Operator { get; }
 
@@ -20,7 +20,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         {
         }
 
-        internal static CompareExpression Expression(ExpressionType nodeType, Expression left, Expression right)
+        internal static CompareExpression Expression(ExpressionType nodeType, SqlExpression left, SqlExpression right)
         {
             if (left == null)
                 throw new ArgumentNullException("left");
@@ -54,7 +54,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             }
         }
 
-        internal static CompareExpression ExpressionForLike(Expression left, Expression right, bool startWith, bool endWith)
+        internal static CompareExpression ExpressionForLike(SqlExpression left, SqlExpression right, bool startWith, bool endWith)
         {
             if (left == null)
                 throw new ArgumentNullException("left");

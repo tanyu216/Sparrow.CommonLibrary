@@ -1,4 +1,8 @@
-﻿using System.Data;
+﻿using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Database.SqlBuilder;
+using Sparrow.CommonLibrary.Mapper;
+using System;
+using System.Data;
 using System.Data.Common;
 
 namespace Sparrow.CommonLibrary.Database
@@ -40,6 +44,118 @@ namespace Sparrow.CommonLibrary.Database
         public T ExecuteScalar<T>(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
             return ExecuteScalar<T>(CommandType.Text, commandText, parameters, transaction);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public T ExecuteScalar<T>(CompareExpression condition)
+        {
+            return ExecuteScalar<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public T ExecuteScalar<T>(CompareExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteScalar<T>(CommandType.Text, sql, parameters);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public T ExecuteScalar<T>(CompareExpression condition, DbTransaction transaction)
+        {
+            return ExecuteScalar<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public T ExecuteScalar<T>(CompareExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteScalar<T>(CommandType.Text, sql, parameters, transaction);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public T ExecuteScalar<T>(ConditionExpression condition)
+        {
+            return ExecuteScalar<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public T ExecuteScalar<T>(ConditionExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteScalar<T>(CommandType.Text, sql, parameters);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public T ExecuteScalar<T>(ConditionExpression condition, DbTransaction transaction)
+        {
+            return ExecuteScalar<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public T ExecuteScalar<T>(ConditionExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteScalar<T>(CommandType.Text, sql, parameters, transaction);
         }
 
 

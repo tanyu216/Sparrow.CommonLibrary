@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Database.Query
 {
-    public class VariableNameExpression : Expression
+    public class VariableNameExpression : SqlExpression
     {
         public string Name { get; protected set; }
 

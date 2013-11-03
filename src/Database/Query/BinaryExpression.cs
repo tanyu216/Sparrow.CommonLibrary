@@ -8,13 +8,13 @@ namespace Sparrow.CommonLibrary.Database.Query
     /// <summary>
     /// 二元运算表达式
     /// </summary>
-    public abstract class BinaryExpression : Expression
+    public abstract class BinaryExpression : SqlExpression
     {
-        public Expression Left { get; protected set; }
+        public SqlExpression Left { get; protected set; }
 
-        public Expression Right { get; protected set; }
+        public SqlExpression Right { get; protected set; }
 
-        internal static BinaryExpression Expression(ExpressionType nodeType, Expression left, Expression right)
+        internal static BinaryExpression Expression(ExpressionType nodeType, SqlExpression left, SqlExpression right)
         {
             switch (nodeType)
             {

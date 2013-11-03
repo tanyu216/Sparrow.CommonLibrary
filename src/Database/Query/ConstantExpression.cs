@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Database.Query
 {
-    public class ConstantExpression : Expression
+    public class ConstantExpression : SqlExpression
     {
         public object Value { get; private set; }
 

@@ -1,4 +1,8 @@
-﻿using System.Data;
+﻿using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Database.SqlBuilder;
+using Sparrow.CommonLibrary.Mapper;
+using System;
+using System.Data;
 using System.Data.Common;
 
 namespace Sparrow.CommonLibrary.Database
@@ -37,6 +41,118 @@ namespace Sparrow.CommonLibrary.Database
         public IDataReader ExecuteReader(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
             return ExecuteReader(CommandType.Text, commandText, parameters, transaction);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public IDataReader ExecuteReader<T>(CompareExpression condition)
+        {
+            return ExecuteReader<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public IDataReader ExecuteReader<T>(CompareExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteReader(CommandType.Text, sql, parameters);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public IDataReader ExecuteReader<T>(CompareExpression condition, DbTransaction transaction)
+        {
+            return ExecuteReader<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public IDataReader ExecuteReader<T>(CompareExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteReader(CommandType.Text, sql, parameters, transaction);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public IDataReader ExecuteReader<T>(ConditionExpression condition)
+        {
+            return ExecuteReader<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public IDataReader ExecuteReader<T>(ConditionExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteReader(CommandType.Text, sql, parameters);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public IDataReader ExecuteReader<T>(ConditionExpression condition, DbTransaction transaction)
+        {
+            return ExecuteReader<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public IDataReader ExecuteReader<T>(ConditionExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            return ExecuteReader(CommandType.Text, sql, parameters, transaction);
         }
 
         /// <summary>

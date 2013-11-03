@@ -65,9 +65,9 @@ namespace Sparrow.CommonLibrary.Database.Query
         public static CollectionExpression<T> Equal<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
             if (value == null)
-                expression1.Add(Expression.IsNull<T>(field));
+                expression1.Add(SqlExpression.IsNull<T>(field));
             else
-                expression1.Add(Expression.Equal<T>(field, value));
+                expression1.Add(SqlExpression.Equal<T>(field, value));
             return expression1;
         }
 
@@ -82,7 +82,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> GreaterThan<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
-            expression1.Add(Expression.GreaterThan<T>(field, value));
+            expression1.Add(SqlExpression.GreaterThan<T>(field, value));
             return expression1;
         }
 
@@ -97,7 +97,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> GreaterThanOrEqual<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
-            expression1.Add(Expression.GreaterThanOrEqual<T>(field, value));
+            expression1.Add(SqlExpression.GreaterThanOrEqual<T>(field, value));
             return expression1;
         }
 
@@ -112,7 +112,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> LessThan<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
-            expression1.Add(Expression.LessThan<T>(field, value));
+            expression1.Add(SqlExpression.LessThan<T>(field, value));
             return expression1;
         }
 
@@ -127,7 +127,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> LessThanOrEqual<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
-            expression1.Add(Expression.LessThanOrEqual<T>(field, value));
+            expression1.Add(SqlExpression.LessThanOrEqual<T>(field, value));
             return expression1;
         }
 
@@ -143,9 +143,9 @@ namespace Sparrow.CommonLibrary.Database.Query
         public static CollectionExpression<T> NotEqual<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value)
         {
             if (value == null)
-                expression1.Add(Expression.IsNotNull<T>(field));
+                expression1.Add(SqlExpression.IsNotNull<T>(field));
             else
-                expression1.Add(Expression.NotEqual<T>(field, value));
+                expression1.Add(SqlExpression.NotEqual<T>(field, value));
             return expression1;
         }
 
@@ -160,7 +160,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> In<T>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, params object[] values)
         {
-            expression1.Add(Expression.In<T>(field, values));
+            expression1.Add(SqlExpression.In<T>(field, values));
             return expression1;
         }
 
@@ -176,7 +176,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// <returns></returns>
         public static CollectionExpression<T> Between<T, TValue>(this CollectionExpression<T> expression1, System.Linq.Expressions.Expression<Func<T, object>> field, TValue value1, TValue value2)
         {
-            expression1.Add(Expression.Between<T>(field, value1, value2));
+            expression1.Add(SqlExpression.Between<T>(field, value1, value2));
             return expression1;
         }
 
@@ -189,13 +189,13 @@ namespace Sparrow.CommonLibrary.Database.Query
         {
             if (collection.Count < 2)
             {
-                return Expression.AndAlso(collection[0], null);
+                return SqlExpression.AndAlso(collection[0], null);
             }
 
-            ConditionExpression prev = Expression.AndAlso(collection[0], collection[1]);
+            ConditionExpression prev = SqlExpression.AndAlso(collection[0], collection[1]);
             for (var i = 2; i < collection.Count; i++)
             {
-                prev = Expression.AndAlso(prev, collection[i]);
+                prev = SqlExpression.AndAlso(prev, collection[i]);
             }
             return prev;
         }
@@ -209,13 +209,13 @@ namespace Sparrow.CommonLibrary.Database.Query
         {
             if (collection.Count < 2)
             {
-                return Expression.OrElse(collection[0], null);
+                return SqlExpression.OrElse(collection[0], null);
             }
 
-            ConditionExpression prev = Expression.OrElse(collection[0], collection[1]);
+            ConditionExpression prev = SqlExpression.OrElse(collection[0], collection[1]);
             for (var i = 2; i < collection.Count; i++)
             {
-                prev = Expression.OrElse(prev, collection[i]);
+                prev = SqlExpression.OrElse(prev, collection[i]);
             }
             return prev;
         }

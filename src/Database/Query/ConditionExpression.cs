@@ -8,7 +8,7 @@ namespace Sparrow.CommonLibrary.Database.Query
     public abstract class ConditionExpression : BinaryExpression
     {
 
-        internal static ConditionExpression Condition(ExpressionType nodeType, Expression left, Expression right)
+        internal static ConditionExpression Condition(ExpressionType nodeType, SqlExpression left, SqlExpression right)
         {
             if (left == null)
                 throw new ArgumentNullException("left");

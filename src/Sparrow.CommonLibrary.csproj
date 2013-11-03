@@ -91,6 +91,7 @@
     <Compile Include="Database\Import\ImporterManager.cs" />
     <Compile Include="Database\Import\Importer.cs" />
     <Compile Include="Database\ParameterCollection.cs" />
+    <Compile Include="Database\Query\AliasExpression.cs" />
     <Compile Include="Database\SqlBatch.cs" />
     <Compile Include="Database\DatabaseHelper.Query.Part.cs" />
     <Compile Include="Entity\DataState.cs" />
@@ -104,6 +105,8 @@
     <Compile Include="Entity\IEntityFieldAccessor.cs" />
     <Compile Include="Entity\ItemValue.cs" />
     <Compile Include="Database\Import\SqlServerImporter.cs" />
+    <Compile Include="Extenssions\CollectionExtenssions.cs" />
+    <Compile Include="Extenssions\OtherExtenssions.cs" />
     <Compile Include="Mapper\Converter\DataConverter.cs" />
     <Compile Include="Mapper\Converter\DataReaderConverterProvider.cs" />
     <Compile Include="Mapper\Converter\DataTableConverterProvider.cs" />
@@ -179,8 +182,9 @@
     <Compile Include="Retrying\RetryStrategy.cs" />
     <Compile Include="Utility\AppSettings.cs" />
     <Compile Include="Utility\Buffered.cs" />
+    <Compile Include="Extenssions\DataExtenssions.cs" />
     <Compile Include="Utility\OperationException.cs" />
-    <Compile Include="Utility\Extenssions\Exts.cs" />
+    <Compile Include="Extenssions\ConvertExtenssions.cs" />
     <Compile Include="Utility\DynamicKeyValueContainer.cs" />
     <Compile Include="Utility\JsonSerialize.cs" />
     <Compile Include="Utility\PathBuilder.cs" />
@@ -207,7 +211,7 @@
     <Compile Include="Weblog\Writer\TextWeblogWriter.cs" />
     <Compile Include="Weblog\Writer\WeblogWriterBase.cs" />
     <Compile Include="Weblog\Writer\MSMQWeblogWriter.cs" />
-    <Compile Include="Utility\Extenssions\WebExts.cs" />
+    <Compile Include="Extenssions\WebExtenssions.cs" />
     <Compile Include="Utility\HttpClient.cs" />
     <Compile Include="Utility\RecognizeSpider.cs" />
   </ItemGroup>

@@ -7,7 +7,7 @@ using Sparrow.CommonLibrary.Database.SqlBuilder;
 
 namespace Sparrow.CommonLibrary.Database.Query
 {
-    public class FunctionExpression : Expression
+    public class FunctionExpression : SqlExpression
     {
         public string Schema { get; set; }
 
@@ -15,14 +15,14 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public string Alias { get; set; }
 
-        public Expression[] Arguments { get; protected set; }
+        public SqlExpression[] Arguments { get; protected set; }
 
-        protected FunctionExpression(string name, Expression arguments)
+        protected FunctionExpression(string name, SqlExpression arguments)
             : this(name, new[] { arguments })
         {
         }
 
-        protected FunctionExpression(string name, params Expression[] arguments)
+        protected FunctionExpression(string name, params SqlExpression[] arguments)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
@@ -52,7 +52,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             return string.Concat(builder.BuildFuncName(Name), "(", BuildParameter(builder, output), ")");
         }
 
-        internal static FunctionExpression Expression(string name, params Expression[] arguments)
+        internal static FunctionExpression Expression(string name, params SqlExpression[] arguments)
         {
             return new FunctionExpression(name, arguments);
         }

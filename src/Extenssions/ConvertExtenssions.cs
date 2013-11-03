@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sparrow.CommonLibrary.Utility.Extenssions
+namespace Sparrow.CommonLibrary.Extenssions
 {
-    public static class Exts
+    public static class ConvertExtenssions
     {
         public static byte[] ToUtf8Bytes(this string value)
         {
@@ -240,87 +240,5 @@ namespace Sparrow.CommonLibrary.Utility.Extenssions
 
         #endregion
 
-        public static string Defualt(this string str, string def)
-        {
-            if (string.IsNullOrEmpty(str))
-                return def;
-            return str;
-        }
-
-        public static string Cut(this string str, int index)
-        {
-            if (string.IsNullOrEmpty(str))
-                return null;
-            if (str.Length <= index)
-                return null;
-            return str[index].ToString(CultureInfo.InvariantCulture);
-        }
-
-        public static string Cut(this string str, int startIndex, int endIndex)
-        {
-            if (string.IsNullOrEmpty(str))
-                return null;
-            if (str.Length <= startIndex)
-                return null;
-            if (str.Length > endIndex)
-                return str.Substring(startIndex, endIndex - startIndex + 1);
-            return str.Substring(startIndex);
-        }
-
-        /// <summary>
-        /// 判断是否为数字
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static bool IsNumber(this string str)
-        {
-            return Regex.IsMatch(str, @"^\d+$");
-        }
-
-        /// <summary>
-        /// 判断是否为浮点数字
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static bool IsDouble(this string str)
-        {
-            return Regex.IsMatch(str, @"^\d+(\.\d+)?$");
-        }
-
-        /// <summary>
-        /// 随机打乱集合的顺序
-        /// </summary>
-        /// <param name="list"></param>
-        public static void RandomList(this IList list)
-        {
-            var random = new Random();
-            var len = list.Count / 2;
-            var max = list.Count;
-            for (int i = 0; i <= len; i++)
-            {
-                int rnd = random.Next(i + 1, max);
-                object val = list[i];
-                list[i] = list[rnd];
-                list[rnd] = val;
-            }
-        }
-
-        /// <summary>
-        /// 随机打乱集合的顺序
-        /// </summary>
-        /// <param name="arrary"></param>
-        public static void RandomList(this object[] arrary)
-        {
-            var random = new Random();
-            var len = arrary.Length / 2;
-            var max = arrary.Length;
-            for (int i = 0; i <= len; i++)
-            {
-                int rnd = random.Next(i + 1, max);
-                object val = arrary[i];
-                arrary[i] = arrary[rnd];
-                arrary[rnd] = val;
-            }
-        }
     }
 }

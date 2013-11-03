@@ -79,18 +79,34 @@ namespace Sparrow.CommonLibrary.Database
         /// 生成数据查询Sql语句
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions"></param>
+        /// <param name="condition"></param>
         /// <param name="output"></param>
         /// <param name="options"></param>
         /// <param name="mapper"></param>
         /// <returns></returns>
-        internal protected string BuildDqlSql<T>(ConditionExpression expressions, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
+        internal protected string BuildDqlSql<T>(ConditionExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
         {
             mapper = MapperManager.GetIMapper<T>();
             var metaInfo = mapper.MetaInfo;
-            var tableName = metaInfo.Name;
             var fields = metaInfo.GetFieldNames();
-            return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, expressions, output, options);
+            return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);
+        }
+
+        /// <summary>
+        /// 生成数据查询Sql语句
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
+        /// <param name="output"></param>
+        /// <param name="options"></param>
+        /// <param name="mapper"></param>
+        /// <returns></returns>
+        internal protected string BuildDqlSql<T>(CompareExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
+        {
+            mapper = MapperManager.GetIMapper<T>();
+            var metaInfo = mapper.MetaInfo;
+            var fields = metaInfo.GetFieldNames();
+            return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);
         }
 
         /// <summary>

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web;
-using Sparrow.CommonLibrary.Utility.Extenssions;
+using Sparrow.CommonLibrary.Extenssions;
 
 namespace Sparrow.CommonLibrary.Logging
 {

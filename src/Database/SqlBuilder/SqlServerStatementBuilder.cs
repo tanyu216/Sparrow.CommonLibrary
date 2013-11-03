@@ -87,12 +87,12 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             return sql.ToString();
         }
 
-        public virtual string QueryFormat(string tableName, string fieldExpressions, string conditionExpressions, SqlOptions options)
+        public override string QueryFormat(string tableName, string fieldExpressions, string conditionExpressions, SqlOptions options)
         {
             return QueryFormat(tableName, null, fieldExpressions, conditionExpressions, options);
         }
 
-        public virtual string QueryFormat(string tableName, string alias, string fieldExpressions, string conditionExpressions, SqlOptions options)
+        public override string QueryFormat(string tableName, string alias, string fieldExpressions, string conditionExpressions, SqlOptions options)
         {
             //select {fieldExpressions} from {tableName} as {alias} where {condition}
             var str = new StringBuilder()

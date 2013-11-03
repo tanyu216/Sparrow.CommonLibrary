@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web;
 
-namespace Sparrow.CommonLibrary.Utility.Extenssions
+namespace Sparrow.CommonLibrary.Extenssions
 {
-    public static class WebExts
+    public static class WebExtenssions
     {
         public static string GetClientIp(this HttpRequest request)
         {

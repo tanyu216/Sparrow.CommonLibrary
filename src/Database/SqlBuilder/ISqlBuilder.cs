@@ -3,7 +3,6 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Database.Query;
 using Sparrow.CommonLibrary.Entity;
-using Sparrow.CommonLibrary.Database.Query;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder
 {

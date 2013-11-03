@@ -9,9 +9,9 @@ namespace Sparrow.CommonLibrary.Database.Query
     /// <summary>
     /// 表达式集合
     /// </summary>
-    public class CollectionExpression : Expression, IList<Expression>
+    public class CollectionExpression : SqlExpression, IList<SqlExpression>
     {
-        private List<Expression> list;
+        private List<SqlExpression> list;
 
         public CollectionExpression()
             : this(4)
@@ -20,27 +20,27 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public CollectionExpression(int capacity)
         {
-            list = new List<Expression>(capacity);
+            list = new List<SqlExpression>(capacity);
         }
 
-        public CollectionExpression(IEnumerable<Expression> collection)
+        public CollectionExpression(IEnumerable<SqlExpression> collection)
         {
-            list = new List<Expression>(collection);
+            list = new List<SqlExpression>(collection);
         }
 
         #region IList<Expression>
 
-        public void Add(Expression expression)
+        public void Add(SqlExpression expression)
         {
             list.Add(expression);
         }
 
-        public void AddRang(IEnumerable<Expression> collection)
+        public void AddRang(IEnumerable<SqlExpression> collection)
         {
             list.AddRange(collection);
         }
 
-        public IEnumerator<Expression> GetEnumerator()
+        public IEnumerator<SqlExpression> GetEnumerator()
         {
             return list.GetEnumerator();
         }
@@ -50,13 +50,13 @@ namespace Sparrow.CommonLibrary.Database.Query
             return list.GetEnumerator();
         }
 
-        public int IndexOf(Expression item)
+        public int IndexOf(SqlExpression item)
         {
 
             return list.IndexOf(item);
         }
 
-        public void Insert(int index, Expression item)
+        public void Insert(int index, SqlExpression item)
         {
             list.Insert(index, item);
         }
@@ -66,7 +66,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             list.RemoveAt(index);
         }
 
-        public Expression this[int index]
+        public SqlExpression this[int index]
         {
             get
             {
@@ -83,12 +83,12 @@ namespace Sparrow.CommonLibrary.Database.Query
             list.Clear();
         }
 
-        public bool Contains(Expression item)
+        public bool Contains(SqlExpression item)
         {
             return list.Contains(item);
         }
 
-        public void CopyTo(Expression[] array, int arrayIndex)
+        public void CopyTo(SqlExpression[] array, int arrayIndex)
         {
             list.CopyTo(array, arrayIndex);
         }
@@ -103,7 +103,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             get { return false; }
         }
 
-        public bool Remove(Expression item)
+        public bool Remove(SqlExpression item)
         {
             return list.Remove(item);
         }
@@ -136,7 +136,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         {
         }
 
-        public CollectionExpression(IEnumerable<Expression> collection)
+        public CollectionExpression(IEnumerable<SqlExpression> collection)
             : base(collection)
         {
         }

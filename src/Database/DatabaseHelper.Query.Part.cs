@@ -64,25 +64,25 @@ namespace Sparrow.CommonLibrary.Database
         /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
-        public T ExecuteFirst<T>(ConditionExpression expressions)
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public T ExecuteFirst<T>(CompareExpression condition)
         {
-            return ExecuteFirst<T>(expressions, SqlOptions.None);
+            return ExecuteFirst<T>(condition, SqlOptions.None);
         }
 
         /// <summary>
         /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="options"> </param>
-        public T ExecuteFirst<T>(ConditionExpression expressions, SqlOptions options)
+        public T ExecuteFirst<T>(CompareExpression condition, SqlOptions options)
         {
-            if (expressions == null) throw new ArgumentNullException("expressions");
+            if (condition == null) throw new ArgumentNullException("condition");
 
             var parameters = CreateParamterCollection();
             IMapper<T> mapper;
-            var sql = BuildDqlSql(expressions, parameters, options, out mapper);
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
@@ -94,27 +94,89 @@ namespace Sparrow.CommonLibrary.Database
         /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="transaction"> </param>
-        public T ExecuteFirst<T>(ConditionExpression expressions, DbTransaction transaction)
+        public T ExecuteFirst<T>(CompareExpression condition, DbTransaction transaction)
         {
-            return ExecuteFirst<T>(expressions, transaction, SqlOptions.None);
+            return ExecuteFirst<T>(condition, transaction, SqlOptions.None);
         }
 
         /// <summary>
         /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="transaction"> </param>
         /// <param name="options"> </param>
-        public T ExecuteFirst<T>(ConditionExpression expressions, DbTransaction transaction, SqlOptions options)
+        public T ExecuteFirst<T>(CompareExpression condition, DbTransaction transaction, SqlOptions options)
         {
-            if (expressions == null) throw new ArgumentNullException("expressions");
+            if (condition == null) throw new ArgumentNullException("condition");
 
             var parameters = CreateParamterCollection();
             IMapper<T> mapper;
-            var sql = BuildDqlSql(expressions, parameters, options, out mapper);
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
+            {
+                return MapperManager.MapSingle<T, IDataReader>(reader);
+            }
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public T ExecuteFirst<T>(ConditionExpression condition)
+        {
+            return ExecuteFirst<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public T ExecuteFirst<T>(ConditionExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
+            {
+                return MapperManager.MapSingle<T, IDataReader>(reader);
+            }
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public T ExecuteFirst<T>(ConditionExpression condition, DbTransaction transaction)
+        {
+            return ExecuteFirst<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集中的第一行数据转换实体对象。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public T ExecuteFirst<T>(ConditionExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("condition");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {
@@ -175,25 +237,25 @@ namespace Sparrow.CommonLibrary.Database
         /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
-        public IList<T> ExecuteList<T>(ConditionExpression expressions)
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public IList<T> ExecuteList<T>(CompareExpression condition)
         {
-            return ExecuteList<T>(expressions, SqlOptions.None);
+            return ExecuteList<T>(condition, SqlOptions.None);
         }
 
         /// <summary>
         /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="options"> </param>
-        public IList<T> ExecuteList<T>(ConditionExpression expressions, SqlOptions options)
+        public IList<T> ExecuteList<T>(CompareExpression condition, SqlOptions options)
         {
-            if (expressions == null) throw new ArgumentNullException("expressions");
+            if (condition == null) throw new ArgumentNullException("expressions");
 
             var parameters = CreateParamterCollection();
             IMapper<T> mapper;
-            var sql = BuildDqlSql(expressions, parameters, options, out mapper);
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
@@ -205,27 +267,89 @@ namespace Sparrow.CommonLibrary.Database
         /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="transaction"> </param>
-        public IList<T> ExecuteList<T>(ConditionExpression expressions, DbTransaction transaction)
+        public IList<T> ExecuteList<T>(CompareExpression condition, DbTransaction transaction)
         {
-            return ExecuteList<T>(expressions, transaction, SqlOptions.None);
+            return ExecuteList<T>(condition, transaction, SqlOptions.None);
         }
 
         /// <summary>
         /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expressions">获取数据的查询表达式</param>
+        /// <param name="condition">获取数据的查询条件表达式</param>
         /// <param name="transaction"> </param>
         /// <param name="options"> </param>
-        public IList<T> ExecuteList<T>(ConditionExpression expressions, DbTransaction transaction, SqlOptions options)
+        public IList<T> ExecuteList<T>(CompareExpression condition, DbTransaction transaction, SqlOptions options)
         {
-            if (expressions == null) throw new ArgumentNullException("expressions");
+            if (condition == null) throw new ArgumentNullException("expressions");
 
             var parameters = CreateParamterCollection();
             IMapper<T> mapper;
-            var sql = BuildDqlSql(expressions, parameters, options, out mapper);
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
+            {
+                return MapperManager.Map<T, IDataReader>(reader);
+            }
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        public IList<T> ExecuteList<T>(ConditionExpression condition)
+        {
+            return ExecuteList<T>(condition, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="options"> </param>
+        public IList<T> ExecuteList<T>(ConditionExpression condition, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("expressions");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
+            // 执行
+            using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
+            {
+                return MapperManager.Map<T, IDataReader>(reader);
+            }
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        public IList<T> ExecuteList<T>(ConditionExpression condition, DbTransaction transaction)
+        {
+            return ExecuteList<T>(condition, transaction, SqlOptions.None);
+        }
+
+        /// <summary>
+        /// 执行条件表达式，将结果集转换成IList&lt;<typeparamref name="T"/>&gt; 集合，并返回。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition">获取数据的查询条件表达式</param>
+        /// <param name="transaction"> </param>
+        /// <param name="options"> </param>
+        public IList<T> ExecuteList<T>(ConditionExpression condition, DbTransaction transaction, SqlOptions options)
+        {
+            if (condition == null) throw new ArgumentNullException("expressions");
+
+            var parameters = CreateParamterCollection();
+            IMapper<T> mapper;
+            var sql = BuildDqlSql(condition, parameters, options, out mapper);
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {

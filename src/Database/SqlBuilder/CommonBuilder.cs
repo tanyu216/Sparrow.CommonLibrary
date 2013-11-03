@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using Sparrow.CommonLibrary.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sparrow.CommonLibrary.Mapper.Metadata;
-using Sparrow.CommonLibrary.Database;
-using Sparrow.CommonLibrary.Database.Query;
-using Sparrow.CommonLibrary.Entity;
-using Sparrow.CommonLibrary.Database.Configuration;
-using System.Collections.Concurrent;
-using Sparrow.CommonLibrary.Database.Query;
 using System.Text.RegularExpressions;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder
