@@ -126,7 +126,11 @@ namespace Sparrow.CommonLibrary.Extenssions
 
         private static readonly char[] IDCardCHNVerifyCode = "1,0,x,9,8,7,6,5,4,3,2".Split(',').Select(x => x[0]).ToArray();
         private static readonly int[] IDCardCHNWI = "7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2".Split(',').Select(x => Convert.ToInt32(x)).ToArray();
-
+        /// <summary>
+        /// 判断字符串为中国的身份证号码
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static bool IsIDCardCHN(this string str)
         {
             if (!Regex.IsMatch(str, @"^\d{15}|\d{17}[0-9xX]$"))
@@ -249,6 +253,138 @@ namespace Sparrow.CommonLibrary.Extenssions
         public static bool IsRange(this double value, double min, double max)
         {
             return value >= min && value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this short value, short max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this int value, int max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this long value, long max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this decimal value, decimal max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this float value, float max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字小于或等于指定的最大值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMax(this double value, double max)
+        {
+            return value <= max;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this short value, short min)
+        {
+            return value >= min;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this int value, int min)
+        {
+            return value >= min;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this long value, long min)
+        {
+            return value >= min;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this decimal value, decimal min)
+        {
+            return value >= min;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this float value, float min)
+        {
+            return value >= min;
+        }
+
+        /// <summary>
+        /// 判断数字大于或等于指定的最小值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static bool IsMin(this double value, double min)
+        {
+            return value >= min;
         }
     }
 }
