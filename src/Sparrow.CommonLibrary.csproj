@@ -107,6 +107,7 @@
     <Compile Include="Database\Import\SqlServerImporter.cs" />
     <Compile Include="Extenssions\CollectionExtenssions.cs" />
     <Compile Include="Extenssions\OtherExtenssions.cs" />
+    <Compile Include="Extenssions\ValidationExtenssions.cs" />
     <Compile Include="Mapper\Converter\DataConverter.cs" />
     <Compile Include="Mapper\Converter\DataReaderConverterProvider.cs" />
     <Compile Include="Mapper\Converter\DataTableConverterProvider.cs" />

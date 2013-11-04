@@ -36,25 +36,5 @@ namespace Sparrow.CommonLibrary.Extenssions
             return str.Substring(startIndex);
         }
 
-        /// <summary>
-        /// 判断是否为数字
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static bool IsNumber(this string str)
-        {
-            return Regex.IsMatch(str, @"^\d+$");
-        }
-
-        /// <summary>
-        /// 判断是否为浮点数字
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static bool IsDouble(this string str)
-        {
-            return Regex.IsMatch(str, @"^\d+(\.\d+)?$");
-        }
-
     }
 }
