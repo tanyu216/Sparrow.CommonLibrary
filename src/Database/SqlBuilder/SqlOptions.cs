@@ -28,6 +28,10 @@
         /// 独占封锁方式（表锁）
         /// </summary>
         /// <remarks>NoLock/RowLock/UpLock/TableLock,只能使用其中一个锁,当参数指定多个锁时,则按以上顺序设置锁</remarks>
-        TableLock = 64
+        TableLock = 64,
+        /// <summary>
+        /// 适用于查询的消重选项
+        /// </summary>
+        Distinct = 128
     }
 }

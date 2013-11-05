@@ -103,20 +103,33 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             throw new NotImplementedException();
         }
 
-        public override string QueryFormat(string tableName, string fieldExpressions, string conditionExpressions, SqlOptions options)
+        public override string QueryFormat(string topExpression, string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, SqlOptions options)
         {
-            return QueryFormat(tableName, null, fieldExpressions, conditionExpressions, options);
-        }
+            if (string.IsNullOrEmpty(fieldExpressions))
+                throw new ArgumentNullException("fieldExpressions");
+            if (string.IsNullOrEmpty(tableExpression))
+                throw new ArgumentNullException("tableExpression");
 
-        public override string QueryFormat(string tableName, string alias, string fieldExpressions, string conditionExpressions, SqlOptions options)
-        {
-            //select {fieldExpressions} from {tableName} as {alias} where {condition}
-            var str = new StringBuilder()
-                .Append(SqlCharSelect).Append(fieldExpressions)
-                .Append(SqlCharFrom).Append(BuildTableName(tableName, alias));
+            //select [distinct][top(1)] {fieldExpressions} from {tableName} as {alias}
+            var str = new StringBuilder().Append(SqlCharSelect);
+            if ((options & SqlOptions.Distinct) > 0)
+                str.Append(SqlCharDistinct);
+            if (!string.IsNullOrEmpty(topExpression))
+                str.Append(SqlCharTop).Append('(').Append(topExpression).Append(')');
+
+            str.Append(fieldExpressions).Append(SqlCharFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
                 str.Append(SqlCharWhere).Append(conditionExpressions);
+
+            if (!string.IsNullOrEmpty(groupbyExpression))
+                str.Append(SqlCharGroupby).Append(groupbyExpression);
+
+            if (!string.IsNullOrEmpty(havingExpression))
+                str.Append(SqlCharHaving).Append(havingExpression);
+
+            if (!string.IsNullOrEmpty(orderbyExpression))
+                str.Append(SqlCharOrderby).Append(orderbyExpression);
 
             return str.Append(LockOption(options)).ToString();
         }

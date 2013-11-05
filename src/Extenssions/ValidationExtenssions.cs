@@ -109,7 +109,7 @@ namespace Sparrow.CommonLibrary.Extenssions
 
             for (var n = str.Length - 1; n >= 0; n--)
             {
-                nDigit = Convert.ToInt32(str[n].ToString());
+                nDigit = Convert.ToInt32(str.Substring(n, 1));
                 if (bEven)
                 {
                     if ((nDigit *= 2) > 9)
@@ -133,7 +133,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <returns></returns>
         public static bool IsIDCardCHN(this string str)
         {
-            if (!Regex.IsMatch(str, @"^\d{15}|\d{17}[0-9xX]$"))
+            if (!Regex.IsMatch(str, @"^(\d{17}[0-9xX]|\d{15})$"))
                 return false;
 
             string ai;

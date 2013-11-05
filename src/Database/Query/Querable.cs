@@ -10,6 +10,7 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 using System.Data;
 using Sparrow.CommonLibrary.Database.Query;
 using System.Collections;
+using Sparrow.CommonLibrary.Database.SqlBuilder;
 
 namespace Sparrow.CommonLibrary.Database.Query
 {
@@ -28,24 +29,25 @@ namespace Sparrow.CommonLibrary.Database.Query
             this.database = database;
             mapper = MapperManager.GetIMapper<T>();
             fields = mapper.MetaInfo.GetFields();
+            Options = SqlOptions.NoLock;
         }
 
         public Queryable<T> Select(Expression<Func<T, object>> field)
         {
-            _fields.Add(SqlExpression.Field(field));
+            Fields.Add(SqlExpression.Field(field));
             return this;
         }
 
         public Queryable<T> Select(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Field(field, alias));
+            Fields.Add(SqlExpression.Field(field, alias));
             return this;
         }
 
         public Queryable<T> Select(params Expression<Func<T, object>>[] fields)
         {
             foreach (var field in fields)
-                _fields.Add(SqlExpression.Field(field));
+                Fields.Add(SqlExpression.Field(field));
             return this;
         }
 
@@ -54,14 +56,14 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(expression);
+            Fields.Add(expression);
             return this;
         }
 
         public Queryable<T> Select(params SqlExpression[] expressions)
         {
             foreach (var exp in expressions)
-                _fields.Add(exp);
+                Fields.Add(exp);
             return this;
         }
 
@@ -72,7 +74,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Sum(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("SUM", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("SUM", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -81,7 +83,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("SUM", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("SUM", expression), alias));
             return this;
         }
 
@@ -92,7 +94,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Min(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("MIN", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("MIN", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -101,7 +103,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("MIN", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("MIN", expression), alias));
             return this;
         }
 
@@ -112,7 +114,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Max(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("MAX", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("MAX", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -121,7 +123,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("MAX", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("MAX", expression), alias));
             return this;
         }
 
@@ -132,7 +134,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Avg(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("AVG", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("AVG", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -141,7 +143,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("AVG", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("AVG", expression), alias));
             return this;
         }
 
@@ -152,7 +154,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Count(Expression<Func<T, object>> field, string alias)
         {
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -161,7 +163,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            _fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", expression), alias));
             return this;
         }
 
@@ -181,54 +183,54 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> Where(Expression<Func<T, object>> field, object value)
         {
-            _expressionsForCondition.Add(SqlExpression.Equal(field, value));
-            return this;
+            return Where(SqlExpression.Equal(field, value));
         }
 
         public Queryable<T> Where(Expression<Func<T, object>> field, Operator op, object value)
         {
+            CompareExpression compare;
             switch (op)
             {
                 case Operator.Equal:
-                    _expressionsForCondition.Add(SqlExpression.Equal(field, value));
+                    compare = SqlExpression.Equal(field, value);
                     break;
                 case Operator.LessThan:
-                    _expressionsForCondition.Add(SqlExpression.LessThan(field, value));
+                    compare = SqlExpression.LessThan(field, value);
                     break;
                 case Operator.LessThanOrEqual:
-                    _expressionsForCondition.Add(SqlExpression.LessThanOrEqual(field, value));
+                    compare = SqlExpression.LessThanOrEqual(field, value);
                     break;
                 case Operator.GreaterThan:
-                    _expressionsForCondition.Add(SqlExpression.GreaterThan(field, value));
+                    compare = SqlExpression.GreaterThan(field, value);
                     break;
                 case Operator.GreaterThanOrEqual:
-                    _expressionsForCondition.Add(SqlExpression.GreaterThanOrEqual(field, value));
+                    compare = SqlExpression.GreaterThanOrEqual(field, value);
                     break;
                 case Operator.In:
-                    _expressionsForCondition.Add(SqlExpression.In(field, value));
+                    compare = SqlExpression.In(field, value);
                     break;
                 case Operator.StartWith:
-                    _expressionsForCondition.Add(SqlExpression.Like(field, value, true, false));
+                    compare = SqlExpression.Like(field, value, true, false);
                     break;
                 case Operator.EndWith:
-                    _expressionsForCondition.Add(SqlExpression.Like(field, value, false, true));
+                    compare = SqlExpression.Like(field, value, false, true);
                     break;
                 case Operator.Like:
-                    _expressionsForCondition.Add(SqlExpression.Like(field, value, true, true));
+                    compare = SqlExpression.Like(field, value, true, true);
                     break;
                 case Operator.NotEqual:
-                    _expressionsForCondition.Add(SqlExpression.NotEqual(field, value));
+                    compare = SqlExpression.NotEqual(field, value);
                     break;
                 case Operator.Between:
                     var values = ((ICollection)value).Cast<object>();
                     if (values.Count() < 2)
                         throw new ArgumentException("value集合未包含两个元素。");
-                    _expressionsForCondition.Add(SqlExpression.Between(field, values.First(), values.Skip(1).First()));
+                    compare = SqlExpression.Between(field, values.First(), values.Skip(1).First());
                     break;
                 default:
                     throw new NotSupportedException(string.Format("不受支持的{0}", op));
             }
-            return this;
+            return Where(compare);
         }
 
         public Queryable<T> Where(CompareExpression condition)
@@ -236,7 +238,10 @@ namespace Sparrow.CommonLibrary.Database.Query
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            _expressionsForCondition.Add(condition);
+            if (_condition == null)
+                _condition = SqlExpression.AndAlso(condition, null);
+            else
+                _condition = SqlExpression.AndAlso(_condition, condition);
             return this;
         }
 
@@ -258,62 +263,91 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable<T> GroupBy(Expression<Func<T, object>> field)
         {
+            Groups.Add(SqlExpression.Field(field));
             return this;
         }
 
         public Queryable<T> GroupBy(params Expression<Func<T, object>>[] fields)
         {
+            Groups.AddRang(fields.Select(x => SqlExpression.Field(x)));
             return this;
         }
 
-        public Queryable<T> GroupBy(Expression<Func<T, object>> field, ConditionExpression condition)
+        public Queryable<T> GroupBy(Expression<Func<T, object>> field, ConditionExpression having)
         {
+            Groups.Add(SqlExpression.Field(field));
+            if (having != null)
+                _having = SqlExpression.AndAlso(_having, having);
             return this;
         }
 
-        public Queryable<T> GroupBy(SqlExpression field)
+        public Queryable<T> GroupBy(SqlExpression expression)
         {
+            Groups.Add(expression);
             return this;
         }
 
         public Queryable<T> GroupBy(params SqlExpression[] fields)
         {
+            Groups.AddRang(fields);
             return this;
         }
 
-        public Queryable<T> GroupBy(SqlExpression field, ConditionExpression condition)
+        public Queryable<T> GroupBy(SqlExpression field, ConditionExpression having)
         {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            Groups.Add(field);
+            if (having != null)
+                _having = SqlExpression.AndAlso(_having, having);
             return this;
         }
 
         public Queryable<T> OrderBy(Expression<Func<T, object>> field)
         {
-            return this;
+            return OrderBy(field, true);
         }
 
         public Queryable<T> OrderBy(Expression<Func<T, object>> field, bool descending)
         {
+            return OrderBy(SqlExpression.Field(field), descending);
+        }
+
+        public Queryable<T> OrderBy(SqlExpression expression)
+        {
+            return OrderBy(expression, true);
+        }
+
+        public Queryable<T> OrderBy(SqlExpression expression, bool descending)
+        {
+            Orders[expression] = descending;
             return this;
         }
 
-        public Queryable<T> OrderBy(SqlExpression field)
-        {
-            return this;
-        }
-
-        public Queryable<T> OrderBy(SqlExpression field, bool descending)
-        {
-            return this;
-        }
+        public SqlOptions Options { get; set; }
 
         public override ExpressionType NodeType
         {
             get { return ExpressionType.Query; }
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, ParameterCollection output)
+        public override string OutputSqlString(ISqlBuilder builder, ParameterCollection output)
         {
-            throw new NotImplementedException();
+            if (_fields == null)
+                Fields.AddRang(mapper.MetaInfo.GetFieldNames().Select(x => SqlExpression.Field(x)));
+
+            return builder.QueryFormat(
+                top > 0 ? builder.Constant(top) : string.Empty,//top(10)
+                Fields.OutputSqlString(builder, output),//id,name,...
+                builder.BuildTableName(mapper.MetaInfo.Name),//tableName
+                _condition != null ? _condition.OutputSqlString(builder, output) : string.Empty,//where id>1 and...
+                _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty,//group by name....
+                _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty,//having count(name)>1 ...
+                _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "TRUE" : "FALSE"))) : string.Empty,//order id
+                distinct ? Options & SqlOptions.Distinct : Options
+                );
+
         }
 
         public string OutputSqlString(ParameterCollection output)
@@ -359,9 +393,6 @@ namespace Sparrow.CommonLibrary.Database.Query
         private CollectionExpression _fields;
         private CollectionExpression Fields { get { return _fields = _fields ?? new CollectionExpression(); } }
 
-        private CollectionExpression<T> _expressionsForCondition;
-        private CollectionExpression<T> ExpressionsForCondition { get { return _expressionsForCondition = _expressionsForCondition ?? new CollectionExpression<T>(); } }
-
         private ConditionExpression _condition;
 
         private CollectionExpression<T> _groups;
@@ -369,7 +400,8 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         private ConditionExpression _having;
 
-
+        private IDictionary<SqlExpression, bool> _orders;
+        private IDictionary<SqlExpression, bool> Orders { get { return _orders = _orders ?? new Dictionary<SqlExpression, bool>(); } }
 
         #endregion
     }

@@ -157,23 +157,16 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <summary>
         /// 格式化Query语句
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="fieldExpressions">字段名称</param>
+        /// <param name="topExpression"></param>
+        /// <param name="fieldExpressions"></param>
+        /// <param name="tableExpression"></param>
         /// <param name="conditionExpressions"></param>
+        /// <param name="groupbyExpression"></param>
+        /// <param name="havingExpression"></param>
+        /// <param name="orderbyExpression"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        string QueryFormat(string tableName, string fieldExpressions, string conditionExpressions, SqlOptions options);
-
-        /// <summary>
-        /// 格式化Query语句
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="alias"></param>
-        /// <param name="fieldExpressions">字段名称</param>
-        /// <param name="conditionExpressions"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        string QueryFormat(string tableName, string alias, string fieldExpressions, string conditionExpressions, SqlOptions options);
+        string QueryFormat(string topExpression, string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, SqlOptions options);
 
     }
 }

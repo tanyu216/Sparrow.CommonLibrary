@@ -59,6 +59,10 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// </summary>
         GreaterThanOrEqual,
         /// <summary>
+        /// 分组
+        /// </summary>
+        GroupBy,
+        /// <summary>
         /// 判断不为空
         /// </summary>
         IsNotNull,
@@ -98,6 +102,10 @@ namespace Sparrow.CommonLibrary.Database.Query
         /// 条件或
         /// </summary>
         OrElse,
+        /// <summary>
+        /// 排序
+        /// </summary>
+        OrderBy,
         /// <summary>
         /// 参数
         /// </summary>

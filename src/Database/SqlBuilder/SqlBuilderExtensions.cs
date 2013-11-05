@@ -34,6 +34,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (metaInfo == null)
                 throw new ArgumentNullException("metaInfo");
 
+            if (string.IsNullOrEmpty(metaInfo.Name))
+                throw new ArgumentException("metaInfo未配置一个有效称应用于TableName。");
+
             return metaInfo.Name;
         }
 
@@ -223,77 +226,82 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue<string, string>> fields, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), null, options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), null, options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, string> fields, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), null, options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), null, options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<string> fields, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), null, options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), null, options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<SqlExpression> fields, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), string.Join(",", builder.ExpressionsJoin(fields.Select(x => x.OutputSqlString(builder, output)))), null, options);
+            return builder.QueryFormat(metaInfo, string.Join(",", builder.ExpressionsJoin(fields.Select(x => x.OutputSqlString(builder, output)))), null, options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue<string, string>> fields, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue<string, string>> fields, CompareExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue<string, string>> fields, ConditionExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Item, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, string> fields, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, string> fields, CompareExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, string> fields, ConditionExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x.Key, x.Value))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<string> fields, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<string> fields, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<string> fields, CompareExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<string> fields, ConditionExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
         }
 
         public static string Query(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<SqlExpression> fields, ConditionExpression condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.QueryFormat(TableName(metaInfo), string.Join(",", builder.ExpressionsJoin(fields.Select(x => x.OutputSqlString(builder, output)))), builder.Where(condition, output, options), options);
+            return builder.QueryFormat(metaInfo, string.Join(",", builder.ExpressionsJoin(fields.Select(x => x.OutputSqlString(builder, output)))), builder.Where(condition, output, options), options);
+        }
+
+        private static string QueryFormat(this ISqlBuilder builder, IMetaInfo metaInfo, string fieldExpressions, string conditionExpressions, SqlOptions options)
+        {
+            return builder.QueryFormat(null, fieldExpressions, builder.BuildTableName(TableName(metaInfo)), conditionExpressions, null, null, null, options);
         }
 
         public static string IncrementByQuery(this ISqlBuilder builder, IMetaInfo metaInfo, string alias, SqlOptions options)

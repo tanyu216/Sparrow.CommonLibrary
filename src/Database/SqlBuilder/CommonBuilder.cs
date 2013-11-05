@@ -23,6 +23,11 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         protected static readonly string SqlCharAllFields = " * ";
         protected static readonly string SqlCharValues = " VALUES ";
         protected static readonly string SqlCharWhere = " WHERE ";
+        protected static readonly string SqlCharGroupby = " GROUP BY ";
+        protected static readonly string SqlCharHaving = " HAVING ";
+        protected static readonly string SqlCharOrderby = " ORDER BY ";
+        protected static readonly string SqlCharTop = " TOP ";
+        protected static readonly string SqlCharDistinct = " DISTINCT ";
 
         #endregion
 
@@ -224,11 +229,43 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         {
             //select {fieldExpressions} from {tableName} as {alias} where {condition}
             var str = new StringBuilder().Append(SqlCharSelect).Append(fieldExpressions).Append(SqlCharFrom).Append(BuildTableName(tableName, alias));
-            
+
             if (!string.IsNullOrEmpty(conditionExpressions))
                 str.Append(SqlCharWhere).Append(conditionExpressions);
 
             return str.ToString();
         }
+
+        public virtual string QueryFormat(string topExpression, string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, SqlOptions options)
+        {
+            if (string.IsNullOrEmpty(fieldExpressions))
+                throw new ArgumentNullException("fieldExpressions");
+            if (string.IsNullOrEmpty(tableExpression))
+                throw new ArgumentNullException("tableExpression");
+
+            //select [distinct][top(1)] {fieldExpressions} from {tableName} as {alias}
+            var str = new StringBuilder().Append(SqlCharSelect);
+            if ((options & SqlOptions.Distinct) > 0)
+                str.Append(SqlCharDistinct);
+            if (!string.IsNullOrEmpty(topExpression))
+                str.Append(SqlCharTop).Append('(').Append(topExpression).Append(')');
+
+            str.Append(fieldExpressions).Append(SqlCharFrom).Append(tableExpression);
+
+            if (!string.IsNullOrEmpty(conditionExpressions))
+                str.Append(SqlCharWhere).Append(conditionExpressions);
+
+            if (!string.IsNullOrEmpty(groupbyExpression))
+                str.Append(SqlCharGroupby).Append(groupbyExpression);
+
+            if (!string.IsNullOrEmpty(havingExpression))
+                str.Append(SqlCharHaving).Append(havingExpression);
+
+            if (!string.IsNullOrEmpty(orderbyExpression))
+                str.Append(SqlCharOrderby).Append(orderbyExpression);
+
+            return str.ToString();
+        }
+
     }
 }

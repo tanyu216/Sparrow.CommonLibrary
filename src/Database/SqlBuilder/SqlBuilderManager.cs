@@ -17,9 +17,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         static SqlBuilderManager()
         {
             builders = new ConcurrentDictionary<string, ISqlBuilder>();
-            builders["provider:system.Data.SqlClient"] = SqlServerStatementBuilder.Default;
-            builders["provider:System.Data.oracleclient"] = OracleStatementBuilder.Default;
-            builders["provider:System.Data.mysqlclient"] = MySqlStatementBuilder.Default;
+            builders["provider:system.data.sqlclient"] = SqlServerStatementBuilder.Default;
+            builders["provider:system.data.oracleclient"] = OracleStatementBuilder.Default;
+            builders["provider:system.data.mysqlclient"] = MySqlStatementBuilder.Default;
         }
 
         /// <summary>

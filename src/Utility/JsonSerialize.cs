@@ -28,7 +28,10 @@ namespace Sparrow.CommonLibrary.Utility
         {
             if (serializer == null)
                 throw new ArgumentNullException("serializer");
-            JsonSerialize.Serializer = serializer;
+            lock (JsonSerialize.Serializer)
+            {
+                JsonSerialize.Serializer = serializer;
+            }
         }
 
         /// <summary>
