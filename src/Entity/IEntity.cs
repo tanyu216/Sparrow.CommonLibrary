@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Sparrow.CommonLibrary.Database;
 
 namespace Sparrow.CommonLibrary.Entity
 {
@@ -32,15 +30,6 @@ namespace Sparrow.CommonLibrary.Entity
         /// <returns></returns>
         bool AnySetted();
 
-        /// <summary>
-        /// 将实体状态置为数据导入中
-        /// </summary>
-        void Importing();
-
-        /// <summary>
-        /// 将实体状态置为数据导入结束
-        /// </summary>
-        void Imported();
     }
 
 }

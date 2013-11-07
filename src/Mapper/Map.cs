@@ -11,7 +11,7 @@ namespace Sparrow.CommonLibrary.Mapper
     /// <summary>
     /// 
     /// </summary>
-    public static class MapperManager
+    public static class Map
     {
         private static readonly ConcurrentDictionary<Type, IMapper> Container =
             new ConcurrentDictionary<Type, IMapper>();
@@ -48,7 +48,7 @@ namespace Sparrow.CommonLibrary.Mapper
             if (Container.TryGetValue(entityType, out output))
                 return output;
 
-            var mapper = typeof(MapperManager).GetMethod("GetIMapper", new Type[0]).MakeGenericMethod(entityType).Invoke(null, new object[] { });
+            var mapper = typeof(Map).GetMethod("GetIMapper", new Type[0]).MakeGenericMethod(entityType).Invoke(null, new object[] { });
             if (mapper != null)
                 return (IMapper)mapper;
             //
@@ -99,9 +99,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static TDestination MapSingle<TDestination, TSource>(TSource source)
+        public static TDestination Single<TDestination, TSource>(TSource source)
         {
-            return Converter.DataConverter.CreateConverter<TDestination>(GetIMapper<TDestination>(), source).Next();
+            return DataSourceAdapter.Instance.Next<TDestination>(source);
         }
 
         /// <summary>
@@ -110,9 +110,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static List<TDestination> Map<TDestination, TSource>(TSource source)
+        public static List<TDestination> List<TDestination, TSource>(TSource source)
         {
-            return Converter.DataConverter.CreateConverter<TDestination>(GetIMapper<TDestination>(), source).Cast();
+            return DataSourceAdapter.Instance.Cast<TDestination>(source);
         }
     }
 }

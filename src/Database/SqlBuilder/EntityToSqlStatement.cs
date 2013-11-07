@@ -5,6 +5,7 @@ using Sparrow.CommonLibrary.Entity;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
+using Sparrow.CommonLibrary.Utility;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder
 {
@@ -162,7 +163,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         {
             if (id == null)
                 throw new ArgumentException("参数id不能为空。");
-            var mapper = MapperManager.GetIMapper<T>();
+            var mapper = Map.GetIMapper<T>();
             var keys = mapper.MetaInfo.GetKeys();
             if (keys.Length != 1)
             {

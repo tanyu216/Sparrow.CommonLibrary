@@ -8,7 +8,7 @@ namespace Sparrow.CommonLibrary.Mapper
     /// <summary>
     /// 实体对象的取值或赋值
     /// </summary>
-    public interface IPropertyValue
+    public interface IPropertyAccessor
     {
         /// <summary>
         /// 向对象的目标属性赋值
@@ -27,7 +27,7 @@ namespace Sparrow.CommonLibrary.Mapper
     /// <summary>
     /// 实体对象的取值或赋值
     /// </summary>
-    public interface IPropertyValue<T> : IPropertyValue
+    public interface IPropertyAccessor<T> : IPropertyAccessor
     {
         /// <summary>
         /// 向对象的目标属性赋值

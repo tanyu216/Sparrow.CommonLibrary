@@ -119,7 +119,7 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             public override IMapper<T> FindIMapper<T>()
             {
-                var mapper = new ObjectMapper<T>();
+                var mapper = new DataMapper<T>();
                 foreach (var property in typeof(T).GetProperties(BindingFlags.Public))
                 {
                     if (property.CanRead && property.CanWrite)

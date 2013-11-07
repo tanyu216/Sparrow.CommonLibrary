@@ -135,12 +135,13 @@ namespace Sparrow.CommonLibrary.Entity
         {
             _codeTypeDeclaration.BaseTypes.Add(new CodeTypeReference(_baseType));
             _codeTypeDeclaration.BaseTypes.Add(new CodeTypeReference(typeof(IEntity)));
+            _codeTypeDeclaration.BaseTypes.Add(new CodeTypeReference(typeof(IMappingTrigger)));
 
-            BuildIEntityMembers();
+            BuildInterfaceMembers();
             BuildOverrideProperties();
         }
 
-        private void BuildIEntityMembers()
+        private void BuildInterfaceMembers()
         {
             List<CodeTypeMember> members = new List<CodeTypeMember>();
 
@@ -206,14 +207,15 @@ namespace Sparrow.CommonLibrary.Entity
 
             #endregion
 
-            #region void Importing();
+            #region void Begin();
 
             CodeMemberField importingField = new CodeMemberField(typeof(bool), "_Importing");
             members.Add(importingField);
 
             CodeMemberMethod methodImporting = new CodeMemberMethod();
-            methodImporting.Name = "Importing";
+            methodImporting.Name = "Begin";
             methodImporting.PrivateImplementationType = new CodeTypeReference(typeof(IEntity));
+            methodImporting.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, fieldOperationState.Name), new CodePrimitiveExpression(DataState.NewOrModify)));
             methodImporting.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, importingField.Name), new CodePrimitiveExpression(true)));
             methodImporting.Statements.Add(new CodeMethodInvokeExpression(
                 new CodeMethodReferenceExpression(
@@ -224,10 +226,10 @@ namespace Sparrow.CommonLibrary.Entity
 
             #endregion
 
-            #region void Imported();
+            #region void End();
 
             CodeMemberMethod methodImported = new CodeMemberMethod();
-            methodImported.Name = "Imported";
+            methodImported.Name = "End";
             methodImported.PrivateImplementationType = new CodeTypeReference(typeof(IEntity));
             methodImported.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, importingField.Name), new CodePrimitiveExpression(false)));
             //

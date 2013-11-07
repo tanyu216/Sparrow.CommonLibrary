@@ -58,7 +58,7 @@ namespace Sparrow.CommonLibrary.Weblog
             // 初始化采集器
             Collecters = new ICollecter[Items.Length];
             var list = new List<ICollecterWithContext>();
-            for (var i = 0; i < Items.Length; i++)
+            for (var i = Items.Length - 1; i > -1; i--)
             {
                 var collect = CollecterTypeContainer.GetCollectType(Items[i]);
                 if (collect != null)
@@ -115,7 +115,7 @@ namespace Sparrow.CommonLibrary.Weblog
             if (disposed)
                 throw new ObjectDisposedException(this.GetType().Name);
             var data = new string[Items.Length];
-            for (var i = 0; i < data.Length; i++)
+            for (var i = data.Length - 1; i > -1; i--)
             {
                 try
                 {

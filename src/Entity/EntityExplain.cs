@@ -110,20 +110,24 @@ namespace Sparrow.CommonLibrary.Entity
             return entity.AnySetted();
         }
 
-        public void Importing()
+        #endregion
+
+        #region IMappingTrigger
+
+        public void Begin()
         {
-            var entity = Data as IEntity;
+            var entity = Data as IMappingTrigger;
             if (entity == null)
                 return;
-            entity.Importing();
+            entity.Begin();
         }
 
-        public void Imported()
+        public void End()
         {
-            var entity = Data as IEntity;
+            var entity = Data as IMappingTrigger;
             if (entity == null)
                 return;
-            entity.Imported();
+            entity.End();
         }
 
         #endregion
@@ -213,11 +217,11 @@ namespace Sparrow.CommonLibrary.Entity
             {
                 if (data is IEntity)
                 {
-                    _mapper = MapperManager.GetIMapper(((IEntity)data).EntityType);
+                    _mapper = Map.GetIMapper(((IEntity)data).EntityType);
                 }
                 else
                 {
-                    _mapper = MapperManager.GetIMapper(data.GetType());
+                    _mapper = Map.GetIMapper(data.GetType());
                 }
             }
             Data = data;

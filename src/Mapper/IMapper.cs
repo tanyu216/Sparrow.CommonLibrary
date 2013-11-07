@@ -13,13 +13,13 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        IPropertyValue this[string field] { get; }
+        IPropertyAccessor this[string field] { get; }
         /// <summary>
         /// 获取对象指定成员对象的属性读写器
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        IPropertyValue this[int index] { get; }
+        IPropertyAccessor this[int index] { get; }
         /// <summary>
         /// 对象元数据
         /// </summary>
@@ -59,13 +59,13 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        new IPropertyValue<T> this[string field] { get; }
+        new IPropertyAccessor<T> this[string field] { get; }
         /// <summary>
         /// 获取对象指定成员对象的属性读写器
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        new IPropertyValue<T> this[int index] { get; }
+        new IPropertyAccessor<T> this[int index] { get; }
         /// <summary>
         /// 创建一个类型为<see cref="T"/>实体对象
         /// </summary>

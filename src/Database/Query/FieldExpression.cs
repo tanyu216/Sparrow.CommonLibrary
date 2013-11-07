@@ -91,7 +91,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 throw new ArgumentNullException("field");
 
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            var fieldInfo = MapperManager.GetIMapper<T>().MetaInfo[propertyInfo];
+            var fieldInfo = Map.GetIMapper<T>().MetaInfo[propertyInfo];
             if (fieldInfo != null)
                 return fieldInfo.FieldName;
             throw new ArgumentException("参数不支持作为查询条件，因为无法获取该属性所映射的成员字段。");

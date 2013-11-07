@@ -12,7 +12,7 @@ using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using System.Linq.Expressions;
 using System.Reflection;
-using Sparrow.CommonLibrary.Mapper.Converter;
+using Sparrow.CommonLibrary.Mapper.DataSourceReader;
 using Sparrow.CommonLibrary.Database.Query;
 using Sparrow.CommonLibrary.Extenssions;
 
@@ -35,7 +35,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (typeof(T) == typeof(DynamicEntity))
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
             _database = database;
-            mapper = Mapper.MapperManager.GetIMapper<T>();
+            mapper = Mapper.Map.GetIMapper<T>();
         }
 
         protected ISqlBuilder SqlBuilder { get { return _database.Builder; } }

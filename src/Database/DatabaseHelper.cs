@@ -13,6 +13,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
+using Sparrow.CommonLibrary.Utility;
 
 namespace Sparrow.CommonLibrary.Database
 {
@@ -86,7 +87,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns></returns>
         internal protected string BuildDqlSql<T>(ConditionExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
         {
-            mapper = MapperManager.GetIMapper<T>();
+            mapper = Map.GetIMapper<T>();
             var metaInfo = mapper.MetaInfo;
             var fields = metaInfo.GetFieldNames();
             return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);
@@ -103,7 +104,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns></returns>
         internal protected string BuildDqlSql<T>(CompareExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
         {
-            mapper = MapperManager.GetIMapper<T>();
+            mapper = Map.GetIMapper<T>();
             var metaInfo = mapper.MetaInfo;
             var fields = metaInfo.GetFieldNames();
             return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);

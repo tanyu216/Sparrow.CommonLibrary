@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Sparrow.CommonLibrary.Utility;
 
 namespace Sparrow.CommonLibrary.Extenssions
 {
@@ -17,19 +18,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <returns></returns>
         private static T Cast<T>(object dbValue)
         {
-            if (dbValue is T)
-                return (T)dbValue;
-            if (dbValue == null || dbValue == DBNull.Value)
-                return default(T);
-
-            try
-            {
-                return (T)dbValue;
-            }
-            catch
-            {
-                return (T)Convert.ChangeType(dbValue, typeof(T));
-            }
+            return DbValueCast.Cast<T>(dbValue);
         }
 
         #region DataTable

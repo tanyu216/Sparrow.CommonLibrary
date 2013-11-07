@@ -13,7 +13,7 @@ namespace Sparrow.CommonLibrary.Mapper
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <remarks>此对象通过Lambda表达示树编译成委托实现对象属性的取值或赋值。</remarks>
-    public class ObjectPropertyValue<T> : IPropertyValue<T>
+    public class PropertyAccessor<T> : IPropertyAccessor<T>
     {
         readonly Func<T, object> _getter;
         readonly Action<T, object> _setter;
@@ -22,7 +22,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 
         /// </summary>
         /// <param name="field"></param>
-        public ObjectPropertyValue(PropertyInfo propertyInfo)
+        public PropertyAccessor(PropertyInfo propertyInfo)
         {
             var param1 = Expression.Parameter(typeof(T), "handler");
             var param2 = Expression.Parameter(typeof(object), "value");
@@ -59,7 +59,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
         protected virtual TPropertyType To<TPropertyType>(object value)
         {
-            return DbValueCast.Cast<TPropertyType>(value);
+            return Sparrow.CommonLibrary.Utility.DbValueCast.Cast<TPropertyType>(value);
         }
     }
 

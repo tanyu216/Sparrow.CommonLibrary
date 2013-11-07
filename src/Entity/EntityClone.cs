@@ -19,9 +19,9 @@ namespace Sparrow.CommonLibrary.Entity
         /// <returns></returns>
         public static T Clone(T source)
         {
-            var mapper = MapperManager.GetIMapper<T>();
+            var mapper = Map.GetIMapper<T>();
             var target = mapper.Create();
-            for (var i = 0; i < mapper.MetaInfo.FieldCount; i++)
+            for (var i = mapper.MetaInfo.FieldCount - 1; i > -1; i--)
             {
                 var property = mapper[i];
                 property.SetValue(target, property.GetValue(source));

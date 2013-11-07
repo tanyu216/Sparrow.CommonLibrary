@@ -38,8 +38,8 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             get
             {
                 if (string.IsNullOrEmpty(DefaultSettings.ConfigurationName))
-                    return "data";
-                return string.Concat(DefaultSettings.ConfigurationName, "/", "data");
+                    return "database";
+                return string.Concat(DefaultSettings.ConfigurationName, "/", "database");
             }
         }
 

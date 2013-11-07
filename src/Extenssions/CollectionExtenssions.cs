@@ -17,7 +17,7 @@ namespace Sparrow.CommonLibrary.Extenssions
             var random = new Random();
             var len = list.Count / 2;
             var max = list.Count;
-            for (int i = 0; i <= len; i++)
+            for (int i = 0; i <= len && i + 1 < max; i++)
             {
                 int rnd = random.Next(i + 1, max);
                 object val = list[i];
@@ -35,7 +35,7 @@ namespace Sparrow.CommonLibrary.Extenssions
             var random = new Random();
             var len = arrary.Length / 2;
             var max = arrary.Length;
-            for (int i = 0; i <= len; i++)
+            for (int i = 0; i <= len && i + 1 < max; i++)
             {
                 int rnd = random.Next(i + 1, max);
                 object val = arrary[i];

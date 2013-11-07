@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, null))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -86,7 +86,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -118,7 +118,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -148,7 +148,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -180,7 +180,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {
-                return MapperManager.MapSingle<T, IDataReader>(reader);
+                return Map.Single<T, IDataReader>(reader);
             }
         }
 
@@ -198,7 +198,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, null))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -229,7 +229,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -259,7 +259,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -291,7 +291,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -321,7 +321,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -353,7 +353,7 @@ namespace Sparrow.CommonLibrary.Database
             // 执行
             using (var reader = ExecuteReader(CommandType.Text, sql, parameters, transaction))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -371,7 +371,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, null))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -386,7 +386,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 
@@ -402,7 +402,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters, transaction))
             {
-                return MapperManager.Map<T, IDataReader>(reader);
+                return Map.List<T, IDataReader>(reader);
             }
         }
 

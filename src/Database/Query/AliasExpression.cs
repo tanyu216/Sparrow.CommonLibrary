@@ -9,7 +9,7 @@ namespace Sparrow.CommonLibrary.Database.Query
     {
         public SqlExpression Exp { get; protected set; }
 
-        public string Alias { get; protected set; }
+        public new string Alias { get; protected set; }
 
         protected AliasExpression()
         {

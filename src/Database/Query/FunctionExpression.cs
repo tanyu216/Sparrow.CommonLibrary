@@ -13,7 +13,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public string Name { get; protected set; }
 
-        public string Alias { get; set; }
+        public new string Alias { get; set; }
 
         public SqlExpression[] Arguments { get; protected set; }
 

@@ -109,7 +109,7 @@ namespace Sparrow.CommonLibrary.Database.Async
         /// <returns></returns>
         public static object EndExecuteScalar<T>(this DatabaseHelper helper, IAsyncResult asyncResult)
         {
-            return DbValueCast.Cast<T>(helper.Executer.EndExecuteScalar(asyncResult));
+            return Sparrow.CommonLibrary.Utility.DbValueCast.Cast<T>(helper.Executer.EndExecuteScalar(asyncResult));
         }
 
         /// <summary>

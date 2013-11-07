@@ -1,5 +1,5 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
+
 namespace Sparrow.CommonLibrary.Mapper.Metadata
 {
     /// <summary>

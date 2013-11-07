@@ -27,7 +27,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         public Queryable(DatabaseHelper database)
         {
             this.database = database;
-            mapper = MapperManager.GetIMapper<T>();
+            mapper = Map.GetIMapper<T>();
             fields = mapper.MetaInfo.GetFields();
             Options = SqlOptions.NoLock;
         }
@@ -334,17 +334,25 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public override string OutputSqlString(ISqlBuilder builder, ParameterCollection output)
         {
-            if (_fields == null)
+            if (_fields == null || _fields.Count == 0)
                 Fields.AddRang(mapper.MetaInfo.GetFieldNames().Select(x => SqlExpression.Field(x)));
 
+            var topExpressions = top > 0 ? builder.Constant(top) : string.Empty;
+            var fieldExpressions = Fields.OutputSqlString(builder, output);
+            var tableExpression = builder.BuildTableName(mapper.MetaInfo.Name);
+            var conditionExpressions = _condition != null ? _condition.OutputSqlString(builder, output) : string.Empty;
+            var groupbyExpression = _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty;
+            var havingExpression = _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty;
+            var orderbyExpression = _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "TRUE" : "FALSE"))) : string.Empty;
+
             return builder.QueryFormat(
-                top > 0 ? builder.Constant(top) : string.Empty,//top(10)
-                Fields.OutputSqlString(builder, output),//id,name,...
-                builder.BuildTableName(mapper.MetaInfo.Name),//tableName
-                _condition != null ? _condition.OutputSqlString(builder, output) : string.Empty,//where id>1 and...
-                _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty,//group by name....
-                _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty,//having count(name)>1 ...
-                _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "TRUE" : "FALSE"))) : string.Empty,//order id
+                topExpressions,//top(10)
+                fieldExpressions,//id,name,...
+                tableExpression,//tableName
+                conditionExpressions,//where id>1 and...
+                groupbyExpression,//group by name....
+                havingExpression,//having count(name)>1 ...
+                orderbyExpression,//order id
                 distinct ? Options & SqlOptions.Distinct : Options
                 );
 
@@ -379,7 +387,7 @@ namespace Sparrow.CommonLibrary.Database.Query
         private string GetFieldName(Expression<Func<T, object>> field)
         {
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            var fieldInfo = MapperManager.GetIMapper<T>().MetaInfo[propertyInfo];
+            var fieldInfo = Map.GetIMapper<T>().MetaInfo[propertyInfo];
             if (fieldInfo != null)
                 return fieldInfo.FieldName;
             throw new ArgumentException("无法获取该属性所映射的成员字段。");

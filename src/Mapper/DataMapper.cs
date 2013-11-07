@@ -15,13 +15,13 @@ namespace Sparrow.CommonLibrary.Mapper
     /// 内部数据映射的实现。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ObjectMapper<T> : IMapper<T>, IMetaInfo, IMetaInfoForDbTable
+    public class DataMapper<T> : IMapper<T>, IMetaInfo, IMetaInfoForDbTable
     {
 
         /// <summary>
         /// 默认初始化
         /// </summary>
-        public ObjectMapper()
+        public DataMapper()
             : this(null)
         { }
 
@@ -29,7 +29,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 初始化
         /// </summary>
         /// <param name="name">元数据名称</param>
-        public ObjectMapper(string name)
+        public DataMapper(string name)
         {
             Type type = typeof(T);
             if (type.IsClass == false)
@@ -48,13 +48,13 @@ namespace Sparrow.CommonLibrary.Mapper
 
         #region IMapper<T>
 
-        private IPropertyValue<T>[] _propertyValues;
+        private IPropertyAccessor<T>[] _propertyValues;
         private string[] _fieldNames;
         private Func<T> _creator;
         private readonly IDictionary<string, int> _fieldIndex;
         private ReaderWriterLock @lock;
 
-        IPropertyValue IMapper.this[string field]
+        IPropertyAccessor IMapper.this[string field]
         {
             get
             {
@@ -63,7 +63,7 @@ namespace Sparrow.CommonLibrary.Mapper
             }
         }
 
-        IPropertyValue IMapper.this[int index]
+        IPropertyAccessor IMapper.this[int index]
         {
             get
             {
@@ -73,7 +73,7 @@ namespace Sparrow.CommonLibrary.Mapper
             }
         }
 
-        public IPropertyValue<T> this[string field]
+        public IPropertyAccessor<T> this[string field]
         {
             get
             {
@@ -82,7 +82,7 @@ namespace Sparrow.CommonLibrary.Mapper
             }
         }
 
-        public IPropertyValue<T> this[int index]
+        public IPropertyAccessor<T> this[int index]
         {
             get
             {
@@ -252,7 +252,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="propertyExp"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public ObjectMapper<T> AppendField(Expression<Func<T, object>> propertyExp, string field)
+        public DataMapper<T> AppendField(Expression<Func<T, object>> propertyExp, string field)
         {
             TestReadonly();
             _currentField = new MetaField(this, field, propertyExp);
@@ -268,7 +268,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="extend"></param>
         /// <returns></returns>
-        public ObjectMapper<T> AddFieldExtend(IMetaFieldExtend extend)
+        public DataMapper<T> AddFieldExtend(IMetaFieldExtend extend)
         {
             TestReadonly();
             if (_currentField == null)
@@ -281,7 +281,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 操作最后添加的成员字段，将成员字段标识为主键字段。
         /// </summary>
         /// <returns></returns>
-        public ObjectMapper<T> MakeKey()
+        public DataMapper<T> MakeKey()
         {
             TestReadonly();
             if (_currentField == null)
@@ -296,7 +296,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="TValue"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public ObjectMapper<T> SetDefaultValue<TValue>(TValue value)
+        public DataMapper<T> SetDefaultValue<TValue>(TValue value)
         {
             TestReadonly();
             if (_currentField == null)
@@ -309,7 +309,7 @@ namespace Sparrow.CommonLibrary.Mapper
         #endregion
 
         private bool _ignoreInherirtr;
-        public ObjectMapper<T> IgnoreInherirtr()
+        public DataMapper<T> IgnoreInherirtr()
         {
             _ignoreInherirtr = true;
             return this;
@@ -320,13 +320,29 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="extend"></param>
         /// <returns></returns>
-        public ObjectMapper<T> AddExtend(IMetaInfoExtend extend)
+        public DataMapper<T> AddExtend(IMetaInfoExtend extend)
         {
             TestReadonly();
             if (extend == null)
                 throw new ArgumentNullException("extend");
             _extends.Add(extend);
             return this;
+        }
+
+        private static Func<PropertyInfo, PropertyAccessor<T>> _propertyAccessoCreater;
+        public static void ReSetPropertyAccessorCreater(Func<PropertyInfo, PropertyAccessor<T>> creater)
+        {
+            if (_propertyAccessoCreater == null)
+            {
+                _propertyAccessoCreater = creater;
+            }
+            else
+            {
+                lock (_propertyAccessoCreater)
+                {
+                    _propertyAccessoCreater = creater;
+                }
+            }
         }
 
         private bool _isReadonly;
@@ -343,7 +359,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 完成映射（生命周期内只能调用一次）。
         /// </summary>
         /// <returns></returns>
-        public ObjectMapper<T> Complete()
+        public DataMapper<T> Complete()
         {
             lock (this)
             {
@@ -352,14 +368,20 @@ namespace Sparrow.CommonLibrary.Mapper
                 if (_fields.Count == 0)
                     throw new MapperException("未设置任何成员字段。");
                 //
-                _propertyValues = new IPropertyValue<T>[_fields.Count];
+                _propertyValues = new IPropertyAccessor<T>[_fields.Count];
                 var keys = new List<IMetaFieldInfo>();
                 _fieldNames = new string[_fields.Count];
+
+                Func<PropertyInfo, PropertyAccessor<T>> creater;
+                if (null == (creater = _propertyAccessoCreater))
+                {
+                    creater = (x) => new PropertyAccessor<T>(x);
+                }
 
                 var i = 0;
                 foreach (var field in _fields.Values)
                 {
-                    _propertyValues[i] = new ObjectPropertyValue<T>(field.PropertyInfo);
+                    _propertyValues[i] = creater(field.PropertyInfo);
                     if (field.IsKey)
                     {
                         keys.Add(field);

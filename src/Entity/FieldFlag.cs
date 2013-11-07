@@ -147,7 +147,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// </summary>
         public void Clean()
         {
-            for (int i = 0; i < _values.Length; i++)
+            for (int i = _values.Length - 1; i > -1; i--)
             {
                 _values[i] = 0;
             }

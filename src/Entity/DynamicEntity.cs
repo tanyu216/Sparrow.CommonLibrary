@@ -96,7 +96,7 @@ namespace Sparrow.CommonLibrary.Entity
                 throw new ArgumentNullException("record");
             _isImporting = true;
             _fieldModified.Clear();
-            for (int i = 0; i < record.FieldCount; i++)
+            for (int i = record.FieldCount - 1; i > -1; i--)
             {
                 SetFieldValue(record.GetName(i), record[i]);
             }
@@ -114,7 +114,7 @@ namespace Sparrow.CommonLibrary.Entity
                 throw new ArgumentNullException("row");
             _isImporting = true;
             _fieldModified.Clear();
-            for (var i = 0; i < row.ItemArray.Length; i++)
+            for (var i = row.ItemArray.Length - 1; i > -1; i--)
             {
                 SetFieldValue(row.Table.Columns[i].ColumnName, row.ItemArray[i]);
             }
@@ -133,7 +133,7 @@ namespace Sparrow.CommonLibrary.Entity
 
             _isImporting = true;
             _fieldModified.Clear();
-            for (var i = 0; i < values.Length; i++)
+            for (var i = values.Length; i > -1; i--)
             {
                 SetFieldValue(fields[i], values[i]);
             }

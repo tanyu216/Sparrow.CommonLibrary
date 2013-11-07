@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
-using Sparrow.CommonLibrary.Database;
 
 namespace Sparrow.CommonLibrary.Entity
 {
     /// <summary>
     /// 实体信息阐述
     /// </summary>
-    public interface IEntityExplain : IEntityFieldAccessor, IEntity, IMetaInfo
+    public interface IEntityExplain : IEntityFieldAccessor, IEntity, IMetaInfo, IMappingTrigger
     {
         /// <summary>
         /// 获取或设置成员字段的值

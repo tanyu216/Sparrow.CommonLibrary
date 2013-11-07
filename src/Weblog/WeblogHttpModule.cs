@@ -60,12 +60,14 @@ namespace Sparrow.CommonLibrary.Weblog
             //如果忽略数据采集直接跳过，不注册事件
             if (Skip)
                 return;
+
             var rawUrl = app.Request.RawUrl;
-            for (var i = 0; i < Ignores.Length; i++)
+            foreach (var ignore in Ignores)
             {
-                if (Ignores[i].IsMatch(rawUrl))
+                if (ignore.IsMatch(rawUrl))
                     return;
             }
+
             //注册事件
             app.BeginRequest += new EventHandler(Application_BeginRequest);
             app.EndRequest += new EventHandler(Application_EndRequest);
