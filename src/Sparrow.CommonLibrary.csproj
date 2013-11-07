@@ -109,10 +109,10 @@
     <Compile Include="Extenssions\OtherExtenssions.cs" />
     <Compile Include="Extenssions\ValidationExtenssions.cs" />
     <Compile Include="Mapper\DataSourceAdapter.cs" />
-    <Compile Include="Mapper\DataSourceReader\DataReaderProvider.cs" />
-    <Compile Include="Mapper\DataSourceReader\DataTableProvider.cs" />
-    <Compile Include="Mapper\DataSourceReader\IDataSourceReader.cs" />
-    <Compile Include="Mapper\DataSourceReader\IDataSourceReaderProvider.cs" />
+    <Compile Include="Mapper\DataSource\DataReaderProvider.cs" />
+    <Compile Include="Mapper\DataSource\DataTableProvider.cs" />
+    <Compile Include="Mapper\DataSource\IDataSourceReader.cs" />
+    <Compile Include="Mapper\DataSource\IDataSourceReaderProvider.cs" />
     <Compile Include="Mapper\IMappingTrigger.cs" />
     <Compile Include="Utility\DbValueCast.cs" />
     <Compile Include="Mapper\IMapper.cs" />
