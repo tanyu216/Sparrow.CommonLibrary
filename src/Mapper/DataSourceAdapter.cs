@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sparrow.CommonLibrary.Entity;
-using Sparrow.CommonLibrary.Mapper.DataSourceReader;
+using Sparrow.CommonLibrary.Mapper.DataSource;
 
 namespace Sparrow.CommonLibrary.Mapper
 {

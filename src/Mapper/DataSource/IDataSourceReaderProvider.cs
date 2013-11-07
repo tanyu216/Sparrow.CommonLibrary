@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sparrow.CommonLibrary.Mapper.DataSourceReader
+namespace Sparrow.CommonLibrary.Mapper.DataSource
 {
     public interface IDataSourceReaderProvider
     {
