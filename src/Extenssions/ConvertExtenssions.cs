@@ -107,7 +107,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// </summary>
         /// <param name="val">System.String</param>
         /// <returns>如果转换失败将返回 System.Int32的默认值</returns>
-        public static int ToInt(this object val)
+        public static int ToInt(this string val)
         {
             return val.ToInt(default(int));
         }
@@ -117,15 +117,13 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <param name="val">System.String</param>
         /// <param name="defVal">在转换成 T 失败时，返回的默认值</param>
         /// <returns>如果转换失败将返回 defVal</returns>
-        public static int ToInt(this object val, int defVal)
+        public static int ToInt(this string val, int defVal)
         {
             if (val == null)
                 return defVal;
-            if (val is int)
-                return (int)val;
 
             int val2;
-            if (int.TryParse(val.ToString(), out val2))
+            if (int.TryParse(val, out val2))
                 return val2;
             return defVal;
         }
@@ -151,7 +149,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// </summary>
         /// <param name="val">System.String</param>
         /// <returns>如果转换失败将返回 System.Decimal 的默认值</returns>
-        public static decimal ToDecimal(this object val)
+        public static decimal ToDecimal(this string val)
         {
             return val.ToDecimal(default(decimal));
         }
@@ -161,15 +159,13 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <param name="val">System.String</param>
         /// <param name="defVal">在转换成 T 失败时，返回的默认值</param>
         /// <returns>如果转换失败将返回 defVal</returns>
-        public static decimal ToDecimal(this object val, decimal defVal)
+        public static decimal ToDecimal(this string val, decimal defVal)
         {
             if (val == null)
                 return defVal;
-            if (val is decimal)
-                return (decimal)val;
 
             decimal val2;
-            if (decimal.TryParse(val.ToString(), out val2))
+            if (decimal.TryParse(val, out val2))
                 return val2;
             return defVal;
         }
@@ -199,17 +195,16 @@ namespace Sparrow.CommonLibrary.Extenssions
 
         #region To DateTime
 
-        public static DateTime ToDateTime(this object value)
+        public static DateTime ToDateTime(this string value)
         {
             return ToDateTime(value, default(DateTime));
         }
 
-        public static DateTime ToDateTime(this object value, DateTime defVal)
+        public static DateTime ToDateTime(this string value, DateTime defVal)
         {
             if (value == null)
                 return defVal;
-            if (value is DateTime)
-                return (DateTime)value;
+
             try
             {
                 return Convert.ToDateTime(value);
@@ -230,8 +225,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         {
             if (value == null)
                 return defVal;
-            if (value is bool)
-                return (bool)value;
+
             bool val2;
             if (bool.TryParse(value.ToString(), out val2))
                 return val2;
