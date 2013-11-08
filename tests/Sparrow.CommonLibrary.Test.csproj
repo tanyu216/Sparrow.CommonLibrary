@@ -45,6 +45,10 @@
     <Compile Include="Cache\CacheManagerTest.cs" />
     <Compile Include="Cryptography\CryptTest.cs" />
     <Compile Include="Cryptography\HashTest.cs" />
+    <Compile Include="Extenssions\CollectionExtenssionsTest.cs" />
+    <Compile Include="Extenssions\ConvertExtenssionsTest.cs" />
+    <Compile Include="Extenssions\DataExtenssionsTest.cs" />
+    <Compile Include="Extenssions\ValidationExtenssionsTest.cs" />
     <Compile Include="Mapper\DataMapperTest.cs" />
     <Compile Include="Mapper\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

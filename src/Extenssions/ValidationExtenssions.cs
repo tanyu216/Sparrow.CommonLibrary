@@ -75,7 +75,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static bool IsDate(this string str)
+        public static bool IsDateTime(this string str)
         {
             DateTime date;
             return DateTime.TryParse(str, out date);
@@ -98,30 +98,31 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <returns></returns>
         public static bool IsCreditCard(this string str)
         {
-            if (!Regex.IsMatch(str, @"[^0-9 \-]+"))
+            if (!Regex.IsMatch(str, @"[0-9 \-]+"))
                 return false;
 
-            var nCheck = 0;
-            var nDigit = 0;
-            var bEven = false;
+            var sum = 0;
+            var digit = 0;
+            var timesTwo = false;
 
             str = Regex.Replace(str, @"\D", "", RegexOptions.IgnoreCase);
+            if (str.Length != 13 && str.Length != 16)
+                return false;
 
             for (var n = str.Length - 1; n >= 0; n--)
             {
-                nDigit = Convert.ToInt32(str.Substring(n, 1));
-                if (bEven)
+                digit = Convert.ToInt32(str.Substring(n, 1));
+                if (timesTwo)
                 {
-                    if ((nDigit *= 2) > 9)
-                    {
-                        nDigit -= 9;
-                    }
+                    digit *= 2;
+                    if (digit > 9)
+                        digit -= 9;
                 }
-                nCheck += nDigit;
-                bEven = !bEven;
+                sum += digit;
+                timesTwo = !timesTwo;
             }
 
-            return (nCheck % 10) == 0;
+            return (sum % 10) == 0;
         }
 
         private static readonly char[] IDCardCHNVerifyCode = "1,0,x,9,8,7,6,5,4,3,2".Split(',').Select(x => x[0]).ToArray();

@@ -47,18 +47,18 @@ namespace Sparrow.CommonLibrary.Extenssions
                                                           });
         }
 
-        #region To T
+        #region Cast T
 
         /// <summary>
         /// 将字符转换成自己的类型
         /// </summary>
         /// <param name="val">System.String</param>
         /// <returns>如果转换失败将返回 T 的默认值</returns>
-        public static T To<T>(this object val)
+        public static T Cast<T>(this object val)
         {
             if (val != null)
             {
-                return val.To(default(T));
+                return val.Cast(default(T));
             }
             return default(T);
         }
@@ -69,7 +69,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <param name="val">System.Object</param>
         /// <param name="defVal">在转换成 T 失败时，返回的默认值</param>
         /// <returns>类型 T 的值</returns>
-        public static T To<T>(this object val, T defVal)
+        public static T Cast<T>(this object val, T defVal)
         {
             if (val == null)
                 return defVal;
@@ -79,7 +79,7 @@ namespace Sparrow.CommonLibrary.Extenssions
             Type type = typeof(T);
             try
             {
-                if (type.BaseType == typeof(Enum))
+                if (type.IsEnum)
                 {
                     return (T)Enum.Parse(type, val.ToString(), true);
                 }
@@ -216,12 +216,12 @@ namespace Sparrow.CommonLibrary.Extenssions
 
         #region To bool
 
-        public static bool ToBoolean(this object value)
+        public static bool ToBoolean(this string value)
         {
             return ToBoolean(value, default(bool));
         }
 
-        public static bool ToBoolean(this object value, bool defVal)
+        public static bool ToBoolean(this string value, bool defVal)
         {
             if (value == null)
                 return defVal;
