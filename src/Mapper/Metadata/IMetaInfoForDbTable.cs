@@ -14,6 +14,6 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
         /// <summary>
         /// 自动增长标识
         /// </summary>
-        IdentityMetaFieldExtend Identity { get; }
+        IncrementFieldExtend Identity { get; }
     }
 }

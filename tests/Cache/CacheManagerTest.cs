@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sparrow.CommonLibrary.Cache;
 
-namespace Sparrow.CommonLibrary.Cache.Test
+namespace Sparrow.CommonLibrary.Test.Cache
 {
     [TestFixture]
     public class CacheManagerTest

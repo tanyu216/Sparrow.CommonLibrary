@@ -124,8 +124,6 @@ namespace Sparrow.CommonLibrary.Mapper
                 {
                     if (property.CanRead && property.CanWrite)
                     {
-                        if (property.GetGetMethod().IsVirtual == false)
-                            mapper.IgnoreInherirtr();
                         var handler = Expression.Parameter(typeof(T), "x");
                         var exp = Expression.Lambda<Func<T, object>>(Expression.MakeMemberAccess(handler, property), handler);
                         mapper.AppendField(exp, property.Name);

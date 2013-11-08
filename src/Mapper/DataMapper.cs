@@ -17,7 +17,6 @@ namespace Sparrow.CommonLibrary.Mapper
     /// <typeparam name="T"></typeparam>
     public class DataMapper<T> : IMapper<T>, IMetaInfo, IMetaInfoForDbTable
     {
-
         /// <summary>
         /// 默认初始化
         /// </summary>
@@ -35,24 +34,18 @@ namespace Sparrow.CommonLibrary.Mapper
             if (type.IsClass == false)
                 throw new MapperException(string.Format("类型[{0}]不是一个合法的实体类型。", type.FullName));
 
-            var ctor = type.GetConstructor(new Type[0]);
-            if (ctor == null)
-                throw new MapperException(string.Format("类型[{0}]无默认构造函数。", type.FullName));
             //
             _name = name;
-            _fields = new ConcurrentDictionary<string, IMetaFieldInfo>();
-            _extends = new ConcurrentBag<IMetaInfoExtend>();
+            _fieldsDic = new Dictionary<string, IMetaFieldInfo>();
+            _extends = new List<IMetaInfoExtend>();
             _fieldIndex = new Dictionary<string, int>();
-            @lock = new ReaderWriterLock();
         }
 
         #region IMapper<T>
 
         private IPropertyAccessor<T>[] _propertyValues;
-        private string[] _fieldNames;
         private Func<T> _creator;
         private readonly IDictionary<string, int> _fieldIndex;
-        private ReaderWriterLock @lock;
 
         IPropertyAccessor IMapper.this[string field]
         {
@@ -113,17 +106,9 @@ namespace Sparrow.CommonLibrary.Mapper
             if (string.IsNullOrWhiteSpace(field))
                 throw new ArgumentNullException("field");
             //
-            @lock.AcquireReaderLock(-1);
-            try
-            {
-                int idx;
-                if (_fieldIndex.TryGetValue(field.ToLower(), out idx))
-                    return idx;
-            }
-            finally
-            {
-                @lock.ReleaseReaderLock();
-            }
+            int idx;
+            if (_fieldIndex.TryGetValue(field.ToLower(), out idx))
+                return idx;
             return -1;
         }
 
@@ -148,9 +133,12 @@ namespace Sparrow.CommonLibrary.Mapper
 
         #region IMetaInfo
 
-        private readonly ConcurrentDictionary<string, IMetaFieldInfo> _fields;
+        private readonly IDictionary<string, IMetaFieldInfo> _fieldsDic;
         private IMetaFieldInfo[] _keys;
-        private readonly ConcurrentBag<IMetaInfoExtend> _extends;
+        private string[] _keyNames;
+        private IMetaFieldInfo[] _fields;
+        private string[] _fieldNames;
+        private readonly List<IMetaInfoExtend> _extends;
 
         private readonly string _name;
 
@@ -166,7 +154,7 @@ namespace Sparrow.CommonLibrary.Mapper
             get { return _keyCount; }
         }
 
-        int IMetaInfo.FieldCount { get { return _fields.Count; } }
+        int IMetaInfo.FieldCount { get { return _fieldsDic.Count; } }
 
         IMetaFieldInfo IMetaInfo.this[string field]
         {
@@ -174,8 +162,9 @@ namespace Sparrow.CommonLibrary.Mapper
             {
                 if (string.IsNullOrEmpty(field))
                     throw new ArgumentNullException("field");
+
                 IMetaFieldInfo metaField;
-                if (_fields.TryGetValue(field, out metaField))
+                if (_fieldsDic.TryGetValue(field, out metaField))
                     return metaField;
                 return null;
             }
@@ -187,7 +176,7 @@ namespace Sparrow.CommonLibrary.Mapper
             {
                 if (propertyInfo == null)
                     throw new ArgumentNullException("propertyInfo");
-                foreach (var info in _fields.Values)
+                foreach (var info in _fields)
                     if (info.PropertyInfo == propertyInfo)
                         return info;
                 //
@@ -205,23 +194,22 @@ namespace Sparrow.CommonLibrary.Mapper
 
         string[] IMetaInfo.GetKeys()
         {
-            var keys = new string[_keys.Length];
-            for (var i = 0; i < keys.Length; i++)
-                keys[i] = _keys[i].FieldName;
+            var keys = new string[_keyNames.Length];
+            _keyNames.CopyTo(keys, 0);
             return keys;
         }
 
         string[] IMetaInfo.GetFieldNames()
         {
-            var fields = new string[_fields.Count];
-            _fields.Keys.CopyTo(fields, 0);
+            var fields = new string[_fieldNames.Length];
+            _fieldNames.CopyTo(fields, 0);
             return fields;
         }
 
         IMetaFieldInfo[] IMetaInfo.GetFields()
         {
-            var fields = new IMetaFieldInfo[_fields.Count];
-            _fields.Values.CopyTo(fields, 0);
+            var fields = new IMetaFieldInfo[_fields.Length];
+            _fields.CopyTo(fields, 0);
             return fields;
         }
 
@@ -238,8 +226,8 @@ namespace Sparrow.CommonLibrary.Mapper
 
         #region IMetaDbTable
 
-        private IdentityMetaFieldExtend _identity;
-        public IdentityMetaFieldExtend Identity { get { return _identity; } }
+        private IncrementFieldExtend _identity;
+        public IncrementFieldExtend Identity { get { return _identity; } }
 
         #endregion
 
@@ -255,11 +243,13 @@ namespace Sparrow.CommonLibrary.Mapper
         public DataMapper<T> AppendField(Expression<Func<T, object>> propertyExp, string field)
         {
             TestReadonly();
-            _currentField = new MetaField(this, field, propertyExp);
-            if (!_fields.TryAdd(field, _currentField))
-            {
+            var metafield = new MetaField(this, field, propertyExp);
+
+            if (_fieldsDic.ContainsKey(field))
                 throw new MapperException("添加成员字段失败。");
-            }
+
+            _fieldsDic.Add(field, metafield);
+            _currentField = metafield;
             return this;
         }
 
@@ -291,6 +281,28 @@ namespace Sparrow.CommonLibrary.Mapper
         }
 
         /// <summary>
+        /// 操作最后添加的成员字段，将成员字段标识为自动增长字段。
+        /// </summary>
+        /// <returns></returns>
+        public DataMapper<T> MakeIncrement()
+        {
+            return MakeIncrement(null);
+        }
+
+        /// <summary>
+        /// 操作最后添加的成员字段，将成员字段标识为自动增长字段。
+        /// </summary>
+        /// <returns></returns>
+        public DataMapper<T> MakeIncrement(string incrementName)
+        {
+            TestReadonly();
+            if (_currentField == null)
+                throw new MapperException("未包含任何成员字段。");
+            _identity = new IncrementFieldExtend(_currentField, incrementName);
+            return this;
+        }
+
+        /// <summary>
         /// 操作最后添加的成员字段，设置成员字段的默认值。
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
@@ -307,13 +319,6 @@ namespace Sparrow.CommonLibrary.Mapper
         }
 
         #endregion
-
-        private bool _ignoreInherirtr;
-        public DataMapper<T> IgnoreInherirtr()
-        {
-            _ignoreInherirtr = true;
-            return this;
-        }
 
         /// <summary>
         /// 增加对象的扩展信息。
@@ -355,6 +360,53 @@ namespace Sparrow.CommonLibrary.Mapper
                 throw new InvalidOperationException(string.Format("{0}在只读状态下无法完成修改操作。", typeof(IMetaFieldInfo).FullName));
         }
 
+        private void Reorganize()
+        {
+            TestReadonly();
+            //
+            if (_fieldsDic.Count == 0)
+                throw new MapperException("未设置任何成员字段。");
+            //
+            _propertyValues = new IPropertyAccessor<T>[_fieldsDic.Count];
+            var keys = new List<IMetaFieldInfo>();
+            _fieldNames = new string[_fieldsDic.Count];
+
+            Func<PropertyInfo, PropertyAccessor<T>> creater;
+            if (null == (creater = _propertyAccessoCreater))
+            {
+                creater = (x) => new PropertyAccessor<T>(x);
+            }
+
+            var i = 0;
+            foreach (var field in _fieldsDic.Values)
+            {
+                _propertyValues[i] = creater(field.PropertyInfo);
+                if (field.IsKey)
+                {
+                    keys.Add(field);
+                }
+                _fieldNames[i] = field.FieldName;
+                //
+                _fieldIndex.Add(field.FieldName.ToLower(), i);
+                //
+                var identity = ((IncrementFieldExtend)field.GetExtends().FirstOrDefault(x => x is IncrementFieldExtend));
+                if (identity != null)
+                {
+                    if (_identity != null)
+                        throw new MapperException("一个实体映射只能包含一个自增长标识。");
+                    _identity = identity;
+                }
+                //
+                ((MetaField)field).MakeReadonly();
+                //
+                i++;
+            }
+            _keys = keys.ToArray();
+            _keyNames = keys.Select(x => x.FieldName).ToArray();
+            _keyCount = keys.Count;
+            _fields = _fieldsDic.Values.ToArray();
+        }
+
         /// <summary>
         /// 完成映射（生命周期内只能调用一次）。
         /// </summary>
@@ -363,61 +415,36 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             lock (this)
             {
-                TestReadonly();
-                //
-                if (_fields.Count == 0)
-                    throw new MapperException("未设置任何成员字段。");
-                //
-                _propertyValues = new IPropertyAccessor<T>[_fields.Count];
-                var keys = new List<IMetaFieldInfo>();
-                _fieldNames = new string[_fields.Count];
+                Reorganize();
 
-                Func<PropertyInfo, PropertyAccessor<T>> creater;
-                if (null == (creater = _propertyAccessoCreater))
-                {
-                    creater = (x) => new PropertyAccessor<T>(x);
-                }
+                var ctor = typeof(T).GetConstructor(new Type[0]);
+                if (ctor == null)
+                    throw new MapperException(string.Format("类型[{0}]无默认构造函数。", typeof(T).FullName));
 
-                var i = 0;
-                foreach (var field in _fields.Values)
-                {
-                    _propertyValues[i] = creater(field.PropertyInfo);
-                    if (field.IsKey)
-                    {
-                        keys.Add(field);
-                    }
-                    _fieldNames[i] = field.FieldName;
-                    //
-                    _fieldIndex.Add(field.FieldName.ToLower(), i);
-                    //
-                    var identity = ((IdentityMetaFieldExtend)field.GetExtends().FirstOrDefault(x => x is IdentityMetaFieldExtend));
-                    if (identity != null)
-                    {
-                        if (_identity != null)
-                            throw new MapperException("一个实体映射只能包含一个自增长标识。");
-                        _identity = identity;
-                    }
-                    //
-                    ((MetaField)field).MakeReadonly();
-                    //
-                    i++;
-                }
-                _keys = keys.ToArray();
-                _keyCount = keys.Count;
-                //
+                _creator = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
 
-                if (this._name == null || _ignoreInherirtr)
-                {
-                    var be = Expression.Block(Expression.New(typeof(T)));
-                    _creator = Expression.Lambda<Func<T>>(be).Compile();
-                }
-                else
-                {
-                    var _newEntityType = EntityBuilder.BuilderEntityClass(typeof(T), this);
-                    var be = Expression.Block(Expression.New(_newEntityType));
-                    _creator = Expression.Lambda<Func<T>>(be).Compile();
-                }
-                //
+                _isReadonly = true;
+            }
+            //
+            return this;
+        }
+
+        /// <summary>
+        /// 完成映射（生命周期内只能调用一次）。
+        /// </summary>
+        /// <param name="builder">自定义类型<typeparamref name="T"/>的实例化。</param>
+        /// <returns></returns>
+        public DataMapper<T> Complete(Func<DataMapper<T>, Func<T>> builder)
+        {
+            if (builder == null)
+                throw new ArgumentNullException("builder");
+
+            lock (this)
+            {
+                Reorganize();
+
+                _creator = builder(this);
+
                 _isReadonly = true;
             }
             //
@@ -432,13 +459,16 @@ namespace Sparrow.CommonLibrary.Mapper
 
             public MetaField(IMapper<T> metaInfo, string field, Expression<Func<T, object>> propertyExp)
             {
-                if (_mapper == null)
+                if (metaInfo == null)
                     throw new ArgumentNullException("metaInfo");
-                if (string.IsNullOrWhiteSpace(_feild))
+                if (string.IsNullOrWhiteSpace(field))
                     throw new ArgumentNullException("field");
+                if (propertyExp == null)
+                    throw new ArgumentNullException("propertyExp");
+
                 //
                 _mapper = metaInfo;
-                _feild = field;
+                _field = field;
                 _expression = propertyExp;
                 _propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(propertyExp).Member;
                 _extends = new ConcurrentBag<IMetaFieldExtend>();
@@ -454,10 +484,10 @@ namespace Sparrow.CommonLibrary.Mapper
             private readonly PropertyInfo _propertyInfo;
             public PropertyInfo PropertyInfo { get { return _propertyInfo; } }
 
-            private readonly string _feild;
+            private readonly string _field;
             public string FieldName
             {
-                get { return _feild; }
+                get { return _field; }
             }
 
             private bool _isKey;

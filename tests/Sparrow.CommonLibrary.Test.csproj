@@ -45,6 +45,8 @@
     <Compile Include="Cache\CacheManagerTest.cs" />
     <Compile Include="Cryptography\CryptTest.cs" />
     <Compile Include="Cryptography\HashTest.cs" />
+    <Compile Include="Mapper\DataMapperTest.cs" />
+    <Compile Include="Mapper\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

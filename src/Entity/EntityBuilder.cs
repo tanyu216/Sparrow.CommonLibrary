@@ -35,7 +35,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="baseType"></param>
         /// <param name="metaInfo"></param>
         /// <returns></returns>
-        public static Type BuilderEntityClass(Type baseType, IMetaInfo metaInfo)
+        public static Type BuildEntityClass(Type baseType, IMetaInfo metaInfo)
         {
             if (baseType == null)
                 throw new ArgumentNullException("baseType");
@@ -44,6 +44,12 @@ namespace Sparrow.CommonLibrary.Entity
             if (_creater != null)
                 return _creater().BuildEntityType(baseType, metaInfo);
             return new EntityBuilder().BuildEntityType(baseType, metaInfo);
+        }
+
+        public static Func<T> BuildEntityClass<T>(IMetaInfo metaInfo)
+        {
+            var subType = BuildEntityClass(typeof(T), metaInfo);
+            return Expression.Lambda<Func<T>>(Expression.New(subType)).Compile();
         }
 
         private static int _next = -1;
@@ -181,6 +187,7 @@ namespace Sparrow.CommonLibrary.Entity
             methodIsSetted.ReturnType = new CodeTypeReference(typeof(bool));
             methodIsSetted.Parameters.Add(new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "index"));
             methodIsSetted.Statements.Add(new CodeMethodReturnStatement(new CodeMethodInvokeExpression(_indexer, "HasMarked", new CodeVariableReferenceExpression("index"))));
+            members.Add(methodIsSetted);
 
             #endregion
 
@@ -190,8 +197,8 @@ namespace Sparrow.CommonLibrary.Entity
             methodAnySetted.Name = "AnySetted";
             methodAnySetted.PrivateImplementationType = new CodeTypeReference(typeof(IEntity));
             methodAnySetted.ReturnType = new CodeTypeReference(typeof(bool));
-            methodAnySetted.Parameters.Add(new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "index"));
             methodAnySetted.Statements.Add(new CodeMethodReturnStatement(new CodeMethodInvokeExpression(_indexer, "HasMarked")));
+            members.Add(methodAnySetted);
 
             #endregion
 
@@ -214,8 +221,8 @@ namespace Sparrow.CommonLibrary.Entity
 
             CodeMemberMethod methodImporting = new CodeMemberMethod();
             methodImporting.Name = "Begin";
-            methodImporting.PrivateImplementationType = new CodeTypeReference(typeof(IEntity));
-            methodImporting.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, fieldOperationState.Name), new CodePrimitiveExpression(DataState.NewOrModify)));
+            methodImporting.PrivateImplementationType = new CodeTypeReference(typeof(IMappingTrigger));
+            methodImporting.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, fieldOperationState.Name), new CodeCastExpression(new CodeTypeReference(typeof(DataState)), new CodePrimitiveExpression((int)DataState.NewOrModify))));
             methodImporting.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, importingField.Name), new CodePrimitiveExpression(true)));
             methodImporting.Statements.Add(new CodeMethodInvokeExpression(
                 new CodeMethodReferenceExpression(
@@ -230,7 +237,7 @@ namespace Sparrow.CommonLibrary.Entity
 
             CodeMemberMethod methodImported = new CodeMemberMethod();
             methodImported.Name = "End";
-            methodImported.PrivateImplementationType = new CodeTypeReference(typeof(IEntity));
+            methodImported.PrivateImplementationType = new CodeTypeReference(typeof(IMappingTrigger));
             methodImported.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(thisRef, importingField.Name), new CodePrimitiveExpression(false)));
             //
             members.Add(methodImported);
@@ -303,7 +310,7 @@ namespace Sparrow.CommonLibrary.Entity
                 var methodIndexerCall = new CodeMethodInvokeExpression(
                     new CodeMethodReferenceExpression(
                         new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_indexer"),
-                        "SetValue"),
+                        "Mark"),
                         new CodePrimitiveExpression(((IMapper)field.MetaInfo).IndexOf(field.FieldName)));
                 var condtion1 = new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(

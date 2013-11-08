@@ -120,7 +120,7 @@
     <Compile Include="Mapper\MapperException.cs" />
     <Compile Include="Mapper\MapperFinder.cs" />
     <Compile Include="Mapper\Map.cs" />
-    <Compile Include="Mapper\Metadata\IdentityMetaFieldExtend.cs" />
+    <Compile Include="Mapper\Metadata\IncrementFieldExtend.cs" />
     <Compile Include="Mapper\Metadata\IMetaFieldExtend.cs" />
     <Compile Include="Mapper\Metadata\IMetaFieldInfo.cs" />
     <Compile Include="Mapper\Metadata\IMetaInfo.cs" />

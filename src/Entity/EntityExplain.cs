@@ -174,7 +174,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         #region IMetaDbTable
 
-        public IdentityMetaFieldExtend Identity
+        public IncrementFieldExtend Identity
         {
             get
             {

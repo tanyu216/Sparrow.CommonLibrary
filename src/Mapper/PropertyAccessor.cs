@@ -32,7 +32,7 @@ namespace Sparrow.CommonLibrary.Mapper
             // 向属性赋值的方法
             var assignExp = Expression.Assign(
                     Expression.Property(param1, propertyInfo),
-                    Expression.Call(this.GetType(), "To", new Type[] { propertyInfo.PropertyType }, new ParameterExpression[] { param2 })
+                    Expression.Call(Expression.Constant(this), "To", new Type[] { propertyInfo.PropertyType }, new ParameterExpression[] { param2 })
                 );
             _setter = Expression.Lambda<Action<T, object>>(assignExp, param1, param2).Compile();
         }
@@ -57,7 +57,7 @@ namespace Sparrow.CommonLibrary.Mapper
             return _getter(handler);
         }
 
-        protected virtual TPropertyType To<TPropertyType>(object value)
+        public virtual TPropertyType To<TPropertyType>(object value)
         {
             return Sparrow.CommonLibrary.Utility.DbValueCast.Cast<TPropertyType>(value);
         }

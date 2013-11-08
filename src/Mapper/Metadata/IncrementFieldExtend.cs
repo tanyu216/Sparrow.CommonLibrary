@@ -9,7 +9,7 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
     /// <summary>
     /// 自动增长标识，应用于数据库的成员字段扩展。
     /// </summary>
-    public class IdentityMetaFieldExtend : IMetaFieldExtend
+    public class IncrementFieldExtend : IMetaFieldExtend
     {
         private readonly string _name;
         public string Name { get { return _name; } }
@@ -27,8 +27,8 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
         /// 初始化
         /// </summary>
         /// <param name="name"></param>
-        public IdentityMetaFieldExtend(IMetaFieldInfo field, string name)
-            : this(field, name, 0)
+        public IncrementFieldExtend(IMetaFieldInfo field, string name)
+            : this(field, name, 1)
         {
         }
 
@@ -36,7 +36,7 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
         /// 初始化
         /// </summary>
         /// <param name="name"></param>
-        public IdentityMetaFieldExtend(IMetaFieldInfo field, string name, int startVal)
+        public IncrementFieldExtend(IMetaFieldInfo field, string name, int startVal)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
