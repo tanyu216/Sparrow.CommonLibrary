@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using Sparrow.CommonLibrary.Mapper;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 
 namespace Sparrow.CommonLibrary.Database

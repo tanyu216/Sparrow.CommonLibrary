@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     public class ParameterExpression : SqlExpression
     {
@@ -24,7 +24,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             get { return ExpressionType.Parameter; }
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+        public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
         {
             return output.Append(Name, Value).ParameterName;
         }

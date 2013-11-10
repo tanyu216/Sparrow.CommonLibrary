@@ -3,7 +3,7 @@ using System.Text;
 using System.Linq;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Entity;
 using System;
 

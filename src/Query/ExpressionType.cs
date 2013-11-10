@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     /// <summary>
     /// 表达式类型

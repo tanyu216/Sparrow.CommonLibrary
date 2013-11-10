@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     /// <summary>
     /// 二元运算表达式
@@ -40,7 +40,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.Add; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), "+", Right.OutputSqlString(builder, output));
             }
@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.Divide; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), "/", Right.OutputSqlString(builder, output));
             }
@@ -66,7 +66,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.Modulo; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), "%", Right.OutputSqlString(builder, output));
             }
@@ -79,7 +79,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.Multiply; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), "*", Right.OutputSqlString(builder, output));
             }
@@ -92,7 +92,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.Subtract; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), "-", Right.OutputSqlString(builder, output));
             }
@@ -113,7 +113,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             get { return _expression.NodeType; }
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+        public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
         {
             return _expression.OutputSqlString(builder, output);
         }

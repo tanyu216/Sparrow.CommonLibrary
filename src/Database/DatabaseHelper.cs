@@ -2,7 +2,7 @@
 using Sparrow.CommonLibrary.Entity;
 using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 using System;
 using System.Collections;

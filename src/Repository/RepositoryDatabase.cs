@@ -12,7 +12,7 @@ using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using System.Linq.Expressions;
 using System.Reflection;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Extenssions;
 
 namespace Sparrow.CommonLibrary.Repository

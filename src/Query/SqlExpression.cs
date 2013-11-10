@@ -5,7 +5,7 @@ using System.Text;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     /// <summary>
     /// Sql表达式最终类

@@ -8,11 +8,11 @@ using System.Reflection;
 using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using System.Data;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using System.Collections;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     /// <summary>
     /// 查询表达式
@@ -26,6 +26,9 @@ namespace Sparrow.CommonLibrary.Database.Query
 
         public Queryable(DatabaseHelper database)
         {
+            if (database == null)
+                throw new ArgumentNullException("database");
+
             this.database = database;
             mapper = Map.GetIMapper<T>();
             fields = mapper.MetaInfo.GetFields();

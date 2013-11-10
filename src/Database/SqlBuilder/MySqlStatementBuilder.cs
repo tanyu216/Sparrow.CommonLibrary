@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
-using Sparrow.CommonLibrary.Database.Query;
+using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Entity;
 using System.Text.RegularExpressions;
 

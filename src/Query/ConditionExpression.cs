@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     public abstract class ConditionExpression : BinaryExpression
     {
@@ -30,7 +30,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.AndAlso; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 if (Right == null)
                     return Left.OutputSqlString(builder, output);
@@ -45,7 +45,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return ExpressionType.OrElse; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 if (Right == null)
                     return Left.OutputSqlString(builder, output);
@@ -68,7 +68,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             get { return _expression.NodeType; }
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+        public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
         {
             return _expression.OutputSqlString(builder, output);
         }

@@ -7,7 +7,7 @@ using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     public class FieldExpression : SqlExpression
     {

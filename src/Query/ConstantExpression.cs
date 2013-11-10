@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Sparrow.CommonLibrary.Database.SqlBuilder;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     public class ConstantExpression : SqlExpression
     {
@@ -20,7 +21,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             get { return ExpressionType.Constant; }
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+        public override string OutputSqlString(ISqlBuilder builder, Database.ParameterCollection output)
         {
             return output.Append("p", Value, true).ParameterName;
         }

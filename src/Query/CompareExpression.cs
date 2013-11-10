@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Query
+namespace Sparrow.CommonLibrary.Query
 {
     /// <summary>
     /// 条件比较表达式
@@ -64,7 +64,7 @@ namespace Sparrow.CommonLibrary.Database.Query
             return new LikeExpression() { Left = left, Right = right, StartWith = startWith, EndWith = endWith };
         }
 
-        public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+        public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
         {
             return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
         }
@@ -94,7 +94,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), " BETWEEN ", Right[0].OutputSqlString(builder, output), " AND ", Right[1].OutputSqlString(builder, output));
             }
@@ -112,7 +112,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return " IN "; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), " IN (", Right.OutputSqlString(builder, output), ")");
             }
@@ -143,7 +143,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return " IS "; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
             }
@@ -219,7 +219,7 @@ namespace Sparrow.CommonLibrary.Database.Query
 
             public bool EndWith { get; set; }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 var condition = new StringBuilder();
                 condition.Append(Left.OutputSqlString(builder, output));
@@ -258,7 +258,7 @@ namespace Sparrow.CommonLibrary.Database.Query
                 get { return " IS NOT "; }
             }
 
-            public override string OutputSqlString(SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
             }

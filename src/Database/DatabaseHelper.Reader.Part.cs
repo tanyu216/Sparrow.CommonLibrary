@@ -1,4 +1,4 @@
-﻿using Sparrow.CommonLibrary.Database.Query;
+﻿using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 using Sparrow.CommonLibrary.Mapper;
 using System;
