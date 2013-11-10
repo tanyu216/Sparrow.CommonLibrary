@@ -1,4 +1,5 @@
 ﻿using Sparrow.CommonLibrary.Entity;
+using Sparrow.CommonLibrary.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,6 +122,8 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (value is Int16 || value is Int32 || value is Int64 || value is UInt16 || value is UInt32 || value is UInt64)
                 return value.ToString();
             if (value is decimal || value is double || value is float)
+                return value.ToString();
+            if (value is Timestamp)
                 return value.ToString();
             if (value is DateTime)
                 return ((DateTime)value).ToString("'yyyy-MM-dd HH:mm:ss'");

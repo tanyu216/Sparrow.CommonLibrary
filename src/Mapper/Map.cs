@@ -101,7 +101,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static TDestination Single<TDestination, TSource>(TSource source)
         {
-            return DataSourceAdapter.Instance.Next<TDestination>(source);
+            return GetIMapper<TDestination>().MapSingle(source);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static List<TDestination> List<TDestination, TSource>(TSource source)
         {
-            return DataSourceAdapter.Instance.Cast<TDestination>(source);
+            return GetIMapper<TDestination>().MapList(source);
         }
     }
 }

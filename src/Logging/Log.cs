@@ -34,7 +34,7 @@ namespace Sparrow.CommonLibrary.Logging
         static Log()
         {
             _currentUserId = null;
-            bufer = new Buffered<LogEntry>(8 * 1000);
+            bufer = new Buffered<LogEntry>();
             bufer.OnFlush += bufer_OnFlush;
         }
 

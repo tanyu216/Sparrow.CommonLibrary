@@ -1,5 +1,7 @@
 ﻿using Sparrow.CommonLibrary.Mapper.Metadata;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Sparrow.CommonLibrary.Mapper
 {
@@ -46,6 +48,18 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <returns></returns>
         object Create();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dataSource"></param>
+        /// <returns></returns>
+        object MapSingle(object dataSource);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dataSource"></param>
+        /// <returns></returns>
+        IList MapList(object dataSource);
     }
 
     /// <summary>
@@ -71,6 +85,18 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <returns></returns>
         new T Create();
+        /// <summary>
+        /// 映射
+        /// </summary>
+        /// <param name="dataSource"></param>
+        /// <returns></returns>
+        new T MapSingle(object dataSource);
+        /// <summary>
+        /// 映射
+        /// </summary>
+        /// <param name="dataSource"></param>
+        /// <returns></returns>
+        new List<T> MapList(object dataSource);
     }
 
 }

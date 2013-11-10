@@ -17,6 +17,11 @@ namespace Sparrow.CommonLibrary.Mapper
 
         private readonly IList<IDataSourceReaderProvider> Providers;
 
+        static DataSourceAdapter()
+        {
+            Instance = new DataSourceAdapter();
+        }
+
         private DataSourceAdapter()
         {
             Providers = new List<IDataSourceReaderProvider>();
@@ -49,9 +54,8 @@ namespace Sparrow.CommonLibrary.Mapper
             throw new NotSupportedException(string.Format("不受支持的数据源:{0}。", source.GetType().FullName));
         }
 
-        private IPropertyAccessor<T>[] GetPropertyAccessors<T>(IDataSourceReader<T> reader, out int[] ordinal, out IMapper<T> mapper)
+        private IPropertyAccessor<T>[] GetPropertyAccessors<T>(IMapper<T> mapper, IDataSourceReader<T> reader, out int[] ordinal)
         {
-            mapper = Map.GetIMapper<T>();
             var fields = mapper.MetaInfo.GetFieldNames();
             var index = reader.Ordinal(fields);
 
@@ -91,12 +95,14 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Next<T>(object dataSource)
+        public T ReadSingle<T>(IMapper<T> mapper, object dataSource)
         {
-            IMapper<T> mapper;
+            if (mapper == null)
+                throw new ArgumentNullException("mapper");
+
             int[] ordinal;
             var reader = CreateReader<T>(dataSource);
-            var accessors = GetPropertyAccessors<T>(reader, out ordinal, out mapper);
+            var accessors = GetPropertyAccessors<T>(mapper, reader, out ordinal);
 
             var data = reader.Read(ordinal);
             if (data == null)
@@ -112,12 +118,14 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public List<T> Cast<T>(object dataSource)
+        public List<T> ReadList<T>(IMapper<T> mapper, object dataSource)
         {
-            IMapper<T> mapper;
+            if (mapper == null)
+                throw new ArgumentNullException("mapper");
+
             int[] ordinal;
             var reader = CreateReader<T>(dataSource);
-            var accessors = GetPropertyAccessors<T>(reader, out ordinal, out mapper);
+            var accessors = GetPropertyAccessors<T>(mapper, reader, out ordinal);
 
             var count = reader.Count;
             var list = count > -1 ? new List<T>(count) : new List<T>(8);

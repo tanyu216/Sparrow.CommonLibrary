@@ -17,17 +17,17 @@ namespace Sparrow.CommonLibrary.Utility
 
         private Timestamp(DateTime datetime)
         {
-            _timestamp = datetime.ToUniversalTime().Ticks / TicksM - FirstYear;
+            _timestamp = (datetime.ToUniversalTime().Ticks - FirstYear) / Ticks;
         }
 
-        private static readonly long FirstYear = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks / TicksM;
-        private const int TicksM = 10000000;
+        private const long FirstYear = 621355968000000000;
+        private const int Ticks = 10000000;
 
         public static Timestamp Now
         {
             get
             {
-                return new Timestamp(DateTime.UtcNow.Ticks / TicksM - FirstYear);
+                return new Timestamp((DateTime.UtcNow.Ticks - FirstYear) / Ticks);
             }
         }
 
@@ -64,42 +64,42 @@ namespace Sparrow.CommonLibrary.Utility
 
         public bool ToBoolean(IFormatProvider provider)
         {
-            return Convert.ToBoolean(_timestamp);
+            return Convert.ToBoolean(_timestamp, provider);
         }
 
         public byte ToByte(IFormatProvider provider)
         {
-            return Convert.ToByte(_timestamp);
+            return Convert.ToByte(_timestamp, provider);
         }
 
         public char ToChar(IFormatProvider provider)
         {
-            return Convert.ToChar(_timestamp);
+            return Convert.ToChar(_timestamp, provider);
         }
 
         public DateTime ToDateTime(IFormatProvider provider)
         {
-            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(_timestamp);
+            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddTicks(_timestamp * Ticks);
         }
 
         public decimal ToDecimal(IFormatProvider provider)
         {
-            return Convert.ToDecimal(_timestamp);
+            return Convert.ToDecimal(_timestamp, provider);
         }
 
         public double ToDouble(IFormatProvider provider)
         {
-            return Convert.ToDouble(_timestamp);
+            return Convert.ToDouble(_timestamp, provider);
         }
 
         public short ToInt16(IFormatProvider provider)
         {
-            return Convert.ToInt16(_timestamp);
+            return Convert.ToInt16(_timestamp, provider);
         }
 
         public int ToInt32(IFormatProvider provider)
         {
-            return Convert.ToInt32(_timestamp);
+            return Convert.ToInt32(_timestamp, provider);
         }
 
         public long ToInt64(IFormatProvider provider)
@@ -109,12 +109,12 @@ namespace Sparrow.CommonLibrary.Utility
 
         public sbyte ToSByte(IFormatProvider provider)
         {
-            return Convert.ToSByte(_timestamp);
+            return Convert.ToSByte(_timestamp, provider);
         }
 
         public float ToSingle(IFormatProvider provider)
         {
-            return Convert.ToSingle(_timestamp);
+            return Convert.ToSingle(_timestamp, provider);
         }
 
         public string ToString(IFormatProvider provider)
@@ -129,17 +129,17 @@ namespace Sparrow.CommonLibrary.Utility
 
         public ushort ToUInt16(IFormatProvider provider)
         {
-            return Convert.ToUInt16(_timestamp);
+            return Convert.ToUInt16(_timestamp, provider);
         }
 
         public uint ToUInt32(IFormatProvider provider)
         {
-            return Convert.ToUInt32(_timestamp);
+            return Convert.ToUInt32(_timestamp, provider);
         }
 
         public ulong ToUInt64(IFormatProvider provider)
         {
-            return Convert.ToUInt64(_timestamp);
+            return Convert.ToUInt64(_timestamp, provider);
         }
 
         #endregion
@@ -175,19 +175,24 @@ namespace Sparrow.CommonLibrary.Utility
 
         #region override operator
 
-        public static TimeSpan operator -(Timestamp t1, Timestamp t2)
+        public static Timestamp operator -(Timestamp t1, Timestamp t2)
         {
-            return new TimeSpan(t1._timestamp * TicksM - t2._timestamp * TicksM);
+            return new Timestamp(t1._timestamp - t2._timestamp);
         }
 
-        public static TimeSpan operator -(Timestamp t1, TimeSpan t2)
+        public static Timestamp operator -(Timestamp t1, TimeSpan t2)
         {
-            return new TimeSpan(t1._timestamp * TicksM - t2.Ticks);
+            return new Timestamp(t1._timestamp - t2.Ticks / Ticks);
         }
 
         public static Timestamp operator +(Timestamp t1, TimeSpan t2)
         {
-            return new Timestamp(t1._timestamp + t2.Ticks / TicksM);
+            return new Timestamp(t1._timestamp + t2.Ticks / Ticks);
+        }
+
+        public static Timestamp operator +(Timestamp t1, Timestamp t2)
+        {
+            return new Timestamp(t1._timestamp + t2._timestamp);
         }
 
         public static bool operator !=(Timestamp t1, Timestamp t2)
@@ -207,7 +212,7 @@ namespace Sparrow.CommonLibrary.Utility
 
         public static bool operator >(Timestamp t1, Timestamp t2)
         {
-            return t1._timestamp < t2._timestamp;
+            return t1._timestamp > t2._timestamp;
         }
 
         public static bool operator <=(Timestamp t1, Timestamp t2)
@@ -217,7 +222,7 @@ namespace Sparrow.CommonLibrary.Utility
 
         public static bool operator >=(Timestamp t1, Timestamp t2)
         {
-            return t1._timestamp <= t2._timestamp;
+            return t1._timestamp >= t2._timestamp;
         }
 
         public static implicit operator Int64(Timestamp t1)
@@ -230,9 +235,24 @@ namespace Sparrow.CommonLibrary.Utility
             return t1.ToDateTime(CultureInfo.InvariantCulture);
         }
 
-        public static implicit operator Timestamp(long timestamp)
+        public static implicit operator Timestamp(Int16 timestamp)
         {
             return new Timestamp(timestamp);
+        }
+
+        public static implicit operator Timestamp(Int32 timestamp)
+        {
+            return new Timestamp(timestamp);
+        }
+
+        public static implicit operator Timestamp(Int64 timestamp)
+        {
+            return new Timestamp(timestamp);
+        }
+
+        public static implicit operator Timestamp(TimeSpan timespan)
+        {
+            return new Timestamp(timespan.Ticks / Ticks);
         }
 
         public static implicit operator Timestamp(DateTime t1)
@@ -321,7 +341,7 @@ namespace Sparrow.CommonLibrary.Utility
 
         public Timestamp Add(TimeSpan value)
         {
-            return new Timestamp(_timestamp + value.Ticks / TicksM);
+            return new Timestamp(_timestamp + value.Ticks / Ticks);
         }
 
     }

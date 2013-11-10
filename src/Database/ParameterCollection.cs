@@ -8,6 +8,7 @@ using System.Collections;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 using Sparrow.CommonLibrary.Database.DbCommon;
+using Sparrow.CommonLibrary.Utility;
 
 namespace Sparrow.CommonLibrary.Database
 {
@@ -92,6 +93,8 @@ namespace Sparrow.CommonLibrary.Database
         {
             var dbParam = _dbProvider.CreateParameter();
             dbParam.ParameterName = _nameBuilder.BuildParameterName(name);
+            if (value is Timestamp)
+                dbParam.DbType = DbType.Int64;
             dbParam.Value = value ?? DBNull.Value;
             return dbParam;
         }
@@ -107,6 +110,8 @@ namespace Sparrow.CommonLibrary.Database
         {
             var dbParam = _dbProvider.CreateParameter();
             dbParam.ParameterName = _nameBuilder.BuildParameterName(suffix ? string.Concat(name, "_", this.Count) : name);
+            if (value is Timestamp)
+                dbParam.DbType = DbType.Int64;
             dbParam.Value = value ?? DBNull.Value;
             return dbParam;
         }

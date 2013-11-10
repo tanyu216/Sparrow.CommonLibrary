@@ -52,10 +52,12 @@
     <Compile Include="Mapper\DataMapperTest.cs" />
     <Compile Include="Mapper\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\BufferedTest.cs" />
+    <Compile Include="Utility\PathBuilderTest.cs" />
+    <Compile Include="Utility\RecognizeSpiderTest.cs" />
+    <Compile Include="Utility\TimestampTest.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utility\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\src\Sparrow.CommonLibrary.csproj">
       <Project>{8b0a4285-9eeb-4baa-9d2e-9d2d5b3530a5}</Project>

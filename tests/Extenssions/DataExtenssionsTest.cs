@@ -36,6 +36,7 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
                     note.Append(charList[rand.Next(0, 26)]);
                 }
                 dataRow[1] = note.ToString();
+                dt.Rows.Add(dataRow);
             }
             return dt;
         }

@@ -37,7 +37,7 @@ namespace Sparrow.CommonLibrary.Utility
         }
 
         /// <summary>
-        /// 缓冲区最大值，超出该值时，将会引发缓冲区溢出异常（默认值：65535）。
+        /// 缓冲区最大值，超出该值时，将会引发缓冲区溢出异常（默认值：131072）。
         /// </summary>
         public int MaxBufer { get; set; }
 
@@ -65,8 +65,8 @@ namespace Sparrow.CommonLibrary.Utility
         /// <param name="interval">当缓冲区设置自动Flush后，每一次自动Flush的时间间隔</param>
         public Buffered(double interval)
         {
-            MaxBufer = 65535;
-            Threshold = 4096;
+            MaxBufer = 131072;
+            Threshold = 65535;
             _queue = new ConcurrentQueue<T>();
             _timer = new Timer(interval);
             _timer.Elapsed += TimerElapsed;
@@ -91,11 +91,11 @@ namespace Sparrow.CommonLibrary.Utility
                 return;
             if (max > MaxBufer)
                 max = MaxBufer;
-            if (!Flushing)
+            if (Flushing)
                 return;
             lock (SyncFlushing)
             {
-                if (!Flushing)
+                if (Flushing)
                     return;
                 Flushing = true;
             }

@@ -28,11 +28,11 @@ namespace Sparrow.CommonLibrary.Utility
             _variant.Add("%rndname%", (x) => Path.GetRandomFileName());
             // 日期类
             _variant.Add("%date%", (x) => DateTime.Now.ToString("yyMMdd"));
-            _variant.Add("%year%", (x) => DateTime.Now.Year.ToString("yyyy"));
-            _variant.Add("%month%", (x) => DateTime.Now.Month.ToString("MM"));
-            _variant.Add("%day%", (x) => DateTime.Now.Day.ToString("dd"));
-            _variant.Add("%hour%", (x) => DateTime.Now.Hour.ToString("hh"));
-            _variant.Add("%minute%", (x) => DateTime.Now.Minute.ToString("mm"));
+            _variant.Add("%year%", (x) => DateTime.Now.ToString("yyyy"));
+            _variant.Add("%month%", (x) => DateTime.Now.ToString("MM"));
+            _variant.Add("%day%", (x) => DateTime.Now.ToString("dd"));
+            _variant.Add("%hour%", (x) => DateTime.Now.ToString("hh"));
+            _variant.Add("%minute%", (x) => DateTime.Now.ToString("mm"));
         }
 
         private void ValidVariantName(string variantName)
@@ -126,6 +126,16 @@ namespace Sparrow.CommonLibrary.Utility
                 }
             }
             return path;
+        }
+
+        /// <summary>
+        /// 生成路径
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <returns></returns>
+        public string Build(string path)
+        {
+            return Build(path, null);
         }
 
         /// <summary>

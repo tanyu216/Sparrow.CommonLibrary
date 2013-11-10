@@ -4,12 +4,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using System.Data;
 
 namespace Sparrow.CommonLibrary.Test.Mapper
 {
     [TestFixture]
     public class DataMapperTest
     {
+        public DataTable CreateDataTable()
+        {
+            var charList = new StringBuilder();
+            for (var i = 0; i < 26; i++)
+            {
+                charList.Append((char)(97 + i));
+            }
+
+            var rand = new Random();
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Id", typeof(int));
+            dt.Columns.Add("Name", typeof(string));
+            dt.Columns.Add("Email", typeof(string));
+
+            for (var i = 1; i <= 1000; i++)
+            {
+                var dataRow = dt.NewRow();
+                dataRow[0] = i;
+                var len = rand.Next(1, 100);
+                var note = new StringBuilder();
+                for (var m = 0; m < len; m++)
+                {
+                    note.Append(charList[rand.Next(0, 26)]);
+                }
+                dataRow[1] = note.ToString();
+                dataRow[2] = "test@hotmail.com";
+                dt.Rows.Add(dataRow);
+            }
+            return dt;
+        }
+
         [SetUp]
         public void Init()
         {
@@ -101,5 +133,22 @@ namespace Sparrow.CommonLibrary.Test.Mapper
 
         }
 
+        [Test]
+        public void MapTest1()
+        {
+            var mapper = UserProfile.GetMapper();
+            var dt = CreateDataTable();
+            var single = mapper.MapSingle(dt);
+            Assert.IsNotNull(single);
+        }
+
+        [Test]
+        public void MapTest2()
+        {
+            var mapper = UserProfile.GetMapper();
+            var dt = CreateDataTable();
+            var list = mapper.MapList(dt);
+            Assert.IsNotNull(list);
+        }
     }
 }

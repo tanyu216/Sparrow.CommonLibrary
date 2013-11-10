@@ -129,6 +129,26 @@ namespace Sparrow.CommonLibrary.Mapper
             return _creator();
         }
 
+        public T MapSingle(object dataSource)
+        {
+            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+        }
+
+        public List<T> MapList(object dataSource)
+        {
+            return DataSourceAdapter.Instance.ReadList(this, dataSource);
+        }
+
+        object IMapper.MapSingle(object dataSource)
+        {
+            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+        }
+
+        System.Collections.IList IMapper.MapList(object dataSource)
+        {
+            return DataSourceAdapter.Instance.ReadList(this, dataSource);
+        }
+
         #endregion
 
         #region IMetaInfo
@@ -557,6 +577,7 @@ namespace Sparrow.CommonLibrary.Mapper
             }
 
         }
+
     }
 
 }
