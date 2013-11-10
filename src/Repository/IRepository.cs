@@ -11,10 +11,10 @@ namespace Sparrow.CommonLibrary.Repository
 
         int Insert(T entity);
         int Insert(IEnumerable<T> entities);
-        
+
         int Update(T entity);
         int Update(IEnumerable<T> entities);
-        
+
         int Save(T entity);
         int Save(IEnumerable<T> entities);
 
@@ -45,22 +45,38 @@ namespace Sparrow.CommonLibrary.Repository
         TValue Min<TValue>(Expression<Func<T, object>> field);
         TValue Min<TValue>(Expression<Func<T, object>> field, CompareExpression condition);
         TValue Min<TValue>(Expression<Func<T, object>> field, ConditionExpression condition);
-        
+
         TValue Max<TValue>(Expression<Func<T, object>> field);
         TValue Max<TValue>(Expression<Func<T, object>> field, CompareExpression condition);
         TValue Max<TValue>(Expression<Func<T, object>> field, ConditionExpression condition);
-        
+
         TValue Avg<TValue>(Expression<Func<T, object>> field);
         TValue Avg<TValue>(Expression<Func<T, object>> field, CompareExpression condition);
         TValue Avg<TValue>(Expression<Func<T, object>> field, ConditionExpression condition);
-        
-        TValue Count<TValue>(Expression<Func<T, object>> field);
-        TValue Count<TValue>(Expression<Func<T, object>> field, CompareExpression condition);
-        TValue Count<TValue>(Expression<Func<T, object>> field, ConditionExpression condition);
-        
-        IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby);
-        IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, CompareExpression condition);
-        IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, ConditionExpression condition);
+
+        int Count(Expression<Func<T, object>> field);
+        int Count(Expression<Func<T, object>> field, CompareExpression condition);
+        int Count(Expression<Func<T, object>> field, ConditionExpression condition);
+
+        IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField);
+        IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition);
+        IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition);
+
+        IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField);
+        IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition);
+        IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition);
+
+        IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField);
+        IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition);
+        IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition);
+
+        IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField);
+        IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition);
+        IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition);
+
+        IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field);
+        IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, CompareExpression condition);
+        IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, ConditionExpression condition);
 
         #endregion
 

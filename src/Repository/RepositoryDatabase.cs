@@ -340,6 +340,10 @@ namespace Sparrow.CommonLibrary.Repository
             return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
         }
 
+        #endregion
+
+        #region IRepository<T>.Groupby
+
         public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
@@ -456,42 +460,42 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Count<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
+        public int Count(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Count(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return Database.ExecuteScalar<int>(sql, parameters);
         }
 
-        public TValue Count<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
+        public int Count(Expression<Func<T, object>> field, CompareExpression condition)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Count(field)
                 .Where(condition)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return Database.ExecuteScalar<int>(sql, parameters);
         }
 
-        public TValue Count<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public int Count(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Count(field)
                 .Where(condition)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return Database.ExecuteScalar<int>(sql, parameters);
         }
 
-        public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby)
+        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
-                .Select(groupby)
-                .Count(field)
-                .GroupBy(groupby)
+                .Select(keyField)
+                .Sum(valueField)
+                .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
             {
@@ -499,14 +503,14 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, CompareExpression condition)
+        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
-                .Select(groupby)
-                .Count(field)
+                .Select(keyField)
+                .Sum(valueField)
                 .Where(condition)
-                .GroupBy(groupby)
+                .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
             {
@@ -514,18 +518,194 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> Groupby<TKey, TValue>(Expression<Func<T, object>> field, Expression<Func<T, object>> groupby, ConditionExpression condition)
+        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
-                .Select(groupby)
-                .Count(field)
+                .Select(keyField)
+                .Sum(valueField)
                 .Where(condition)
-                .GroupBy(groupby)
+                .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Min(valueField)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Min(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Min(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Max(valueField)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Max(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Max(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Avg(valueField)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Avg(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(keyField)
+                .Avg(valueField)
+                .Where(condition)
+                .GroupBy(keyField)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, TValue>();
+            }
+        }
+
+        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(field)
+                .Count(field)
+                .GroupBy(field)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, int>();
+            }
+        }
+
+        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, CompareExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(field)
+                .Count(field)
+                .Where(condition)
+                .GroupBy(field)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, int>();
+            }
+        }
+
+        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, ConditionExpression condition)
+        {
+            var parameters = CreateParamterCollection();
+            string sql = new Queryable<T>(Database)
+                .Select(field)
+                .Count(field)
+                .Where(condition)
+                .GroupBy(field)
+                .OutputSqlString(parameters);
+            using (var reader = Database.ExecuteReader(sql, parameters))
+            {
+                return reader.ToDictionary<TKey, int>();
             }
         }
 

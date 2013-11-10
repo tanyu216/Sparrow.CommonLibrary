@@ -45,12 +45,17 @@
     <Compile Include="Cache\CacheManagerTest.cs" />
     <Compile Include="Cryptography\CryptTest.cs" />
     <Compile Include="Cryptography\HashTest.cs" />
+    <Compile Include="Entity\EntityExplainTest.cs" />
+    <Compile Include="Entity\EntityTest.cs" />
     <Compile Include="Extenssions\CollectionExtenssionsTest.cs" />
     <Compile Include="Extenssions\ConvertExtenssionsTest.cs" />
     <Compile Include="Extenssions\DataExtenssionsTest.cs" />
     <Compile Include="Extenssions\ValidationExtenssionsTest.cs" />
     <Compile Include="Mapper\DataMapperTest.cs" />
+    <Compile Include="Mapper\MapperFinderTest.cs" />
     <Compile Include="Mapper\UserProfile.cs" />
+    <Compile Include="Mapper\UserProfile2.cs" />
+    <Compile Include="Mapper\UserProfile3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BufferedTest.cs" />
     <Compile Include="Utility\PathBuilderTest.cs" />

@@ -120,12 +120,12 @@ namespace Sparrow.CommonLibrary.Mapper
             public override IMapper<T> FindIMapper<T>()
             {
                 var mapper = new DataMapper<T>();
-                foreach (var property in typeof(T).GetProperties(BindingFlags.Public))
+                foreach (var property in typeof(T).GetProperties())
                 {
                     if (property.CanRead && property.CanWrite)
                     {
                         var handler = Expression.Parameter(typeof(T), "x");
-                        var exp = Expression.Lambda<Func<T, object>>(Expression.MakeMemberAccess(handler, property), handler);
+                        var exp = Expression.Lambda<Func<T, object>>(Expression.Convert(Expression.MakeMemberAccess(handler, property), typeof(object)), handler);
                         mapper.AppendField(exp, property.Name);
                     }
                 }

@@ -55,14 +55,14 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void CreateDataMapper()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             Assert.IsNotNull(mapper);
         }
 
         [Test]
         public void CreateInstanceByDataMapper()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var user = mapper.Create();
             Assert.IsNotNull(user);
         }
@@ -70,7 +70,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void PropertyTest1()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var user = mapper.Create();
 
             Assert.AreEqual(user.Id, 0);
@@ -85,7 +85,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void PropertyTest2()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var user = mapper.Create();
 
             Assert.AreEqual(user.Id, 0);
@@ -101,7 +101,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MetaInfoTest1()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
 
             Assert.AreEqual(mapper.FieldName(0), "Id");
             Assert.AreEqual(mapper.FieldName(1), "Name");
@@ -122,7 +122,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MetaInfoTest2()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var field1 = mapper.MetaInfo.GetFields()[0];
             var field2 = mapper.MetaInfo.GetFields()[3];
 
@@ -136,7 +136,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MapTest1()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var dt = CreateDataTable();
             var single = mapper.MapSingle(dt);
             Assert.IsNotNull(single);
@@ -145,7 +145,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MapTest2()
         {
-            var mapper = UserProfile.GetMapper();
+            var mapper = UserProfile.GetIMapper();
             var dt = CreateDataTable();
             var list = mapper.MapList(dt);
             Assert.IsNotNull(list);

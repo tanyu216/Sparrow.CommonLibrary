@@ -37,7 +37,7 @@ namespace Sparrow.CommonLibrary.Test.Utility
             for (var i = 0; i < 100000; i++)
             {
                 buffered.Write(i);
-                if (i % 1000 == 0)
+                if (i % 100 == 0)
                     System.Threading.Thread.Sleep(5);
             }
         }

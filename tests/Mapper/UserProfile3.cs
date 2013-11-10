@@ -10,7 +10,7 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 
 namespace Sparrow.CommonLibrary.Test.Mapper
 {
-    public class UserProfile
+    public class UserProfile3
     {
         public virtual int Id { get; set; }
         public virtual string Name { get; set; }
@@ -18,15 +18,15 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public virtual string Email { get; set; }
         public virtual string FixPhone { get; set; }
 
-        public static IMapper<UserProfile> GetIMapper()
+        public static IMapper<UserProfile3> GetIMapper()
         {
-            return new DataMapper<UserProfile>("UserProfile")
+            return new DataMapper<UserProfile3>()
                 .AppendField(x => x.Id, "Id").MakeKey().MakeIncrement()
                 .AppendField(x => x.Name, "Name")
                 .AppendField(x => x.Sex, "Sex")
                 .AppendField(x => x.Email, "Email")
                 .AppendField(x => x.FixPhone, "FixPhone")
-                .Complete(x => EntityBuilder.BuildEntityClass<UserProfile>(x));
+                .Complete();
 
         }
     }
