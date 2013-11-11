@@ -56,12 +56,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static IMapper<T> GetIMapper<T>()
         {
-            MapperFinder[] finders;
-            lock (Finders)
-            {
-                finders = new MapperFinder[Finders.Count];
-                Finders.CopyTo(0, finders, 0, finders.Length);
-            }
+            MapperFinder[] finders = Finders.ToArray();
             //
             Exception lastException = null;
             foreach (var mapperFinder in finders)

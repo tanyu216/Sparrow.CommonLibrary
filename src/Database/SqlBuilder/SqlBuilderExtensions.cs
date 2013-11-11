@@ -145,6 +145,11 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             return builder.DeleteFormat(TableName(metaInfo), builder.Where(condition, output, options), options);
         }
 
+        public static string Delete(this ISqlBuilder builder, IMetaInfo metaInfo, CompareExpression condition, ParameterCollection output, SqlOptions options)
+        {
+            return builder.DeleteFormat(TableName(metaInfo), builder.Where(condition, output, options), options);
+        }
+
         public static string Delete(this ISqlBuilder builder, IMetaInfo metaInfo, ConditionExpression condition, ParameterCollection output, SqlOptions options)
         {
             return builder.DeleteFormat(TableName(metaInfo), builder.Where(condition, output, options), options);

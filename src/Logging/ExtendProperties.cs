@@ -100,13 +100,13 @@ namespace Sparrow.CommonLibrary.Logging
                 }
                 else
                 {
-                    var properties = _obj.GetType().GetProperties(BindingFlags.GetField | BindingFlags.Static | BindingFlags.Public);
+                    var properties = _obj.GetType().GetProperties(BindingFlags.GetField | BindingFlags.Static | BindingFlags.Instance);
                     foreach (var propertyInfo in properties)
                     {
                         _properties[propertyInfo.Name] = propertyInfo.GetValue(_obj, null);
                     }
                     //
-                    var fileds = _obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static);
+                    var fileds = _obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.Static);
                     foreach (var fieldInfo in fileds)
                     {
                         _properties[fieldInfo.Name] = fieldInfo.GetValue(_obj);

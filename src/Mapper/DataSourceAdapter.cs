@@ -45,6 +45,8 @@ namespace Sparrow.CommonLibrary.Mapper
             if (source == null)
                 throw new ArgumentNullException("source");
 
+            var providers = Providers.ToArray();
+
             foreach (var reader in Providers)
             {
                 if (reader.IsSupported(source))

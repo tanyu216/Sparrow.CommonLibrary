@@ -190,7 +190,10 @@ namespace Sparrow.CommonLibrary.Repository
         {
             if (entity == null)
                 throw new ArgumentNullException("entity");
-            //
+
+            if (entity is IEntity)
+                ((IEntity)entity).OperationState = DataState.New;
+
             IDictionary<string, T> incrementEntity = null;
             var parameters = CreateParamterCollection();
             var sql = BuildDmlSql(entity, DataState.New, parameters, ref incrementEntity);
@@ -203,6 +206,10 @@ namespace Sparrow.CommonLibrary.Repository
             if (entities == null)
                 throw new ArgumentNullException("entity");
 
+            foreach (var entity in entities)
+                if (entity is IEntity)
+                    ((IEntity)entity).OperationState = DataState.New;
+
             var parameters = CreateParamterCollection();
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.New, parameters, ref incrementEntity);
@@ -214,7 +221,10 @@ namespace Sparrow.CommonLibrary.Repository
         {
             if (entity == null)
                 throw new ArgumentNullException("entity");
-            //
+
+            if (entity is IEntity)
+                ((IEntity)entity).OperationState = DataState.Modify;
+
             var parameters = CreateParamterCollection();
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, DataState.Modify, parameters, ref incrementEntity);
@@ -226,7 +236,11 @@ namespace Sparrow.CommonLibrary.Repository
         {
             if (entities == null)
                 throw new ArgumentNullException("entities");
-            //
+
+            foreach (var entity in entities)
+                if (entity is IEntity)
+                    ((IEntity)entity).OperationState = DataState.Modify;
+
             var parameters = CreateParamterCollection();
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.Modify, parameters, ref incrementEntity);
@@ -238,7 +252,10 @@ namespace Sparrow.CommonLibrary.Repository
         {
             if (entity == null)
                 throw new ArgumentNullException("entity");
-            //
+
+            if (entity is IEntity)
+                ((IEntity)entity).OperationState = DataState.NewOrModify;
+
             var parameters = CreateParamterCollection();
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, parameters, ref incrementEntity);
@@ -250,7 +267,11 @@ namespace Sparrow.CommonLibrary.Repository
         {
             if (entities == null)
                 throw new ArgumentNullException("entities");
-            //
+
+            foreach (var entity in entities)
+                if (entity is IEntity)
+                    ((IEntity)entity).OperationState = DataState.NewOrModify;
+
             var parameters = CreateParamterCollection();
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, parameters, ref incrementEntity);
@@ -272,7 +293,13 @@ namespace Sparrow.CommonLibrary.Repository
 
         public int Delete(CompareExpression condition)
         {
-            throw new NotImplementedException();
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+            //
+            var parameters = CreateParamterCollection();
+            var sql = SqlBuilder.Delete(mapper.MetaInfo, condition, parameters, SqlOptions.None);
+            //
+            return DoExecute(sql, parameters, null);
         }
 
         public int Delete(ConditionExpression condition)
