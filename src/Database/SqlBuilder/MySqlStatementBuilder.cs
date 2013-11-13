@@ -18,8 +18,8 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     {
         public static readonly MySqlStatementBuilder Default = new MySqlStatementBuilder();
 
-        readonly static Regex testNameRegex = new Regex(@"^(`\w+`)(\.`\w+`)*$");
-        readonly static Regex matchNamesRegex = new Regex(@"(\w+)");
+        readonly static Regex testNameRegex = new Regex(@"^(`\w+`)(\.`\w+`)*$", RegexOptions.Compiled);
+        readonly static Regex matchNamesRegex = new Regex(@"(\w+)", RegexOptions.Compiled);
 
         protected MySqlStatementBuilder()
         {

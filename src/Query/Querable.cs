@@ -309,7 +309,7 @@ namespace Sparrow.CommonLibrary.Query
 
         public Queryable<T> OrderBy(Expression<Func<T, object>> field)
         {
-            return OrderBy(field, true);
+            return OrderBy(field, false);
         }
 
         public Queryable<T> OrderBy(Expression<Func<T, object>> field, bool descending)
@@ -319,7 +319,7 @@ namespace Sparrow.CommonLibrary.Query
 
         public Queryable<T> OrderBy(SqlExpression expression)
         {
-            return OrderBy(expression, true);
+            return OrderBy(expression, false);
         }
 
         public Queryable<T> OrderBy(SqlExpression expression, bool descending)
@@ -346,7 +346,7 @@ namespace Sparrow.CommonLibrary.Query
             var conditionExpressions = _condition != null ? _condition.OutputSqlString(builder, output) : string.Empty;
             var groupbyExpression = _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty;
             var havingExpression = _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty;
-            var orderbyExpression = _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "TRUE" : "FALSE"))) : string.Empty;
+            var orderbyExpression = _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "DESC" : "ASC"))) : string.Empty;
 
             return builder.QueryFormat(
                 topExpressions,//top(10)

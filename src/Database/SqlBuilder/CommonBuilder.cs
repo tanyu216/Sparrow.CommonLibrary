@@ -13,27 +13,27 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     /// </summary>
     public abstract class CommonBuilder : ISqlBuilder
     {
-        #region SqlChar
+        #region Words
 
-        protected static readonly string SqlCharSelect = "SELECT ";
-        protected static readonly string SqlCharDelete = "DELETE ";
-        protected static readonly string SqlCharUpdate = "UPDATE ";
-        protected static readonly string SqlCharInsertInto = "INSERT INTO ";
-        protected static readonly string SqlCharSet = " SET ";
-        protected static readonly string SqlCharFrom = " FROM ";
-        protected static readonly string SqlCharAllFields = " * ";
-        protected static readonly string SqlCharValues = " VALUES ";
-        protected static readonly string SqlCharWhere = " WHERE ";
-        protected static readonly string SqlCharGroupby = " GROUP BY ";
-        protected static readonly string SqlCharHaving = " HAVING ";
-        protected static readonly string SqlCharOrderby = " ORDER BY ";
-        protected static readonly string SqlCharTop = " TOP ";
-        protected static readonly string SqlCharDistinct = " DISTINCT ";
+        protected static readonly string WordSelect = "SELECT ";
+        protected static readonly string WordDelete = "DELETE ";
+        protected static readonly string WordUpdate = "UPDATE ";
+        protected static readonly string WordInsertInto = "INSERT INTO ";
+        protected static readonly string WordSet = " SET ";
+        protected static readonly string WordFrom = " FROM ";
+        protected static readonly string WordAllFields = " * ";
+        protected static readonly string WordValues = " VALUES ";
+        protected static readonly string WordWhere = " WHERE ";
+        protected static readonly string WordGroupby = " GROUP BY ";
+        protected static readonly string WordHaving = " HAVING ";
+        protected static readonly string WordOrderby = " ORDER BY ";
+        protected static readonly string WordTop = " TOP ";
+        protected static readonly string WordDistinct = " DISTINCT ";
 
         #endregion
 
-        readonly static Regex testNameRegex = new Regex(@"^(\[\w+\])(\.\[\w+\])*$");
-        readonly static Regex matchNamesRegex = new Regex(@"(\w+)");
+        readonly static Regex testNameRegex = new Regex(@"^(\[\w+\])(\.\[\w+\])*$", RegexOptions.Compiled);
+        readonly static Regex matchNamesRegex = new Regex(@"(\w+)", RegexOptions.Compiled);
 
         public virtual string BuildAlias(string alias)
         {
@@ -117,12 +117,12 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         {
             if (value == null || value == DBNull.Value)
                 return "NULL";
-            if (value is string || value is char)
-                return string.Concat("'", value.ToString(), "'");
-            if (value is Int16 || value is Int32 || value is Int64 || value is UInt16 || value is UInt32 || value is UInt64)
+            if (value is Int32 || value is Int64 || value is Int16 || value is UInt32 || value is UInt64 || value is UInt16)
                 return value.ToString();
             if (value is decimal || value is double || value is float)
                 return value.ToString();
+            if (value is string || value is char)
+                return string.Concat("'", value.ToString(), "'");
             if (value is Timestamp)
                 return value.ToString();
             if (value is DateTime)
@@ -171,9 +171,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             var values = ExpressionsJoin(fieldAndValueExpressions.Select(x => x.Value));
             // insert into {tableName}({fields})values({values})
             return new StringBuilder()
-                .Append(SqlCharInsertInto).Append(BuildTableName(tableName))
+                .Append(WordInsertInto).Append(BuildTableName(tableName))
                 .Append("(").Append(fields).Append(")")
-                .Append(SqlCharValues).Append("(").Append(values).Append(")")
+                .Append(WordValues).Append("(").Append(values).Append(")")
                 .ToString();
         }
 
@@ -192,7 +192,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             var sql = new StringBuilder();
             // 1、生成UPDATE语句前半部分
             // 示例：UPDATE TableName SET
-            sql.Append(SqlCharUpdate).Append(BuildTableName(tableName)).Append(SqlCharSet);
+            sql.Append(WordUpdate).Append(BuildTableName(tableName)).Append(WordSet);
 
             // 2、生成中间set字段值部分
             // 示例：ColumnName=@parameterName,
@@ -206,7 +206,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
 
             // 3、加入修改条件
             if (!string.IsNullOrEmpty(condition))
-                sql.Append(SqlCharWhere).Append(condition);
+                sql.Append(WordWhere).Append(condition);
 
             // 4、返回
             return sql.ToString();
@@ -215,26 +215,10 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         public virtual string DeleteFormat(string tableName, string condition, SqlOptions options)
         {
             //delete from {tableName} where {condition}
-            var str = new StringBuilder().Append(SqlCharDelete).Append(BuildTableName(tableName));
+            var str = new StringBuilder().Append(WordDelete).Append(BuildTableName(tableName));
 
             if (!string.IsNullOrEmpty(condition))
-                str.Append(SqlCharWhere).Append(condition);
-
-            return str.ToString();
-        }
-
-        public virtual string QueryFormat(string tableName, string fieldExpressions, string conditionExpressions, SqlOptions options)
-        {
-            return QueryFormat(tableName, null, fieldExpressions, conditionExpressions, options);
-        }
-
-        public virtual string QueryFormat(string tableName, string alias, string fieldExpressions, string conditionExpressions, SqlOptions options)
-        {
-            //select {fieldExpressions} from {tableName} as {alias} where {condition}
-            var str = new StringBuilder().Append(SqlCharSelect).Append(fieldExpressions).Append(SqlCharFrom).Append(BuildTableName(tableName, alias));
-
-            if (!string.IsNullOrEmpty(conditionExpressions))
-                str.Append(SqlCharWhere).Append(conditionExpressions);
+                str.Append(WordWhere).Append(condition);
 
             return str.ToString();
         }
@@ -246,29 +230,103 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(tableExpression))
                 throw new ArgumentNullException("tableExpression");
 
-            //select [distinct][top(1)] {fieldExpressions} from {tableName} as {alias}
-            var str = new StringBuilder().Append(SqlCharSelect);
+            //select [distinct][top(1)] {fieldExpressions} from {tableExpression} [where conditionExpression] [group by {groupbyExpression} [having {havingExpression}]] [order by {orderbyExpression}]
+            var str = new StringBuilder().Append(WordSelect);
             if ((options & SqlOptions.Distinct) > 0)
-                str.Append(SqlCharDistinct);
+                str.Append(WordDistinct);
             if (!string.IsNullOrEmpty(topExpression))
-                str.Append(SqlCharTop).Append('(').Append(topExpression).Append(')');
+                str.Append(WordTop).Append('(').Append(topExpression).Append(')');
 
-            str.Append(fieldExpressions).Append(SqlCharFrom).Append(tableExpression);
+            str.Append(fieldExpressions).Append(WordFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
-                str.Append(SqlCharWhere).Append(conditionExpressions);
+                str.Append(WordWhere).Append(conditionExpressions);
 
             if (!string.IsNullOrEmpty(groupbyExpression))
-                str.Append(SqlCharGroupby).Append(groupbyExpression);
+            {
+                str.Append(WordGroupby).Append(groupbyExpression);
 
-            if (!string.IsNullOrEmpty(havingExpression))
-                str.Append(SqlCharHaving).Append(havingExpression);
+                if (!string.IsNullOrEmpty(havingExpression))
+                    str.Append(WordHaving).Append(havingExpression);
+            }
 
             if (!string.IsNullOrEmpty(orderbyExpression))
-                str.Append(SqlCharOrderby).Append(orderbyExpression);
+                str.Append(WordOrderby).Append(orderbyExpression);
 
             return str.ToString();
         }
 
+
+        private static readonly Regex orderReplace = new Regex(@"\s+(DESC|ASC)\s*($|,)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// 默认的分页查询，问题：该查询的末页返回数据不足<paramref name="rowCount"/>时，将会返提取前一页的行补齐。需要手动处理
+        /// </summary>
+        /// <param name="fieldExpressions"></param>
+        /// <param name="tableExpression"></param>
+        /// <param name="conditionExpressions"></param>
+        /// <param name="groupbyExpression"></param>
+        /// <param name="havingExpression"></param>
+        /// <param name="orderbyExpression"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="rowCount"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public virtual string QueryFormat(string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, int startIndex, int rowCount, SqlOptions options)
+        {
+            if (string.IsNullOrEmpty(fieldExpressions))
+                throw new ArgumentNullException("fieldExpressions");
+            if (string.IsNullOrEmpty(tableExpression))
+                throw new ArgumentNullException("tableExpression");
+            if (string.IsNullOrEmpty(orderbyExpression))
+                throw new ArgumentNullException("orderbyExpression");
+
+            // select top {rowCount} * from (select top ({startIndex}+{rowCount}) {fieldExpressions} from {tableExpressions} [where conditionExpression] [group by {groupbyExpression} [having havingExpression]] by order by {orderExpression}))
+            var nest1 = new StringBuilder().Append(WordSelect);
+            nest1.Append(WordTop).Append('(').Append(Constant(startIndex + rowCount)).Append(')');
+            nest1.Append(fieldExpressions);
+            nest1.Append(WordFrom).Append(tableExpression);
+
+            if (!string.IsNullOrEmpty(conditionExpressions))
+                nest1.Append(WordWhere).Append(conditionExpressions);
+
+            if (!string.IsNullOrEmpty(groupbyExpression))
+            {
+                nest1.Append(WordGroupby).Append(groupbyExpression);
+
+                if (!string.IsNullOrEmpty(havingExpression))
+                    nest1.Append(WordHaving).Append(havingExpression);
+            }
+
+            nest1.Append(WordOrderby).Append(orderbyExpression);
+
+            var reverseOrderby = orderReplace.Replace(orderbyExpression, x =>
+            {
+                switch ((x.Groups[1].Value ?? string.Empty).ToUpper())
+                {
+                    case "ASC":
+                        if ((x.Groups[2].Value ?? string.Empty) == ",")
+                            return " DESC,";
+                        return " DESC ";
+                    case "DESC":
+                        if ((x.Groups[2].Value ?? string.Empty) == ",")
+                            return " ASC,";
+                        return " ASC ";
+                }
+                return string.Empty;
+            });
+
+            var nest2 = new StringBuilder()
+                .Append(WordSelect).Append(WordTop).Append('(').Append(Constant(rowCount)).Append(')')
+                .Append(WordFrom).Append('(').Append(nest1.ToString()).Append(") AS TT0")
+                .Append(WordOrderby).Append(reverseOrderby)
+                .ToString();
+
+            return new StringBuilder()
+                .Append(WordSelect).Append(fieldExpressions)
+                .Append(WordFrom).Append('(').Append(nest2).Append(") AS TT1")
+                .Append(WordOrderby).Append(orderbyExpression)
+                .ToString();
+        }
     }
 }

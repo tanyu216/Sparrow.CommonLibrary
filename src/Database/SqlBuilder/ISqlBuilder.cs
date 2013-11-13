@@ -168,5 +168,19 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         string QueryFormat(string topExpression, string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, SqlOptions options);
 
+        /// <summary>
+        /// 格式化分页sql查询
+        /// </summary>
+        /// <param name="fieldExpressions"></param>
+        /// <param name="tableExpression"></param>
+        /// <param name="conditionExpressions"></param>
+        /// <param name="groupbyExpression"></param>
+        /// <param name="havingExpression"></param>
+        /// <param name="orderbyExpression"></param>
+        /// <param name="startIndex">从第0行开始的startIndex</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        string QueryFormat(string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, int startIndex, int rowCount, SqlOptions options);
     }
 }
