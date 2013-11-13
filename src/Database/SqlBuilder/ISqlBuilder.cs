@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
-using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Entity;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder

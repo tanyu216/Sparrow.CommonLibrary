@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Timers;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
     /// 多线程安全的缓冲区，用于网络传输或文件操作的中间衔接，以提高数据输入输出的效率。

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Sparrow.CommonLibrary.Logging;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Web
 {
     /// <summary>
     /// 识别网络爬虫

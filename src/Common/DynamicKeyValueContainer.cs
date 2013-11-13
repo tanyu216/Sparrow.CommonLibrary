@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
     /// key/value容器对象，value不是一个静态值，而是由key设置的lambda表达式决定。

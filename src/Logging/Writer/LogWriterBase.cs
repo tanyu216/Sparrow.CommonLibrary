@@ -67,7 +67,7 @@ namespace Sparrow.CommonLibrary.Logging.Writer
 
         protected virtual string PropertiesSerializer(object data)
         {
-            return Sparrow.CommonLibrary.Utility.JsonSerialize.Serialize(data);
+            return Sparrow.CommonLibrary.Common.JsonSerialize.Serialize(data);
         }
 
         #region implement

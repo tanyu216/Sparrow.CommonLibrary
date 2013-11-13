@@ -9,12 +9,12 @@ namespace Sparrow.CommonLibrary.Database.Import
     /// <summary>
     /// 适用于SqlServer数据库的导入工具
     /// </summary>
-    public class SqlServerImporter : Importer
+    public class ImporterForSqlServer : Importer
     {
         private readonly IDictionary<string, string> _columnMappings;
         private readonly DbCommon.ICommandExecuter _executer;
 
-        public SqlServerImporter(DbCommon.ICommandExecuter executer)
+        public ImporterForSqlServer(DbCommon.ICommandExecuter executer)
         {
             _columnMappings = new Dictionary<string, string>();
             _executer = executer;

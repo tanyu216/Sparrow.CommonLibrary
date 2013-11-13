@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Configuration;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
     /// app.config/web.config配置节点：appSettings，当配置文件中不包含需要的配置是，使用默认设置的配置。

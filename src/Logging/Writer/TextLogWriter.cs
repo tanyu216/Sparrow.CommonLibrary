@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Logging.Writer
 {

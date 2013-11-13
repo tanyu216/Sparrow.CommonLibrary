@@ -8,7 +8,7 @@ using System.Collections;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
 using Sparrow.CommonLibrary.Database.DbCommon;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Database
 {

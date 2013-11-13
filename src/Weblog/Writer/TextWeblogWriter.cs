@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Weblog.Writer
 {

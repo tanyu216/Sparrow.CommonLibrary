@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using Sparrow.CommonLibrary.Logging;
 using Sparrow.CommonLibrary.Retrying;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Web
 {
     public class HttpClient
     {

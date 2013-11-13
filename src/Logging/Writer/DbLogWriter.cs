@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 using Sparrow.CommonLibrary.Database;
 
 namespace Sparrow.CommonLibrary.Logging.Writer

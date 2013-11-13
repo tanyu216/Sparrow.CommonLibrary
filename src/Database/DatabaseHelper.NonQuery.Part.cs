@@ -16,7 +16,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>受影响的行数</returns>
         public int ExecuteNonQuery(string commandText)
         {
-            return ExecuteNonQuery(CommandType.Text, commandText, null);
+            return ExecuteNonQuery(CommandType.Text, commandText, (ParameterCollection)null);
         }
 
         /// <summary>
@@ -38,6 +38,29 @@ namespace Sparrow.CommonLibrary.Database
         /// <param name="transaction"> </param>
         /// <returns>受影响的行数</returns>
         public int ExecuteNonQuery(string commandText, ParameterCollection parameters, DbTransaction transaction)
+        {
+            return ExecuteNonQuery(CommandType.Text, commandText, parameters, transaction);
+        }
+
+        /// <summary>
+        /// 执行sql语句，不返回结果集。
+        /// </summary>
+        /// <param name="commandText">sql语句</param>
+        /// <param name="parameters">sql语句的参数</param>
+        /// <returns>受影响的行数</returns>
+        public int ExecuteNonQuery(string commandText, params object[] parameters)
+        {
+            return ExecuteNonQuery(CommandType.Text, commandText, parameters);
+        }
+
+        /// <summary>
+        /// 执行sql语句，不返回结果集。
+        /// </summary>
+        /// <param name="commandText">sql语句</param>
+        /// <param name="parameters">sql语句的参数</param>
+        /// <param name="transaction"> </param>
+        /// <returns>受影响的行数</returns>
+        public int ExecuteNonQuery(string commandText, DbTransaction transaction, params object[] parameters)
         {
             return ExecuteNonQuery(CommandType.Text, commandText, parameters, transaction);
         }
@@ -75,7 +98,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>受影响的行数</returns>
         public int SprocExecuteNonQuery(string commandText)
         {
-            return ExecuteNonQuery(CommandType.StoredProcedure, commandText, null);
+            return ExecuteNonQuery(CommandType.StoredProcedure, commandText, (ParameterCollection)null);
         }
 
         /// <summary>

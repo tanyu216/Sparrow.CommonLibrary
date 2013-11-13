@@ -13,7 +13,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Database
 {
@@ -77,40 +77,6 @@ namespace Sparrow.CommonLibrary.Database
         #region Build
 
         /// <summary>
-        /// 生成数据查询Sql语句
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="condition"></param>
-        /// <param name="output"></param>
-        /// <param name="options"></param>
-        /// <param name="mapper"></param>
-        /// <returns></returns>
-        internal protected string BuildDqlSql<T>(ConditionExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
-        {
-            mapper = Map.GetIMapper<T>();
-            var metaInfo = mapper.MetaInfo;
-            var fields = metaInfo.GetFieldNames();
-            return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);
-        }
-
-        /// <summary>
-        /// 生成数据查询Sql语句
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="condition"></param>
-        /// <param name="output"></param>
-        /// <param name="options"></param>
-        /// <param name="mapper"></param>
-        /// <returns></returns>
-        internal protected string BuildDqlSql<T>(CompareExpression condition, ParameterCollection output, SqlOptions options, out IMapper<T> mapper)
-        {
-            mapper = Map.GetIMapper<T>();
-            var metaInfo = mapper.MetaInfo;
-            var fields = metaInfo.GetFieldNames();
-            return EntityToSql.StmBuilder.Query(mapper.MetaInfo, fields, condition, output, options);
-        }
-
-        /// <summary>
         /// 生成command对象
         /// </summary>
         /// <param name="commandType"></param>
@@ -127,6 +93,23 @@ namespace Sparrow.CommonLibrary.Database
                 command.Parameters.AddRange(parameterCollection.ToArray());
             //
             return command;
+        }
+
+        /// <summary>
+        /// 生成command对象
+        /// </summary>
+        /// <param name="commandType"></param>
+        /// <param name="commandText"></param>
+        /// <param name="parameterCollection"></param>
+        /// <returns></returns>
+        internal protected DbCommand BuildDbCommand(CommandType commandType, string commandText, object[] parameters)
+        {
+            if (commandText == null) throw new ArgumentNullException("commandText");
+
+            var plist = CreateParamterCollection(parameters.Length);
+            var pnames = plist.Fill(parameters);
+            var sql = string.Format(commandText, pnames);
+            return BuildDbCommand(commandType, sql, plist);
         }
 
         /// <summary>
@@ -304,6 +287,24 @@ namespace Sparrow.CommonLibrary.Database
         /// </summary>
         /// <param name="commandType"></param>
         /// <param name="commandText"></param>
+        /// <param name="parameters"></param>
+        /// <param name="dbTransaction"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IDataReader ExecuteReader(CommandType commandType, string commandText, object[] parameters, DbTransaction dbTransaction = null)
+        {
+            var command = BuildDbCommand(commandType, commandText, parameters);
+            if (dbTransaction == null)
+                return Executer.ExecuteReader(command);
+            //
+            return Executer.ExecuteReader(command, dbTransaction);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandType"></param>
+        /// <param name="commandText"></param>
         /// <param name="parameterCollection"></param>
         /// <param name="dbTransaction"></param>
         /// <returns></returns>
@@ -322,6 +323,24 @@ namespace Sparrow.CommonLibrary.Database
         /// </summary>
         /// <param name="commandType"></param>
         /// <param name="commandText"></param>
+        /// <param name="parameters"></param>
+        /// <param name="dbTransaction"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public T ExecuteScalar<T>(CommandType commandType, string commandText, object[] parameters, DbTransaction dbTransaction = null)
+        {
+            var command = BuildDbCommand(commandType, commandText, parameters);
+            if (dbTransaction == null)
+                return DbValueCast.Cast<T>(Executer.ExecuteScalar(command));
+            //
+            return DbValueCast.Cast<T>(Executer.ExecuteScalar(command, dbTransaction));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandType"></param>
+        /// <param name="commandText"></param>
         /// <param name="parameterCollection"></param>
         /// <param name="dbTransaction"></param>
         /// <returns></returns>
@@ -329,6 +348,24 @@ namespace Sparrow.CommonLibrary.Database
         public int ExecuteNonQuery(CommandType commandType, string commandText, ParameterCollection parameterCollection, DbTransaction dbTransaction = null)
         {
             var command = BuildDbCommand(commandType, commandText, parameterCollection);
+            if (dbTransaction == null)
+                return Executer.ExecuteNonQuery(command);
+            //
+            return Executer.ExecuteNonQuery(command, dbTransaction);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandType"></param>
+        /// <param name="commandText"></param>
+        /// <param name="parameters"></param>
+        /// <param name="dbTransaction"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public int ExecuteNonQuery(CommandType commandType, string commandText, object[] parameters, DbTransaction dbTransaction = null)
+        {
+            var command = BuildDbCommand(commandType, commandText, parameters);
             if (dbTransaction == null)
                 return Executer.ExecuteNonQuery(command);
             //

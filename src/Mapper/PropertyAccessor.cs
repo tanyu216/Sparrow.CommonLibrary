@@ -59,7 +59,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
         public virtual TPropertyType To<TPropertyType>(object value)
         {
-            return Sparrow.CommonLibrary.Utility.DbValueCast.Cast<TPropertyType>(value);
+            return Sparrow.CommonLibrary.Common.DbValueCast.Cast<TPropertyType>(value);
         }
     }
 

@@ -297,7 +297,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("condition");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.Delete(mapper.MetaInfo, condition, parameters, SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, condition.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
@@ -308,18 +308,23 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("condition");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.Delete(mapper.MetaInfo, condition, parameters, SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, condition.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
 
         #endregion
 
-        #region IRepository<T>.Query
+        #region IRepository<T>.Database.Query
 
         public IList<T> GetList()
         {
             return _database.ExecuteList<T>(SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), SqlOptions.NoLock));
+        }
+
+        public IList<T> GetList(int startIndex, int rowCount)
+        {
+            return new Queryable<T>(_database).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
         public IList<T> GetList(CompareExpression condition)
@@ -336,6 +341,11 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("condition");
 
             return _database.ExecuteList<T>(condition, SqlOptions.NoLock);
+        }
+
+        public IList<T> GetList(ConditionExpression condition, int startIndex, int rowCount)
+        {
+            return new Queryable<T>(_database).Where(condition).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
         public T Get(CompareExpression condition)

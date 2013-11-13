@@ -1,12 +1,12 @@
 ﻿using NUnit.Framework;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sparrow.CommonLibrary.Test.Utility
+namespace Sparrow.CommonLibrary.Test.Web
 {
     [TestFixture]
     public class RecognizeSpiderTest

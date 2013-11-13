@@ -328,6 +328,19 @@ namespace Sparrow.CommonLibrary.Query
             return this;
         }
 
+        /// <summary>
+        /// 启用分页查询
+        /// </summary>
+        /// <param name="startIndex">从0行开始的起始行，小于0则表示不使用分页查询。</param>
+        /// <param name="rowCount">数据返回的行数</param>
+        /// <returns></returns>
+        public Queryable<T> RowLimit(int startIndex, int rowCount)
+        {
+            this.startIndex = startIndex;
+            this.rowCount = rowCount;
+            return this;
+        }
+
         public SqlOptions Options { get; set; }
 
         public override ExpressionType NodeType
@@ -348,17 +361,33 @@ namespace Sparrow.CommonLibrary.Query
             var havingExpression = _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty;
             var orderbyExpression = _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "DESC" : "ASC"))) : string.Empty;
 
-            return builder.QueryFormat(
-                topExpressions,//top(10)
-                fieldExpressions,//id,name,...
-                tableExpression,//tableName
-                conditionExpressions,//where id>1 and...
-                groupbyExpression,//group by name....
-                havingExpression,//having count(name)>1 ...
-                orderbyExpression,//order id
-                distinct ? Options & SqlOptions.Distinct : Options
-                );
-
+            if (startIndex < 0)
+            {
+                return builder.QueryFormat(
+                    topExpressions,//top(10)
+                    fieldExpressions,//id,name,...
+                    tableExpression,//tableName
+                    conditionExpressions,//where id>1 and...
+                    groupbyExpression,//group by name....
+                    havingExpression,//having count(name)>1 ...
+                    orderbyExpression,//order id
+                    distinct ? Options & SqlOptions.Distinct : Options
+                    );
+            }
+            else
+            {
+                return builder.QueryFormat(
+                    fieldExpressions,//id,name,...
+                    tableExpression,//tableName
+                    conditionExpressions,//where id>1 and...
+                    groupbyExpression,//group by name....
+                    havingExpression,//having count(name)>1 ...
+                    orderbyExpression,//order id
+                    startIndex,
+                    rowCount,
+                    distinct ? Options & SqlOptions.Distinct : Options
+                    );
+            }
         }
 
         public string OutputSqlString(ParameterCollection output)
@@ -400,6 +429,9 @@ namespace Sparrow.CommonLibrary.Query
 
         private bool distinct;
         private int top;
+
+        private int startIndex = -1;
+        private int rowCount = 0;
 
         private CollectionExpression _fields;
         private CollectionExpression Fields { get { return _fields = _fields ?? new CollectionExpression(); } }

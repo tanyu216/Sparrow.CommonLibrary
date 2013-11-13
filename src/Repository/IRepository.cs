@@ -27,8 +27,9 @@ namespace Sparrow.CommonLibrary.Repository
         #region Query
 
         IList<T> GetList();
+        IList<T> GetList(int startIndex, int rowCount);
         IList<T> GetList(CompareExpression condition);
-        IList<T> GetList(ConditionExpression condition);
+        IList<T> GetList(ConditionExpression condition, int startIndex, int rowCount);
 
         T Get(object id);
         T Get(CompareExpression condition);

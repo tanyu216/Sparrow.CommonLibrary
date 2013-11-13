@@ -18,7 +18,7 @@ namespace Sparrow.CommonLibrary.Database.Import
         static ImporterManager()
         {
             importers = new ConcurrentDictionary<string, Type>();
-            importers["provider:system.data.sqlclient"] = typeof(SqlServerImporter);
+            importers["provider:system.data.sqlclient"] = typeof(ImporterForSqlServer);
         }
 
         public static void SetImporterType(string providerName, Type type)

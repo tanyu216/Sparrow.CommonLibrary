@@ -88,8 +88,8 @@
     <Compile Include="Database\DbCommon\DbProvider.cs" />
     <Compile Include="Database\DbCommon\ExecuterManager.cs" />
     <Compile Include="Database\DbCommon\ICommandExecuter.cs" />
-    <Compile Include="Database\Import\ImporterManager.cs" />
-    <Compile Include="Database\Import\Importer.cs" />
+    <Compile Include="Database\ImporterManager.cs" />
+    <Compile Include="Database\Importer.cs" />
     <Compile Include="Database\ParameterCollection.cs" />
     <Compile Include="Query\AliasExpression.cs" />
     <Compile Include="Database\SqlBatch.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Entity\IEntityExplain.cs" />
     <Compile Include="Entity\IEntityFieldAccessor.cs" />
     <Compile Include="Entity\ItemValue.cs" />
-    <Compile Include="Database\Import\SqlServerImporter.cs" />
+    <Compile Include="Database\ImporterForSqlServer.cs" />
     <Compile Include="Extenssions\CollectionExtenssions.cs" />
     <Compile Include="Extenssions\OtherExtenssions.cs" />
     <Compile Include="Extenssions\ValidationExtenssions.cs" />
@@ -115,7 +115,7 @@
     <Compile Include="Mapper\DataSource\IDataSourceReaderProvider.cs" />
     <Compile Include="Mapper\IMappingTrigger.cs" />
     <Compile Include="Query\DatabaseHelperExtessions.cs" />
-    <Compile Include="Utility\DbValueCast.cs" />
+    <Compile Include="Common\DbValueCast.cs" />
     <Compile Include="Mapper\IMapper.cs" />
     <Compile Include="Mapper\IPropertyAccessor.cs" />
     <Compile Include="Mapper\MapperException.cs" />
@@ -157,7 +157,7 @@
     <Compile Include="Database\SqlBuilder\OracleStatementBuilder.cs" />
     <Compile Include="Database\SqlBuilder\SqlOptions.cs" />
     <Compile Include="Database\SqlBuilder\SqlServerStatementBuilder.cs" />
-    <Compile Include="DefaultSettings.cs" />
+    <Compile Include="Common\DefaultSettings.cs" />
     <Compile Include="Logging\Configuration\FilterElementCollection.cs" />
     <Compile Include="Logging\Configuration\FilterElement.cs" />
     <Compile Include="Logging\Configuration\LoggingConfigurationSection.cs" />
@@ -183,15 +183,15 @@
     <Compile Include="Retrying\NonRetryInterval.cs" />
     <Compile Include="Retrying\RetryingEventArgs.cs" />
     <Compile Include="Retrying\RetryStrategy.cs" />
-    <Compile Include="Utility\AppSettings.cs" />
-    <Compile Include="Utility\Buffered.cs" />
+    <Compile Include="Common\AppSettings.cs" />
+    <Compile Include="Common\Buffered.cs" />
     <Compile Include="Extenssions\DataExtenssions.cs" />
-    <Compile Include="Utility\OperationException.cs" />
+    <Compile Include="Common\OperationException.cs" />
     <Compile Include="Extenssions\ConvertExtenssions.cs" />
-    <Compile Include="Utility\DynamicKeyValueContainer.cs" />
-    <Compile Include="Utility\JsonSerialize.cs" />
-    <Compile Include="Utility\PathBuilder.cs" />
-    <Compile Include="Utility\Timestamp.cs" />
+    <Compile Include="Common\DynamicKeyValueContainer.cs" />
+    <Compile Include="Common\JsonSerialize.cs" />
+    <Compile Include="Common\PathBuilder.cs" />
+    <Compile Include="Common\Timestamp.cs" />
     <Compile Include="Weblog\Collect\CollecterTypeContainer.cs" />
     <Compile Include="Weblog\Collect\Collecters.cs" />
     <Compile Include="Weblog\Collect\ICollecter.cs" />
@@ -215,8 +215,8 @@
     <Compile Include="Weblog\Writer\WeblogWriterBase.cs" />
     <Compile Include="Weblog\Writer\MSMQWeblogWriter.cs" />
     <Compile Include="Extenssions\WebExtenssions.cs" />
-    <Compile Include="Utility\HttpClient.cs" />
-    <Compile Include="Utility\RecognizeSpider.cs" />
+    <Compile Include="Web\HttpClient.cs" />
+    <Compile Include="Web\RecognizeSpider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Validation\" />

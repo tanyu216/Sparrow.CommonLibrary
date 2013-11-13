@@ -1,5 +1,5 @@
 ﻿using Sparrow.CommonLibrary.Entity;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,22 +13,22 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     /// </summary>
     public abstract class CommonBuilder : ISqlBuilder
     {
-        #region Words
+        #region KeyWord
 
-        protected static readonly string WordSelect = "SELECT ";
-        protected static readonly string WordDelete = "DELETE ";
-        protected static readonly string WordUpdate = "UPDATE ";
-        protected static readonly string WordInsertInto = "INSERT INTO ";
-        protected static readonly string WordSet = " SET ";
-        protected static readonly string WordFrom = " FROM ";
-        protected static readonly string WordAllFields = " * ";
-        protected static readonly string WordValues = " VALUES ";
-        protected static readonly string WordWhere = " WHERE ";
-        protected static readonly string WordGroupby = " GROUP BY ";
-        protected static readonly string WordHaving = " HAVING ";
-        protected static readonly string WordOrderby = " ORDER BY ";
-        protected static readonly string WordTop = " TOP ";
-        protected static readonly string WordDistinct = " DISTINCT ";
+        protected static readonly string KeyWordSelect = "SELECT ";
+        protected static readonly string KeyWordDelete = "DELETE ";
+        protected static readonly string KeyWordUpdate = "UPDATE ";
+        protected static readonly string KeyWordInsertInto = "INSERT INTO ";
+        protected static readonly string KeyWordSet = " SET ";
+        protected static readonly string KeyWordFrom = " FROM ";
+        protected static readonly string KeyWordAllFields = " * ";
+        protected static readonly string KeyWordValues = " VALUES ";
+        protected static readonly string KeyWordWhere = " WHERE ";
+        protected static readonly string KeyWordGroupby = " GROUP BY ";
+        protected static readonly string KeyWordHaving = " HAVING ";
+        protected static readonly string KeyWordOrderby = " ORDER BY ";
+        protected static readonly string KeyWordTop = " TOP ";
+        protected static readonly string KeyWordDistinct = " DISTINCT ";
 
         #endregion
 
@@ -171,9 +171,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             var values = ExpressionsJoin(fieldAndValueExpressions.Select(x => x.Value));
             // insert into {tableName}({fields})values({values})
             return new StringBuilder()
-                .Append(WordInsertInto).Append(BuildTableName(tableName))
+                .Append(KeyWordInsertInto).Append(BuildTableName(tableName))
                 .Append("(").Append(fields).Append(")")
-                .Append(WordValues).Append("(").Append(values).Append(")")
+                .Append(KeyWordValues).Append("(").Append(values).Append(")")
                 .ToString();
         }
 
@@ -192,7 +192,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             var sql = new StringBuilder();
             // 1、生成UPDATE语句前半部分
             // 示例：UPDATE TableName SET
-            sql.Append(WordUpdate).Append(BuildTableName(tableName)).Append(WordSet);
+            sql.Append(KeyWordUpdate).Append(BuildTableName(tableName)).Append(KeyWordSet);
 
             // 2、生成中间set字段值部分
             // 示例：ColumnName=@parameterName,
@@ -206,7 +206,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
 
             // 3、加入修改条件
             if (!string.IsNullOrEmpty(condition))
-                sql.Append(WordWhere).Append(condition);
+                sql.Append(KeyWordWhere).Append(condition);
 
             // 4、返回
             return sql.ToString();
@@ -215,10 +215,10 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         public virtual string DeleteFormat(string tableName, string condition, SqlOptions options)
         {
             //delete from {tableName} where {condition}
-            var str = new StringBuilder().Append(WordDelete).Append(BuildTableName(tableName));
+            var str = new StringBuilder().Append(KeyWordDelete).Append(BuildTableName(tableName));
 
             if (!string.IsNullOrEmpty(condition))
-                str.Append(WordWhere).Append(condition);
+                str.Append(KeyWordWhere).Append(condition);
 
             return str.ToString();
         }
@@ -230,28 +230,27 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(tableExpression))
                 throw new ArgumentNullException("tableExpression");
 
-            //select [distinct][top(1)] {fieldExpressions} from {tableExpression} [where conditionExpression] [group by {groupbyExpression} [having {havingExpression}]] [order by {orderbyExpression}]
-            var str = new StringBuilder().Append(WordSelect);
-            if ((options & SqlOptions.Distinct) > 0)
-                str.Append(WordDistinct);
-            if (!string.IsNullOrEmpty(topExpression))
-                str.Append(WordTop).Append('(').Append(topExpression).Append(')');
+            //select {fieldExpressions} from {tableName} as {alias} where {condition}
+            var str = new StringBuilder(KeyWordSelect);
 
-            str.Append(fieldExpressions).Append(WordFrom).Append(tableExpression);
+            if ((options & SqlOptions.Distinct) > 0)
+                str.Append(KeyWordDistinct);
+
+            str.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
-                str.Append(WordWhere).Append(conditionExpressions);
+                str.Append(KeyWordWhere).Append(conditionExpressions);
 
             if (!string.IsNullOrEmpty(groupbyExpression))
             {
-                str.Append(WordGroupby).Append(groupbyExpression);
+                str.Append(KeyWordGroupby).Append(groupbyExpression);
 
                 if (!string.IsNullOrEmpty(havingExpression))
-                    str.Append(WordHaving).Append(havingExpression);
+                    str.Append(KeyWordHaving).Append(havingExpression);
             }
 
             if (!string.IsNullOrEmpty(orderbyExpression))
-                str.Append(WordOrderby).Append(orderbyExpression);
+                str.Append(KeyWordOrderby).Append(orderbyExpression);
 
             return str.ToString();
         }
@@ -281,24 +280,28 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(orderbyExpression))
                 throw new ArgumentNullException("orderbyExpression");
 
-            // select top {rowCount} * from (select top ({startIndex}+{rowCount}) {fieldExpressions} from {tableExpressions} [where conditionExpression] [group by {groupbyExpression} [having havingExpression]] by order by {orderExpression}))
-            var nest1 = new StringBuilder().Append(WordSelect);
-            nest1.Append(WordTop).Append('(').Append(Constant(startIndex + rowCount)).Append(')');
-            nest1.Append(fieldExpressions);
-            nest1.Append(WordFrom).Append(tableExpression);
+            //select [distinct][top(1)] {fieldExpressions} from {tableName} as {alias}
+            var nest1 = new StringBuilder(KeyWordSelect);
+            if ((options & SqlOptions.Distinct) > 0)
+                nest1.Append(KeyWordDistinct);
+
+            nest1.Append(KeyWordTop).Append('(').Append(Constant(startIndex+rowCount)).Append(')');
+
+            nest1.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
-                nest1.Append(WordWhere).Append(conditionExpressions);
+                nest1.Append(KeyWordWhere).Append(conditionExpressions);
 
             if (!string.IsNullOrEmpty(groupbyExpression))
             {
-                nest1.Append(WordGroupby).Append(groupbyExpression);
+                nest1.Append(KeyWordGroupby).Append(groupbyExpression);
 
                 if (!string.IsNullOrEmpty(havingExpression))
-                    nest1.Append(WordHaving).Append(havingExpression);
+                    nest1.Append(KeyWordHaving).Append(havingExpression);
             }
 
-            nest1.Append(WordOrderby).Append(orderbyExpression);
+            if (!string.IsNullOrEmpty(orderbyExpression))
+                nest1.Append(KeyWordOrderby).Append(orderbyExpression);
 
             var reverseOrderby = orderReplace.Replace(orderbyExpression, x =>
             {
@@ -317,15 +320,15 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             });
 
             var nest2 = new StringBuilder()
-                .Append(WordSelect).Append(WordTop).Append('(').Append(Constant(rowCount)).Append(')')
-                .Append(WordFrom).Append('(').Append(nest1.ToString()).Append(") AS TT0")
-                .Append(WordOrderby).Append(reverseOrderby)
+                .Append(KeyWordSelect).Append(KeyWordTop).Append('(').Append(Constant(rowCount)).Append(')')
+                .Append(KeyWordFrom).Append('(').Append(nest1.ToString()).Append(") AS TT0")
+                .Append(KeyWordOrderby).Append(reverseOrderby)
                 .ToString();
 
             return new StringBuilder()
-                .Append(WordSelect).Append(fieldExpressions)
-                .Append(WordFrom).Append('(').Append(nest2).Append(") AS TT1")
-                .Append(WordOrderby).Append(orderbyExpression)
+                .Append(KeyWordSelect).Append(fieldExpressions)
+                .Append(KeyWordFrom).Append('(').Append(nest2).Append(") AS TT1")
+                .Append(KeyWordOrderby).Append(orderbyExpression)
                 .ToString();
         }
     }

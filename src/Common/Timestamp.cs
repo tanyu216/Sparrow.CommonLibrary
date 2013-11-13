@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
     /// 基于格林威志的Unix时间截

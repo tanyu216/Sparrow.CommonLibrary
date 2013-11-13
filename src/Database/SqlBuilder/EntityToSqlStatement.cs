@@ -5,7 +5,7 @@ using Sparrow.CommonLibrary.Entity;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder
 {

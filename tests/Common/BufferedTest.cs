@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sparrow.CommonLibrary.Utility;
+using Sparrow.CommonLibrary.Common;
 
-namespace Sparrow.CommonLibrary.Test.Utility
+namespace Sparrow.CommonLibrary.Test.Common
 {
     [TestFixture]
     public class BufferedTest

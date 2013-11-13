@@ -14,9 +14,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     /// </summary>
     public class OracleStatementBuilder : CommonBuilder
     {
-        protected static readonly string WordRowLock = " FOR UPDATE ";
-        protected static readonly string WordUpdateLock = " FOR UPDATE ";
-        protected static readonly string WordTabLock = " IN EXCLUSIVE ";
+        protected static readonly string KeyWordRowLock = " FOR UPDATE ";
+        protected static readonly string KeyWordUpdateLock = " FOR UPDATE ";
+        protected static readonly string KeyWordTabLock = " IN EXCLUSIVE ";
 
         /// <summary>
         /// 
@@ -62,11 +62,11 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         {
             var optVal = (int)options;
             if ((optVal & (int)SqlOptions.RowLock) > 0)
-                return WordRowLock;
+                return KeyWordRowLock;
             if ((optVal & (int)SqlOptions.UpdateLock) > 0)
-                return WordUpdateLock;
+                return KeyWordUpdateLock;
             if ((optVal & (int)SqlOptions.TableLock) > 0)
-                return WordTabLock;
+                return KeyWordTabLock;
             //
             return string.Empty;
         }
@@ -82,9 +82,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             var values = ExpressionsJoin(fieldAndExpressions.Select(x => x.Value));
             // insert into {tableName}({fields})values({values})
             return new StringBuilder()
-                .Append(WordInsertInto).Append(BuildTableName(tableName))
+                .Append(KeyWordInsertInto).Append(BuildTableName(tableName))
                 .Append("(").Append(BuildField(incrementField)).Append(',').Append(fields).Append(")")
-                .Append(WordValues).Append("(").Append(incrementName).Append(".NEXTVAL,").Append(values).Append(")")
+                .Append(KeyWordValues).Append("(").Append(incrementName).Append(".NEXTVAL,").Append(values).Append(")")
                 .ToString();
         }
 
@@ -110,33 +110,35 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(tableExpression))
                 throw new ArgumentNullException("tableExpression");
 
-            //select [distinct][top(1)] {fieldExpressions} from {tableName} as {alias}
-            var str = new StringBuilder().Append(WordSelect);
+            //select [distinct][top(1)] {fieldExpressions} from {tableExpression}
+            var str = new StringBuilder(KeyWordSelect);
             if ((options & SqlOptions.Distinct) > 0)
-                str.Append(WordDistinct);
+                str.Append(KeyWordDistinct);
             if (!string.IsNullOrEmpty(topExpression))
-                str.Append(WordTop).Append('(').Append(topExpression).Append(')');
+                str.Append(KeyWordTop).Append('(').Append(topExpression).Append(')');
 
-            str.Append(fieldExpressions).Append(WordFrom).Append(tableExpression);
+            str.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
-                str.Append(WordWhere).Append(conditionExpressions);
+                str.Append(KeyWordWhere).Append(conditionExpressions);
 
             if (!string.IsNullOrEmpty(groupbyExpression))
-                str.Append(WordGroupby).Append(groupbyExpression);
+            {
+                str.Append(KeyWordGroupby).Append(groupbyExpression);
 
-            if (!string.IsNullOrEmpty(havingExpression))
-                str.Append(WordHaving).Append(havingExpression);
+                if (!string.IsNullOrEmpty(havingExpression))
+                    str.Append(KeyWordHaving).Append(havingExpression);
+            }
 
             if (!string.IsNullOrEmpty(orderbyExpression))
-                str.Append(WordOrderby).Append(orderbyExpression);
+                str.Append(KeyWordOrderby).Append(orderbyExpression);
 
             return str.Append(LockOption(options)).ToString();
         }
 
         public override string QueryFormat(string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, int startIndex, int rowCount, SqlOptions options)
         {
-            
+            throw new NotImplementedException();
         }
     }
 }

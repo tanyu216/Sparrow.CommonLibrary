@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sparrow.CommonLibrary.Query;
 
 namespace Sparrow.CommonLibrary.Query
 {

@@ -16,15 +16,9 @@ namespace Sparrow.CommonLibrary
         /// </summary>
         public static string ConfigurationName { get; set; }
 
-        /// <summary>
-        /// 日期格式化输出。
-        /// </summary>
-        public static string DateTimeFormateString { get; set; }
-
         static DefaultSettings()
         {
             ConfigurationName = "sparrow.CommonLibrary";
-            DateTimeFormateString = "yyyy-MM-dd";
         }
 
     }

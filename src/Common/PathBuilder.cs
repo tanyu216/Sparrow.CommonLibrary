@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Sparrow.CommonLibrary.Extenssions;
 
-namespace Sparrow.CommonLibrary.Utility
+namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
     /// 文件路径生成辅助工具
