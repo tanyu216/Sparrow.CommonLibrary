@@ -16,6 +16,8 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     /// </summary>
     public class MySqlStatementBuilder : CommonBuilder
     {
+        private static readonly string KeyWordLimit = " LIMIT ";
+
         public static readonly MySqlStatementBuilder Default = new MySqlStatementBuilder();
 
         readonly static Regex testNameRegex = new Regex(@"^(`\w+`)(\.`\w+`)*$", RegexOptions.Compiled);
@@ -61,17 +63,76 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
 
         public override string IncrementByQuery(string incrementName, string alias, SqlOptions options)
         {
-            throw new NotImplementedException();
+            return string.Format("SELECT LAST_INSERT_ID() AS {0}", BuildAlias(alias ?? incrementName));
         }
 
         public override string IncrementByParameter(string incrementName, string paramName, SqlOptions options)
         {
-            throw new NotImplementedException();
+            return string.Concat("SELECT {0}:=LAST_INSERT_ID() ", BuildParameterName(paramName));
         }
 
         public override string IfExistsFormat(string ifQuerySql, string ifTrueSql, string ifFalseSql, SqlOptions options)
         {
-            throw new NotImplementedException();
+            var sql = new StringBuilder();
+            // 
+            if (string.IsNullOrWhiteSpace(ifTrueSql) || string.IsNullOrWhiteSpace(ifFalseSql))
+            {
+                if (string.IsNullOrWhiteSpace(ifTrueSql))
+                {
+                    sql.Append("IF EXISTS(").Append(ifQuerySql).AppendLine(") THEN");
+                    sql.AppendLine(ifTrueSql);
+                    sql.AppendLine("END IF");
+                }
+                else
+                {
+                    sql.Append("IF NOT EXISTS(").Append(ifQuerySql).AppendLine(") THEN");
+                    sql.AppendLine(ifFalseSql);
+                    sql.AppendLine("END IF");
+                }
+            }
+            else
+            {
+                sql.Append("IF EXISTS(").Append(ifQuerySql).AppendLine(") THEN");
+                sql.AppendLine(ifTrueSql);
+                sql.AppendLine(" ELSE ");
+                sql.AppendLine(ifFalseSql);
+                sql.AppendLine("END IF");
+            }
+            // 
+            return sql.ToString();
+        }
+
+        public override string QueryFormat(string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, int startIndex, int rowCount, SqlOptions options)
+        {
+            if (string.IsNullOrEmpty(fieldExpressions))
+                throw new ArgumentNullException("fieldExpressions");
+            if (string.IsNullOrEmpty(tableExpression))
+                throw new ArgumentNullException("tableExpression");
+
+            var sql = new StringBuilder(KeyWordSelect);
+            if ((options & SqlOptions.Distinct) > 0)
+                sql.Append(KeyWordDistinct);
+
+            sql.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
+
+            if (!string.IsNullOrEmpty(conditionExpressions))
+                sql.Append(KeyWordWhere).Append(conditionExpressions);
+
+            if (!string.IsNullOrEmpty(groupbyExpression))
+            {
+                sql.Append(KeyWordGroupby).Append(groupbyExpression);
+
+                if (!string.IsNullOrEmpty(havingExpression))
+                    sql.Append(KeyWordHaving).Append(havingExpression);
+            }
+
+            if (!string.IsNullOrEmpty(orderbyExpression))
+                sql.Append(KeyWordOrderby).Append(orderbyExpression);
+
+            // limit 10,20
+            sql.Append(KeyWordLimit).Append(Constant(startIndex)).Append(',').Append(Constant(startIndex + rowCount));
+
+            return sql.ToString();
         }
     }
 }

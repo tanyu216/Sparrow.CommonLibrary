@@ -90,12 +90,12 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
 
         public override string IncrementByQuery(string incrementName, string alias, SqlOptions options)
         {
-            return string.Format("SELECT {0}.CURRVAL {1} FROM DUAL", incrementName, alias ?? incrementName);
+            return string.Format("SELECT {0}.CURRVAL {1} FROM DUAL", incrementName, BuildAlias(alias ?? incrementName));
         }
 
         public override string IncrementByParameter(string incrementName, string paramName, SqlOptions options)
         {
-            return string.Format("SELECT {1}={0}.CURRVAL FROM DUAL", incrementName, BuildParameterName(paramName));
+            return string.Format("{1}:={0}.CURRVAL ", incrementName, BuildParameterName(paramName));
         }
 
         public override string IfExistsFormat(string ifQuerySql, string ifTrueSql, string ifFalseSql, SqlOptions options)
@@ -110,35 +110,57 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(tableExpression))
                 throw new ArgumentNullException("tableExpression");
 
-            //select [distinct][top(1)] {fieldExpressions} from {tableExpression}
-            var str = new StringBuilder(KeyWordSelect);
+            //select [distinct][top(1)] {fieldExpressions} from {tableExpression} [where {conditionExpression}] [group by {groupbyExpression} [having {havingExpression}]] [{lock} ]
+            var sql = new StringBuilder(KeyWordSelect);
             if ((options & SqlOptions.Distinct) > 0)
-                str.Append(KeyWordDistinct);
+                sql.Append(KeyWordDistinct);
             if (!string.IsNullOrEmpty(topExpression))
-                str.Append(KeyWordTop).Append('(').Append(topExpression).Append(')');
+                sql.Append(KeyWordTop).Append('(').Append(topExpression).Append(')');
 
-            str.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
+            sql.Append(fieldExpressions).Append(KeyWordFrom).Append(tableExpression);
 
             if (!string.IsNullOrEmpty(conditionExpressions))
-                str.Append(KeyWordWhere).Append(conditionExpressions);
+                sql.Append(KeyWordWhere).Append(conditionExpressions);
 
             if (!string.IsNullOrEmpty(groupbyExpression))
             {
-                str.Append(KeyWordGroupby).Append(groupbyExpression);
+                sql.Append(KeyWordGroupby).Append(groupbyExpression);
 
                 if (!string.IsNullOrEmpty(havingExpression))
-                    str.Append(KeyWordHaving).Append(havingExpression);
+                    sql.Append(KeyWordHaving).Append(havingExpression);
             }
 
             if (!string.IsNullOrEmpty(orderbyExpression))
-                str.Append(KeyWordOrderby).Append(orderbyExpression);
+                sql.Append(KeyWordOrderby).Append(orderbyExpression);
 
-            return str.Append(LockOption(options)).ToString();
+            return sql.Append(LockOption(options)).ToString();
         }
+
+        /// <summary>
+        /// 分页查询模板
+        /// <para>
+        /// select * from (
+        ///     select *,rownum AS tt0_temp_rownumber from(
+        ///         select {0:feildExpressions} from {1:tableExpression} [where {2:conditionExpression}] [group by {3:groupbyExpression} [having {4:havingExpression}]] {8:lock} 
+        ///     )as tt0 where rownum &lt;= {6:startIndex}+{7:rowcount}
+        /// )as tt1 where tt0_temp_rownumber &gt; {6:startIndex}
+        /// </para>
+        /// </summary>
+        private static readonly string tmplPageOfSql1 = "SELECT /*+ FIRST_ROWS */ * FROM (SELECT *,ROWNUM AS TT0_TEMP_ROWNUMBER FROM(SELECT {0} FROM {1} {2} {3} {4} {5} {8} )AS TT0 WHERE ROWNUM <= {6}+{7}) AS TT1WHERE TT0_TEMP_ROWNUMBER<{6}";
 
         public override string QueryFormat(string fieldExpressions, string tableExpression, string conditionExpressions, string groupbyExpression, string havingExpression, string orderbyExpression, int startIndex, int rowCount, SqlOptions options)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(fieldExpressions))
+                throw new ArgumentNullException("fieldExpressions");
+            if (string.IsNullOrEmpty(tableExpression))
+                throw new ArgumentNullException("tableExpression");
+
+            return string.Format(tmplPageOfSql1, fieldExpressions, tableExpression,
+                string.IsNullOrEmpty(conditionExpressions) ? null : string.Concat(KeyWordWhere, conditionExpressions),
+                string.IsNullOrEmpty(groupbyExpression) ? null : string.Concat(KeyWordGroupby, groupbyExpression),
+                string.IsNullOrEmpty(groupbyExpression) || string.IsNullOrEmpty(havingExpression) ? null : string.Concat(KeyWordHaving, havingExpression),
+                string.IsNullOrEmpty(orderbyExpression) ? null : string.Concat(KeyWordOrderby, orderbyExpression),
+                Constant(startIndex), Constant(rowCount), LockOption(options));
         }
     }
 }
