@@ -20,7 +20,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
 
         public static IMapper<UserProfile3> GetIMapper()
         {
-            return new DataMapper<UserProfile3>()
+            return DataMapperExtenssions.Create<UserProfile3>()
                 .AppendProperty(x => x.Id, "Id")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")

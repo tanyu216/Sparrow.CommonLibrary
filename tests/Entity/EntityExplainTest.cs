@@ -31,6 +31,7 @@ namespace Sparrow.CommonLibrary.Test.Entity
             Assert.AreEqual(dbMetaInfo.GetProperties()[1].PropertyName, "Name");
 
             var explain = new EntityExplain(user);
+            Assert.AreEqual(explain["Id"], 1);
             Assert.AreEqual(explain.GetSettedFields().Skip(1).First(), "Name");
             Assert.AreEqual(explain.GetFieldValues(explain.GetSettedFields()).Skip(1).First().Value, "test");
             Assert.IsTrue(explain.IsSetted(0));

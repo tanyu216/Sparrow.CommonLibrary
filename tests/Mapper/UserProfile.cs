@@ -20,13 +20,13 @@ namespace Sparrow.CommonLibrary.Test.Mapper
 
         public static IMapper<UserProfile> GetIMapper()
         {
-            return new DataMapper<UserProfile>("UserProfile")
-                .AppendProperty(x => x.Id, "Id")
+            return DataMapperExtenssions.Create<UserProfile>("UserProfile")
+                .AppendProperty(x => x.Id, "Id", true)
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")
                 .AppendProperty(x => x.Email, "Email")
                 .AppendProperty(x => x.FixPhone, "FixPhone")
-                .Complete(x => EntityBuilder.BuildEntityClass<UserProfile>(x.MetaInfo));
+                .Complie();
 
         }
     }

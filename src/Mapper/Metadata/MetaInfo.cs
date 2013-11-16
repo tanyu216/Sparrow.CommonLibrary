@@ -177,7 +177,7 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
             {
                 lock (propertyList)
                 {
-                    if (!isReorganize)
+                    if (isReorganize)
                     {
                         return;
                     }

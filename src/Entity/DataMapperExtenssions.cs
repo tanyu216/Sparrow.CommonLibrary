@@ -10,6 +10,11 @@ namespace Sparrow.CommonLibrary.Entity
 {
     public static class DataMapperExtenssions
     {
+        public static DataMapper<T> Create<T>()
+        {
+            return new DataMapper<T>(new DbMetaInfo(null, typeof(T)));
+        }
+
         public static DataMapper<T> Create<T>(string tableName)
         {
             return new DataMapper<T>(new DbMetaInfo(tableName, typeof(T)));
@@ -57,6 +62,11 @@ namespace Sparrow.CommonLibrary.Entity
             dataMapper.MetaInfo.AddPropertyInfo(new DbIncrementMetaPropertyInfo(property.MetaInfo, property.PropertyName, property.PropertyInfo, ((property is DbMetaPropertyInfo) ? ((DbMetaPropertyInfo)property).IsKey : false), incrementName, startVal));
 
             return dataMapper;
+        }
+
+        public static DataMapper<T> Complie<T>(this DataMapper<T> dataMapper)
+        {
+            return dataMapper.Complete(x => EntityBuilder.BuildEntityClass<T>(x.MetaInfo));
         }
     }
 }

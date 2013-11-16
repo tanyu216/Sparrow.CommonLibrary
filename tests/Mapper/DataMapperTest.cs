@@ -108,7 +108,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             Assert.AreEqual(mapper.MetaInfo[1].PropertyName, "Name");
             Assert.AreEqual(mapper.MetaInfo.IndexOf("Email"), 3);
 
-            Assert.IsNull(mapper.MetaInfo.Name);
+            Assert.IsNotNull(mapper.MetaInfo.Name);
             Assert.AreEqual(mapper.MetaInfo.GetPropertyNames()[3], "Email");
             Assert.AreEqual(mapper.MetaInfo.PropertyCount, 5);
 
@@ -124,12 +124,10 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         {
             var mapper = UserProfile.GetIMapper();
             var field1 = (DbMetaPropertyInfo)mapper.MetaInfo.GetProperties()[0];
-            var field2 = (DbMetaPropertyInfo)mapper.MetaInfo.GetProperties()[3];
-
+            
             Assert.AreEqual(field1.PropertyName, "Id");
-            Assert.AreEqual(field2.PropertyName, "Email");
             Assert.IsTrue(field1.IsKey);
-            Assert.IsFalse(field2.IsKey);
+
 
         }
 

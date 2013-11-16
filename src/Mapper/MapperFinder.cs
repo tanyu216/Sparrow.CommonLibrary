@@ -132,7 +132,7 @@ namespace Sparrow.CommonLibrary.Mapper
                         mapper.AppendProperty(exp, property.Name);
                     }
                 }
-                if (((IMetaInfo)mapper).PropertyCount == 0)
+                if (mapper.MetaInfo.PropertyCount == 0)
                     throw new ArgumentException(string.Format("{0}没有公开任何可读写的成员属性。", typeof(T).FullName));
                 //
                 return mapper.Complete();

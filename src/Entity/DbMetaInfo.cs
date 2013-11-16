@@ -26,7 +26,14 @@ namespace Sparrow.CommonLibrary.Entity
         /// <summary>
         /// 表中主键的数量
         /// </summary>
-        public int KeyCount { get { return _keys.Length; } }
+        public int KeyCount
+        {
+            get
+            {
+                Reorganize();
+                return _keys.Length;
+            }
+        }
 
         public DbMetaInfo(string tableName, Type entityType)
             : base(tableName, entityType)
@@ -64,7 +71,7 @@ namespace Sparrow.CommonLibrary.Entity
             {
                 lock (_syncObj)
                 {
-                    if (!isReorganize)
+                    if (isReorganize)
                     {
                         return;
                     }
