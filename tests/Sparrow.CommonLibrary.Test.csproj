@@ -46,6 +46,7 @@
     <Compile Include="Cryptography\CryptTest.cs" />
     <Compile Include="Cryptography\HashTest.cs" />
     <Compile Include="Database\DatabaseTest.cs" />
+    <Compile Include="Database\SqlBuilderTest.cs" />
     <Compile Include="Entity\EntityExplainTest.cs" />
     <Compile Include="Entity\EntityTest.cs" />
     <Compile Include="Extenssions\CollectionExtenssionsTest.cs" />
