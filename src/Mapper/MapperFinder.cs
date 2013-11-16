@@ -29,7 +29,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="finder"></param>
         public static void AddFinder(MapperFinder finder)
         {
-            if (finder == null) throw new ArgumentNullException("finder");
+            if (finder == null) 
+                throw new ArgumentNullException("finder");
+
             lock (Finders)
             {
                 Finders.Insert(0, finder);
@@ -42,7 +44,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="finder"></param>
         public static void ResetLastFinder(MapperFinder finder)
         {
-            if (finder == null) throw new ArgumentNullException("finder");
+            if (finder == null)
+                throw new ArgumentNullException("finder");
+
             lock (Finders)
             {
                 Finders[Finders.Count - 1] = finder;
@@ -56,8 +60,12 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static IMapper<T> GetIMapper<T>()
         {
-            MapperFinder[] finders = Finders.ToArray();
-            //
+            MapperFinder[] finders = null;
+            lock (Finders)
+            {
+                finders = Finders.ToArray();
+            }
+
             Exception lastException = null;
             foreach (var mapperFinder in finders)
             {
@@ -121,10 +129,10 @@ namespace Sparrow.CommonLibrary.Mapper
                     {
                         var handler = Expression.Parameter(typeof(T), "x");
                         var exp = Expression.Lambda<Func<T, object>>(Expression.Convert(Expression.MakeMemberAccess(handler, property), typeof(object)), handler);
-                        mapper.AppendField(exp, property.Name);
+                        mapper.AppendProperty(exp, property.Name);
                     }
                 }
-                if (((IMetaInfo)mapper).FieldCount == 0)
+                if (((IMetaInfo)mapper).PropertyCount == 0)
                     throw new ArgumentException(string.Format("{0}没有公开任何可读写的成员属性。", typeof(T).FullName));
                 //
                 return mapper.Complete();

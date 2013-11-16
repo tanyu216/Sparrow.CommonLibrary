@@ -58,7 +58,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
         private IPropertyAccessor<T>[] GetPropertyAccessors<T>(IMapper<T> mapper, IDataSourceReader<T> reader, out int[] ordinal)
         {
-            var fields = mapper.MetaInfo.GetFieldNames();
+            var fields = mapper.MetaInfo.GetPropertyNames();
             var index = reader.Ordinal(fields);
 
             if (index == null || index.Length != fields.Length)

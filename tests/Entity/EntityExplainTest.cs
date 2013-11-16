@@ -17,21 +17,22 @@ namespace Sparrow.CommonLibrary.Test.Entity
         public void Test1()
         {
             var mapper = Map.GetIMapper<UserProfile>();
+            var dbMetaInfo = mapper.MetaInfo as DbMetaInfo;
             var user = mapper.Create();
             user.Id = 1;
             user.Name = "test";
             user.Email = "test@hotmail.com";
 
-            var explain = new EntityExplain(user);
-            Assert.AreEqual(explain.FieldCount, 5);
-            Assert.AreEqual(explain.KeyCount, 1);
-            Assert.AreEqual(explain.GetFieldNames()[0], "Id");
-            Assert.AreEqual(explain.GetFieldNames()[1], "Name");
-            Assert.AreEqual(explain.GetKeys()[0], "Id");
-            Assert.AreEqual(explain.GetFields()[1].FieldName, "Name");
+            Assert.AreEqual(dbMetaInfo.PropertyCount, 5);
+            Assert.AreEqual(dbMetaInfo.KeyCount, 1);
+            Assert.AreEqual(dbMetaInfo.GetPropertyNames()[0], "Id");
+            Assert.AreEqual(dbMetaInfo.GetPropertyNames()[1], "Name");
+            Assert.AreEqual(dbMetaInfo.GetKeys()[0], "Id");
+            Assert.AreEqual(dbMetaInfo.GetProperties()[1].PropertyName, "Name");
 
+            var explain = new EntityExplain(user);
             Assert.AreEqual(explain.GetSettedFields().Skip(1).First(), "Name");
-            Assert.AreEqual(explain.GetValues(explain.GetSettedFields()).Skip(1).First().Value, "test");
+            Assert.AreEqual(explain.GetFieldValues(explain.GetSettedFields()).Skip(1).First().Value, "test");
             Assert.IsTrue(explain.IsSetted(0));
             Assert.IsFalse(explain.IsSetted(4));
         }

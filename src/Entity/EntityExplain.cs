@@ -10,62 +10,8 @@ namespace Sparrow.CommonLibrary.Entity
     /// <summary>
     /// 拥有映射信息的实体对象，当实体对象未从<see cref="Sparrow.CommonLibrary.Entity.IEntity"/>继承时，使用此对象解析实体映射信息。
     /// </summary>
-    public class EntityExplain : IEntityExplain, IMetaInfoForDbTable
+    public class EntityExplain : IEntityExplain
     {
-        #region IMetaInfo
-
-        public string Name
-        {
-            get { return _mapper.MetaInfo.Name; }
-        }
-
-        public int KeyCount
-        {
-            get { return _mapper.MetaInfo.KeyCount; }
-        }
-
-        public int FieldCount
-        {
-            get { return _mapper.MetaInfo.FieldCount; }
-        }
-
-        IMetaFieldInfo IMetaInfo.this[string field]
-        {
-            get { return _mapper.MetaInfo[field]; }
-        }
-
-        IMetaFieldInfo IMetaInfo.this[PropertyInfo propertyInfo]
-        {
-            get { return _mapper.MetaInfo[propertyInfo]; }
-        }
-
-        public bool IsKey(string field)
-        {
-            return _mapper.MetaInfo.IsKey(field);
-        }
-
-        public string[] GetKeys()
-        {
-            return _mapper.MetaInfo.GetKeys();
-        }
-
-        public string[] GetFieldNames()
-        {
-            return _mapper.MetaInfo.GetFieldNames();
-        }
-
-        public IMetaFieldInfo[] GetFields()
-        {
-            return _mapper.MetaInfo.GetFields();
-        }
-
-        public IMetaInfoExtend[] GetExtends()
-        {
-            return _mapper.MetaInfo.GetExtends();
-        }
-
-        #endregion
-
         #region IEntity
 
         public DataState OperationState
@@ -156,33 +102,58 @@ namespace Sparrow.CommonLibrary.Entity
         {
             var entity = Data as IEntity;
             if (entity == null)
-                return _mapper.MetaInfo.GetFieldNames();
+                return _mapper.MetaInfo.GetPropertyNames();
             //
             var list = new List<string>();
-            for (var i = 0; i < _mapper.MetaInfo.FieldCount; i++)
+            for (var i = 0; i < _mapper.MetaInfo.PropertyCount; i++)
                 if (entity.IsSetted(i))
-                    list.Add(_mapper.FieldName(i));
+                    list.Add(_mapper.MetaInfo[i].PropertyName);
             return list;
         }
 
-        public IEnumerable<ItemValue> GetValues(IEnumerable<string> fields)
+        public IEnumerable<ItemValue> GetFieldValues(IEnumerable<string> fields)
         {
             return from field in fields select new ItemValue(field, this[field]);
         }
 
         #endregion
 
-        #region IMetaDbTable
+        #region IEntityExplain
 
-        public IncrementFieldExtend Identity
+        private IMapper _mapper;
+
+        public IMapper Mapper { get { return _mapper; } }
+
+        public string TableName
+        {
+            get { return _mapper.MetaInfo.Name; }
+        }
+
+        public DbIncrementMetaPropertyInfo Increment
         {
             get
             {
-                var metaDb = _mapper.MetaInfo as IMetaInfoForDbTable;
-                if (metaDb != null)
-                    return metaDb.Identity;
+                var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+                if (dbMeta != null)
+                    return dbMeta.Increment;
                 return null;
             }
+        }
+
+        public bool IsKey(string columnName)
+        {
+            var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+            if (dbMeta != null)
+                return dbMeta.IsKey(columnName);
+            return false;
+        }
+
+        public string[] GetKeys()
+        {
+            var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+            if (dbMeta != null)
+                return dbMeta.GetKeys();
+            return new string[0];
         }
 
         #endregion
@@ -191,8 +162,6 @@ namespace Sparrow.CommonLibrary.Entity
         /// 实体对象
         /// </summary>
         public object Data { get; private set; }
-
-        private IMapper _mapper;
 
         /// <summary>
         /// 
@@ -232,7 +201,7 @@ namespace Sparrow.CommonLibrary.Entity
     /// <summary>
     /// 
     /// </summary>
-    public class EntityExplain<T> : EntityExplain
+    public class EntityExplain<T> : EntityExplain, IEntityExplain<T>
     {
 
         /// <summary>
@@ -260,5 +229,9 @@ namespace Sparrow.CommonLibrary.Entity
             Data = data;
         }
 
+        public new IMapper<T> Mapper
+        {
+            get { return (IMapper<T>)base.Mapper; }
+        }
     }
 }

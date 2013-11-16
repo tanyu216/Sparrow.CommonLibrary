@@ -91,6 +91,12 @@
     <Compile Include="Database\ImporterManager.cs" />
     <Compile Include="Database\Importer.cs" />
     <Compile Include="Database\ParameterCollection.cs" />
+    <Compile Include="Entity\DbIncrementMetaPropertyInfo.cs" />
+    <Compile Include="Entity\DbMetaInfo.cs" />
+    <Compile Include="Entity\DbMetaPropertyInfo.cs" />
+    <Compile Include="Entity\DataMapperExtenssions.cs" />
+    <Compile Include="Mapper\Metadata\MetaInfo.cs" />
+    <Compile Include="Mapper\Metadata\MetaPropertyInfo.cs" />
     <Compile Include="Query\AliasExpression.cs" />
     <Compile Include="Database\SqlBatch.cs" />
     <Compile Include="Database\DatabaseHelper.Query.Part.cs" />
@@ -121,13 +127,8 @@
     <Compile Include="Mapper\MapperException.cs" />
     <Compile Include="Mapper\MapperFinder.cs" />
     <Compile Include="Mapper\Map.cs" />
-    <Compile Include="Mapper\Metadata\IncrementFieldExtend.cs" />
-    <Compile Include="Mapper\Metadata\IMetaFieldExtend.cs" />
-    <Compile Include="Mapper\Metadata\IMetaFieldInfo.cs" />
+    <Compile Include="Mapper\Metadata\IMetaPropertyInfo.cs" />
     <Compile Include="Mapper\Metadata\IMetaInfo.cs" />
-    <Compile Include="Mapper\Metadata\IMetaInfoExtend.cs" />
-    <Compile Include="Mapper\Metadata\IMetaInfoForDbTable.cs" />
-    <Compile Include="Mapper\Metadata\MetaDbFieldInfo.cs" />
     <Compile Include="Mapper\DataMapper.cs" />
     <Compile Include="Mapper\PropertyAccessor.cs" />
     <Compile Include="Mapper\PropertyExpression.cs" />

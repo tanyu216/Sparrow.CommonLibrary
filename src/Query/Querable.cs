@@ -22,7 +22,7 @@ namespace Sparrow.CommonLibrary.Query
         private readonly DatabaseHelper database;
 
         private readonly IMapper<T> mapper;
-        private readonly IMetaFieldInfo[] fields;
+        private readonly IMetaPropertyInfo[] fields;
 
         public Queryable(DatabaseHelper database)
         {
@@ -31,7 +31,7 @@ namespace Sparrow.CommonLibrary.Query
 
             this.database = database;
             mapper = Map.GetIMapper<T>();
-            fields = mapper.MetaInfo.GetFields();
+            fields = mapper.MetaInfo.GetProperties();
             Options = SqlOptions.NoLock;
         }
 
@@ -351,7 +351,7 @@ namespace Sparrow.CommonLibrary.Query
         public override string OutputSqlString(ISqlBuilder builder, ParameterCollection output)
         {
             if (_fields == null || _fields.Count == 0)
-                Fields.AddRang(mapper.MetaInfo.GetFieldNames().Select(x => SqlExpression.Field(x)));
+                Fields.AddRang(mapper.MetaInfo.GetPropertyNames().Select(x => SqlExpression.Field(x)));
 
             var topExpressions = top > 0 ? builder.Constant(top) : string.Empty;
             var fieldExpressions = Fields.OutputSqlString(builder, output);
@@ -421,7 +421,7 @@ namespace Sparrow.CommonLibrary.Query
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
             var fieldInfo = Map.GetIMapper<T>().MetaInfo[propertyInfo];
             if (fieldInfo != null)
-                return fieldInfo.FieldName;
+                return fieldInfo.PropertyName;
             throw new ArgumentException("无法获取该属性所映射的成员字段。");
         }
 

@@ -21,7 +21,7 @@ namespace Sparrow.CommonLibrary.Entity
         {
             var mapper = Map.GetIMapper<T>();
             var target = mapper.Create();
-            for (var i = mapper.MetaInfo.FieldCount - 1; i > -1; i--)
+            for (var i = mapper.MetaInfo.PropertyCount - 1; i > -1; i--)
             {
                 var property = mapper[i];
                 property.SetValue(target, property.GetValue(source));

@@ -15,44 +15,56 @@ namespace Sparrow.CommonLibrary.Mapper
     /// 内部数据映射的实现。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DataMapper<T> : IMapper<T>, IMetaInfo, IMetaInfoForDbTable
+    public class DataMapper<T> : IMapper<T>
     {
-        /// <summary>
-        /// 默认初始化
-        /// </summary>
-        public DataMapper()
-            : this(null)
-        { }
+        private readonly IMetaInfo _metaInfo;
 
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="name">元数据名称</param>
+        public DataMapper()
+            : this(new MetaInfo(null, typeof(T)))
+        {
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public DataMapper(string name)
+            : this(new MetaInfo(name, typeof(T)))
+        {
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="metaInfo">元数据</param>
+        public DataMapper(IMetaInfo metaInfo)
         {
             Type type = typeof(T);
             if (type.IsClass == false)
-                throw new MapperException(string.Format("类型[{0}]不是一个合法的实体类型。", type.FullName));
+                throw new MapperException(string.Format("类型[{0}]不是[{1}]有效识别的实体类型。", type.FullName, this.GetType().FullName));
 
-            //
-            _name = name;
-            _fieldsDic = new Dictionary<string, IMetaFieldInfo>();
-            _extends = new List<IMetaInfoExtend>();
-            _fieldIndex = new Dictionary<string, int>();
+            if (metaInfo == null)
+                throw new ArgumentNullException("metaInfo");
+
+            if (metaInfo.EntityType != typeof(T))
+                throw new MapperException("metaInfo元数据中的EntityType与泛型T不一致。");
+
+            _metaInfo = metaInfo;
         }
 
         #region IMapper<T>
 
-        private IPropertyAccessor<T>[] _propertyValues;
+        private IPropertyAccessor<T>[] _pAccessors;
         private Func<T> _creator;
-        private readonly IDictionary<string, int> _fieldIndex;
 
-        IPropertyAccessor IMapper.this[string field]
+        IPropertyAccessor IMapper.this[string propertyName]
         {
             get
             {
-                int i = IndexOf(field);
-                return i > -1 ? _propertyValues[i] : null;
+                int i = MetaInfo.IndexOf(propertyName);
+                return i > -1 ? _pAccessors[i] : null;
             }
         }
 
@@ -60,18 +72,18 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             get
             {
-                if (index < 0 || _propertyValues.Length <= index)
+                if (index < 0 || _pAccessors.Length <= index)
                     return null;
-                return _propertyValues[index];
+                return _pAccessors[index];
             }
         }
 
-        public IPropertyAccessor<T> this[string field]
+        public IPropertyAccessor<T> this[string propertyName]
         {
             get
             {
-                int i = IndexOf(field);
-                return i > -1 ? _propertyValues[i] : null;
+                int i = MetaInfo.IndexOf(propertyName);
+                return i > -1 ? _pAccessors[i] : null;
             }
         }
 
@@ -79,44 +91,15 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             get
             {
-                if (index < 0 || _propertyValues.Length <= index)
+                if (index < 0 || _pAccessors.Length <= index)
                     return null;
-                return _propertyValues[index];
+                return _pAccessors[index];
             }
         }
 
         public IMetaInfo MetaInfo
         {
-            get { return this; }
-        }
-
-        public Type EntityType
-        {
-            get { return typeof(T); }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="field"></param>
-        /// <returns></returns>
-        /// <remarks>唯一一个不区分大小写的方法</remarks>
-        public int IndexOf(string field)
-        {
-            if (string.IsNullOrWhiteSpace(field))
-                throw new ArgumentNullException("field");
-            //
-            int idx;
-            if (_fieldIndex.TryGetValue(field.ToLower(), out idx))
-                return idx;
-            return -1;
-        }
-
-        public string FieldName(int index)
-        {
-            if (index < 0 || _fieldNames.Length <= index)
-                return null;
-            return _fieldNames[index];
+            get { return _metaInfo; }
         }
 
         object IMapper.Create()
@@ -151,280 +134,71 @@ namespace Sparrow.CommonLibrary.Mapper
 
         #endregion
 
-        #region IMetaInfo
+        #region DataMapper
 
-        private readonly IDictionary<string, IMetaFieldInfo> _fieldsDic;
-        private IMetaFieldInfo[] _keys;
-        private string[] _keyNames;
-        private IMetaFieldInfo[] _fields;
-        private string[] _fieldNames;
-        private readonly List<IMetaInfoExtend> _extends;
-
-        private readonly string _name;
-
-        string IMetaInfo.Name
-        {
-            get { return _name; }
-        }
-
-        private int _keyCount;
-
-        int IMetaInfo.KeyCount
-        {
-            get { return _keyCount; }
-        }
-
-        int IMetaInfo.FieldCount { get { return _fieldsDic.Count; } }
-
-        IMetaFieldInfo IMetaInfo.this[string field]
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(field))
-                    throw new ArgumentNullException("field");
-
-                IMetaFieldInfo metaField;
-                if (_fieldsDic.TryGetValue(field, out metaField))
-                    return metaField;
-                return null;
-            }
-        }
-
-        IMetaFieldInfo IMetaInfo.this[PropertyInfo propertyInfo]
-        {
-            get
-            {
-                if (propertyInfo == null)
-                    throw new ArgumentNullException("propertyInfo");
-                foreach (var info in _fields)
-                    if (info.PropertyInfo == propertyInfo)
-                        return info;
-                //
-                return null;
-            }
-        }
-
-        bool IMetaInfo.IsKey(string field)
-        {
-            for (var i = 0; i < _keys.Length; i++)
-                if (field == _keys[i].FieldName)
-                    return _keys[i].IsKey;
-            return false;
-        }
-
-        string[] IMetaInfo.GetKeys()
-        {
-            var keys = new string[_keyNames.Length];
-            _keyNames.CopyTo(keys, 0);
-            return keys;
-        }
-
-        string[] IMetaInfo.GetFieldNames()
-        {
-            var fields = new string[_fieldNames.Length];
-            _fieldNames.CopyTo(fields, 0);
-            return fields;
-        }
-
-        IMetaFieldInfo[] IMetaInfo.GetFields()
-        {
-            var fields = new IMetaFieldInfo[_fields.Length];
-            _fields.CopyTo(fields, 0);
-            return fields;
-        }
-
-        IMetaInfoExtend[] IMetaInfo.GetExtends()
-        {
-            if (_extends.Count == 0)
-                return null;
-            var extends = new IMetaInfoExtend[_extends.Count];
-            _extends.CopyTo(extends, 0);
-            return extends;
-        }
-
-        #endregion
-
-        #region IMetaDbTable
-
-        private IncrementFieldExtend _identity;
-        public IncrementFieldExtend Identity { get { return _identity; } }
-
-        #endregion
-
-        #region Field
-
-        private MetaField _currentField;
         /// <summary>
-        /// 添加成员字段。
+        /// 添加需要映射的属性成员。
         /// </summary>
         /// <param name="propertyExp"></param>
-        /// <param name="field"></param>
+        /// <param name="propertyName"></param>
         /// <returns></returns>
-        public DataMapper<T> AppendField(Expression<Func<T, object>> propertyExp, string field)
+        public DataMapper<T> AppendProperty(Expression<Func<T, object>> propertyExp, string propertyName)
         {
-            TestReadonly();
-            var metafield = new MetaField(this, field, propertyExp);
+            if (propertyExp == null)
+                throw new ArgumentNullException("propertyExp");
+            if (string.IsNullOrEmpty(propertyName))
+                throw new ArgumentNullException("propertyName");
 
-            if (_fieldsDic.ContainsKey(field))
-                throw new MapperException("添加成员字段失败。");
-
-            _fieldsDic.Add(field, metafield);
-            _currentField = metafield;
+            var propertyInfo = PropertyExpression.ExtractMemberExpression(propertyExp);
+            MetaInfo.AddPropertyInfo(new MetaPropertyInfo(MetaInfo,propertyName,(PropertyInfo)propertyInfo.Member));
             return this;
         }
 
         /// <summary>
-        /// 操作最后添加的成员字段，向成员字段中添加扩展信息。
+        /// 添加需要映射的属性成员。
         /// </summary>
-        /// <param name="extend"></param>
+        /// <param name="propertyInfo"></param>
         /// <returns></returns>
-        public DataMapper<T> AddFieldExtend(IMetaFieldExtend extend)
+        public DataMapper<T> AppendProperty(IMetaPropertyInfo propertyInfo)
         {
-            TestReadonly();
-            if (_currentField == null)
-                throw new MapperException("未包含任何成员字段。");
-            _currentField.AddExtend(extend);
+            if (propertyInfo == null)
+                throw new ArgumentNullException("propertyInfo");
+
+            MetaInfo.AddPropertyInfo(propertyInfo);
             return this;
         }
 
-        /// <summary>
-        /// 操作最后添加的成员字段，将成员字段标识为主键字段。
-        /// </summary>
-        /// <returns></returns>
-        public DataMapper<T> MakeKey()
-        {
-            TestReadonly();
-            if (_currentField == null)
-                throw new MapperException("未包含任何成员字段。");
-            _currentField.MakeKey();
-            return this;
-        }
-
-        /// <summary>
-        /// 操作最后添加的成员字段，将成员字段标识为自动增长字段。
-        /// </summary>
-        /// <returns></returns>
-        public DataMapper<T> MakeIncrement()
-        {
-            return MakeIncrement(null);
-        }
-
-        /// <summary>
-        /// 操作最后添加的成员字段，将成员字段标识为自动增长字段。
-        /// </summary>
-        /// <returns></returns>
-        public DataMapper<T> MakeIncrement(string incrementName)
-        {
-            TestReadonly();
-            if (_currentField == null)
-                throw new MapperException("未包含任何成员字段。");
-            _identity = new IncrementFieldExtend(_currentField, incrementName);
-            return this;
-        }
-
-        /// <summary>
-        /// 操作最后添加的成员字段，设置成员字段的默认值。
-        /// </summary>
-        /// <typeparam name="TValue"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public DataMapper<T> SetDefaultValue<TValue>(TValue value)
-        {
-            TestReadonly();
-            if (_currentField == null)
-                throw new MapperException("未包含任何成员字段。");
-            Convert.ChangeType(value, _currentField.PropertyInfo.PropertyType);//类型校验
-            _currentField.SetDefaultValue(value);
-            return this;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 增加对象的扩展信息。
-        /// </summary>
-        /// <param name="extend"></param>
-        /// <returns></returns>
-        public DataMapper<T> AddExtend(IMetaInfoExtend extend)
-        {
-            TestReadonly();
-            if (extend == null)
-                throw new ArgumentNullException("extend");
-            _extends.Add(extend);
-            return this;
-        }
-
-        private static Func<PropertyInfo, PropertyAccessor<T>> _propertyAccessoCreater;
-        public static void ReSetPropertyAccessorCreater(Func<PropertyInfo, PropertyAccessor<T>> creater)
-        {
-            if (_propertyAccessoCreater == null)
-            {
-                _propertyAccessoCreater = creater;
-            }
-            else
-            {
-                lock (_propertyAccessoCreater)
-                {
-                    _propertyAccessoCreater = creater;
-                }
-            }
-        }
-
-        private bool _isReadonly;
-        /// <summary>
-        /// 只读检测
-        /// </summary>
-        protected void TestReadonly()
-        {
-            if (_isReadonly)
-                throw new InvalidOperationException(string.Format("{0}在只读状态下无法完成修改操作。", typeof(IMetaFieldInfo).FullName));
-        }
+        private bool isReorganize;
 
         private void Reorganize()
         {
-            TestReadonly();
-            //
-            if (_fieldsDic.Count == 0)
-                throw new MapperException("未设置任何成员字段。");
-            //
-            _propertyValues = new IPropertyAccessor<T>[_fieldsDic.Count];
-            var keys = new List<IMetaFieldInfo>();
-            _fieldNames = new string[_fieldsDic.Count];
+            if (isReorganize)
+                throw new MapperException("不能重复调用方法：Complete()。");
 
-            Func<PropertyInfo, PropertyAccessor<T>> creater;
-            if (null == (creater = _propertyAccessoCreater))
-            {
-                creater = (x) => new PropertyAccessor<T>(x);
-            }
+            if (MetaInfo.PropertyCount == 0)
+                throw new MapperException("未设映射任何一个属性成员。");
 
-            var i = 0;
-            foreach (var field in _fieldsDic.Values)
+            lock (this)
             {
-                _propertyValues[i] = creater(field.PropertyInfo);
-                if (field.IsKey)
+                if (isReorganize)
+                    throw new MapperException("不能重复调用方法：Complete()。");
+
+                MetaInfo.MakeReadonly();
+
+                Func<PropertyInfo, PropertyAccessor<T>> creater;
+                if (null == (creater = _propertyAccessoCreater))
                 {
-                    keys.Add(field);
+                    creater = (x) => new PropertyAccessor<T>(x);
                 }
-                _fieldNames[i] = field.FieldName;
-                //
-                _fieldIndex.Add(field.FieldName.ToLower(), i);
-                //
-                var identity = ((IncrementFieldExtend)field.GetExtends().FirstOrDefault(x => x is IncrementFieldExtend));
-                if (identity != null)
+
+                _pAccessors = new IPropertyAccessor<T>[MetaInfo.PropertyCount];
+                for (var i = MetaInfo.PropertyCount - 1; i > -1; i--)
                 {
-                    if (_identity != null)
-                        throw new MapperException("一个实体映射只能包含一个自增长标识。");
-                    _identity = identity;
+                    _pAccessors[i] = creater(MetaInfo[i].PropertyInfo);
                 }
-                //
-                ((MetaField)field).MakeReadonly();
-                //
-                i++;
+
+                isReorganize = true;
             }
-            _keys = keys.ToArray();
-            _keyNames = keys.Select(x => x.FieldName).ToArray();
-            _keyCount = keys.Count;
-            _fields = _fieldsDic.Values.ToArray();
         }
 
         /// <summary>
@@ -433,19 +207,14 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public DataMapper<T> Complete()
         {
-            lock (this)
-            {
-                Reorganize();
+            Reorganize();
 
-                var ctor = typeof(T).GetConstructor(new Type[0]);
-                if (ctor == null)
-                    throw new MapperException(string.Format("类型[{0}]无默认构造函数。", typeof(T).FullName));
+            var ctor = typeof(T).GetConstructor(new Type[0]);
+            if (ctor == null)
+                throw new MapperException(string.Format("类型[{0}]无默认构造函数。", typeof(T).FullName));
 
-                _creator = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+            _creator = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
 
-                _isReadonly = true;
-            }
-            //
             return this;
         }
 
@@ -459,123 +228,29 @@ namespace Sparrow.CommonLibrary.Mapper
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            lock (this)
-            {
-                Reorganize();
+            Reorganize();
 
-                _creator = builder(this);
+            _creator = builder(this);
 
-                _isReadonly = true;
-            }
-            //
             return this;
         }
 
-        internal protected class MetaField : IMetaFieldInfo
+        #endregion
+
+        private static Func<PropertyInfo, PropertyAccessor<T>> _propertyAccessoCreater;
+        public static void ResetPropertyAccessorCreater(Func<PropertyInfo, PropertyAccessor<T>> creater)
         {
-            private readonly IMapper _mapper;
-            private bool _isReadonly;
-            private readonly Expression<Func<T, object>> _expression;
-
-            public MetaField(IMapper<T> metaInfo, string field, Expression<Func<T, object>> propertyExp)
+            if (_propertyAccessoCreater == null)
             {
-                if (metaInfo == null)
-                    throw new ArgumentNullException("metaInfo");
-                if (string.IsNullOrWhiteSpace(field))
-                    throw new ArgumentNullException("field");
-                if (propertyExp == null)
-                    throw new ArgumentNullException("propertyExp");
-
-                //
-                _mapper = metaInfo;
-                _field = field;
-                _expression = propertyExp;
-                _propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(propertyExp).Member;
-                _extends = new ConcurrentBag<IMetaFieldExtend>();
+                _propertyAccessoCreater = creater;
             }
-
-            #region IMetaFieldInfo
-
-            public IMetaInfo MetaInfo
+            else
             {
-                get { return _mapper.MetaInfo; }
+                lock (_propertyAccessoCreater)
+                {
+                    _propertyAccessoCreater = creater;
+                }
             }
-
-            private readonly PropertyInfo _propertyInfo;
-            public PropertyInfo PropertyInfo { get { return _propertyInfo; } }
-
-            private readonly string _field;
-            public string FieldName
-            {
-                get { return _field; }
-            }
-
-            private bool _isKey;
-            public bool IsKey
-            {
-                get { return _isKey; }
-            }
-
-            private object _defaultValue;
-            public object DefaultValue { get { return _defaultValue; } }
-
-            private bool _hasDefaultValue;
-            public bool HasDefaultValue()
-            {
-                return _hasDefaultValue;
-            }
-
-            private readonly ConcurrentBag<IMetaFieldExtend> _extends;
-            public IMetaFieldExtend[] GetExtends()
-            {
-                var extends = new IMetaFieldExtend[_extends.Count];
-                _extends.CopyTo(extends, 0);
-                return extends;
-            }
-
-            #endregion
-
-            public Expression<Func<T, object>> Expression { get { return _expression; } }
-
-            protected void TestReadonly()
-            {
-                if (_isReadonly)
-                    throw new InvalidOperationException(string.Format("{0}在只读状态下无法完成修改操作。", typeof(IMetaFieldInfo).FullName));
-            }
-
-            public void MakeReadonly()
-            {
-                _isReadonly = true;
-            }
-
-            public void MakeKey()
-            {
-                TestReadonly();
-                _isKey = true;
-            }
-
-            public void AddExtend(IMetaFieldExtend extend)
-            {
-                TestReadonly();
-                if (extend == null)
-                    throw new ArgumentNullException("extend");
-                _extends.Add(extend);
-            }
-
-            public void SetDefaultValue<TValue>(TValue value)
-            {
-                TestReadonly();
-                _defaultValue = value;
-                _hasDefaultValue = true;
-            }
-
-            public TValue GetDefaultValue<TValue>()
-            {
-                if (!_hasDefaultValue)
-                    return default(TValue);
-                return (TValue)_defaultValue;
-            }
-
         }
 
     }

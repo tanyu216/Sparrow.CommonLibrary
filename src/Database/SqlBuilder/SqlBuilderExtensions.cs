@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Entity;
+using Sparrow.CommonLibrary.Mapper;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 
 namespace Sparrow.CommonLibrary.Database.SqlBuilder
@@ -15,13 +16,24 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
     internal static class SqlBuilderExtensions
     {
 
+        private static string TableName(IEntityExplain entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+
+            if (string.IsNullOrEmpty(entity.TableName))
+                throw new MapperException("未设置一个有效的TableName。");
+
+            return entity.TableName;
+        }
+
         private static string TableName(IMetaInfo metaInfo)
         {
             if (metaInfo == null)
                 throw new ArgumentNullException("metaInfo");
 
             if (string.IsNullOrEmpty(metaInfo.Name))
-                throw new ArgumentException("metaInfo未配置一个有效称应用于TableName。");
+                throw new MapperException("未设置一个有效的TableName。");
 
             return metaInfo.Name;
         }
@@ -92,67 +104,65 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             return where.ToString();
         }
 
-        public static string Delete(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
+        public static string Delete(this ISqlBuilder builder, IEntityExplain entity, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.DeleteFormat(TableName(metaInfo), builder.Where(condition, output, options), options);
+            return builder.DeleteFormat(TableName(entity), builder.Where(condition, output, options), options);
         }
 
-        public static string Delete(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
+        public static string Delete(this ISqlBuilder builder, IEntityExplain entity, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.DeleteFormat(TableName(metaInfo), builder.Where(condition, output, options), options);
+            return builder.DeleteFormat(TableName(entity), builder.Where(condition, output, options), options);
         }
 
-        public static string Update(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue> fieldValues, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
+        public static string Update(this ISqlBuilder builder, IEntityExplain entity, IEnumerable<ItemValue> fieldValues, IEnumerable<ItemValue> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.UpdateFormat(TableName(metaInfo), fieldValues.Select(x => new ItemValue<string, string>(x.Item, output.Append("p", x.Value, true).ParameterName)), builder.Where(condition, output, options), options);
+            return builder.UpdateFormat(TableName(entity), fieldValues.Select(x => new ItemValue<string, string>(x.Item, output.Append("p", x.Value, true).ParameterName)), builder.Where(condition, output, options), options);
         }
 
-        public static string Update(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, object> fieldValues, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
+        public static string Update(this ISqlBuilder builder, IEntityExplain entity, IDictionary<string, object> fieldValues, IDictionary<string, object> condition, ParameterCollection output, SqlOptions options)
         {
-            return builder.UpdateFormat(TableName(metaInfo), fieldValues.Select(x => new ItemValue<string, string>(x.Key, output.Append("p", x.Value, true).ParameterName)), builder.Where(condition, output, options), options);
+            return builder.UpdateFormat(TableName(entity), fieldValues.Select(x => new ItemValue<string, string>(x.Key, output.Append("p", x.Value, true).ParameterName)), builder.Where(condition, output, options), options);
         }
 
-        public static string Insert(this ISqlBuilder builder, IMetaInfo metaInfo, IEnumerable<ItemValue> fieldValues, ParameterCollection output, SqlOptions options)
+        public static string Insert(this ISqlBuilder builder, IEntityExplain entity, IEnumerable<ItemValue> fieldValues, ParameterCollection output, SqlOptions options)
         {
             var list = new List<ItemValue<string, string>>();
 
-            IMetaInfoForDbTable metaDb = metaInfo as IMetaInfoForDbTable;
             foreach (var item in fieldValues)
             {
-                if (metaDb != null && metaDb.Identity != null && metaDb.Identity.FieldInfo.FieldName == item.Item)
+                if (entity.Increment != null && entity.Increment.PropertyName == item.Item)
                     continue;
 
                 list.Add(new ItemValue<string, string>(item.Item, output.Append("p", item.Value, true).ParameterName));
             }
-            if (metaDb != null && metaDb.Identity != null)
+            if (entity.Increment != null)
             {
-                return builder.InsertFormat(TableName(metaInfo), list, metaDb.Identity.FieldInfo.FieldName, metaDb.Identity.Name, options);
+                return builder.InsertFormat(TableName(entity), list, entity.Increment.PropertyName, entity.Increment.IncrementName, options);
             }
             else
             {
-                return builder.InsertFormat(TableName(metaInfo), list, options);
+                return builder.InsertFormat(TableName(entity), list, options);
             }
         }
 
-        public static string Insert(this ISqlBuilder builder, IMetaInfo metaInfo, IDictionary<string, object> fieldValues, ParameterCollection output, SqlOptions options)
+        public static string Insert(this ISqlBuilder builder, IEntityExplain entity, IDictionary<string, object> fieldValues, ParameterCollection output, SqlOptions options)
         {
             var list = new List<ItemValue<string, string>>();
 
-            IMetaInfoForDbTable metaDb = metaInfo as IMetaInfoForDbTable;
             foreach (var item in fieldValues)
             {
-                if (metaDb != null && metaDb.Identity != null && metaDb.Identity.FieldInfo.FieldName == item.Key)
+                if (entity.Increment != null && entity.Increment.PropertyName == item.Key)
                     continue;
 
                 list.Add(new ItemValue<string, string>(item.Key, output.Append("p", item.Value, true).ParameterName));
             }
-            if (metaDb != null && metaDb.Identity != null)
+            if (entity.Increment != null)
             {
-                return builder.InsertFormat(TableName(metaInfo), list, metaDb.Identity.FieldInfo.FieldName, metaDb.Identity.Name, options);
+                return builder.InsertFormat(TableName(entity), list, entity.Increment.PropertyName, entity.Increment.IncrementName, options);
             }
             else
             {
-                return builder.InsertFormat(TableName(metaInfo), list, options);
+                return builder.InsertFormat(TableName(entity), list, options);
             }
         }
 
@@ -191,21 +201,19 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             return builder.QueryFormat(metaInfo, builder.ExpressionsJoin(fields.Select(x => builder.BuildField(x))), builder.Where(condition, output, options), options);
         }
 
-        private static string QueryFormat(this ISqlBuilder builder, IMetaInfo metaInfo, string fieldExpressions, string conditionExpressions, SqlOptions options)
+        private static string QueryFormat(this ISqlBuilder builder, IMetaInfo entity, string fieldExpressions, string conditionExpressions, SqlOptions options)
         {
-            return builder.QueryFormat(null, fieldExpressions, builder.BuildTableName(TableName(metaInfo)), conditionExpressions, null, null, null, options);
+            return builder.QueryFormat(null, fieldExpressions, builder.BuildTableName(TableName(entity)), conditionExpressions, null, null, null, options);
         }
 
-        public static string IncrementByQuery(this ISqlBuilder builder, IMetaInfo metaInfo, string alias, SqlOptions options)
+        public static string IncrementByQuery(this ISqlBuilder builder, IEntityExplain entity, string alias, SqlOptions options)
         {
-            var metaDb = metaInfo as IMetaInfoForDbTable;
-            if (metaDb == null)
-                throw new ArgumentException("metaInfo未实现接口" + typeof(IMetaInfoForDbTable).FullName);
+            if (entity == null)
+                throw new ArgumentNullException("metaInfo");
+            if (entity.Increment == null)
+                throw new ArgumentException("没有自动增长标识");
 
-            if (metaDb.Identity == null)
-                throw new ArgumentException("metaInfo没有自动增长标识");
-
-            return builder.IncrementByQuery(metaDb.Identity.Name, alias, options);
+            return builder.IncrementByQuery(entity.Increment.IncrementName, alias, options);
         }
     }
 }

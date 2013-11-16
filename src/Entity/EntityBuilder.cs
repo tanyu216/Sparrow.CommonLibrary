@@ -14,7 +14,7 @@ using Sparrow.CommonLibrary.Mapper;
 namespace Sparrow.CommonLibrary.Entity
 {
     /// <summary>
-    /// 实例对象生成器，依据<typeparamref name="T"/>生成<typeparamref name="T"/>类型的子类，子类在继承 <typeparamref name="T"/>实现覆盖它属性的同时还实现<see cref="IMapper"/>接口。
+    /// 实体生成器。
     /// </summary>
     public class EntityBuilder
     {
@@ -37,10 +37,6 @@ namespace Sparrow.CommonLibrary.Entity
         /// <returns></returns>
         public static Type BuildEntityClass(Type baseType, IMetaInfo metaInfo)
         {
-            if (baseType == null)
-                throw new ArgumentNullException("baseType");
-            if (metaInfo == null)
-                throw new ArgumentNullException("metaInfo");
             if (_creater != null)
                 return _creater().BuildEntityType(baseType, metaInfo);
             return new EntityBuilder().BuildEntityType(baseType, metaInfo);
@@ -67,8 +63,10 @@ namespace Sparrow.CommonLibrary.Entity
         /// <returns></returns>
         public virtual Type BuildEntityType(Type baseType, IMetaInfo metaInfo)
         {
-            if (!(metaInfo is IMapper))
-                throw new ArgumentException(string.Format("metaInfo未能实现{0}", typeof(IMapper).FullName));
+            if (baseType == null)
+                throw new ArgumentNullException("baseType");
+            if (metaInfo == null)
+                throw new ArgumentNullException("metaInfo");
 
             _baseType = baseType;
             _metaInfo = metaInfo;
@@ -251,7 +249,7 @@ namespace Sparrow.CommonLibrary.Entity
             defaultCtor.Attributes = MemberAttributes.Public;
             defaultCtor.Statements.Add(new CodeAssignStatement(
                                             new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), fieldIndexer.Name),
-                                            new CodeObjectCreateExpression(typeof(FieldFlag), new CodePrimitiveExpression(_metaInfo.FieldCount))
+                                            new CodeObjectCreateExpression(typeof(FieldFlag), new CodePrimitiveExpression(_metaInfo.PropertyCount))
                                         ));
             members.Add(defaultCtor);
 
@@ -263,10 +261,10 @@ namespace Sparrow.CommonLibrary.Entity
 
         private void BuildOverrideProperties()
         {
-            IList<CodeTypeMember> members = new List<CodeTypeMember>(_metaInfo.FieldCount);
+            IList<CodeTypeMember> members = new List<CodeTypeMember>(_metaInfo.PropertyCount);
 
             // 重写基类（实体对象）的属性。
-            foreach (var field in _metaInfo.GetFields())
+            foreach (var field in _metaInfo.GetProperties())
             {
                 var propertyInfo = field.PropertyInfo;
                 string propertyName = propertyInfo.Name;
@@ -311,7 +309,7 @@ namespace Sparrow.CommonLibrary.Entity
                     new CodeMethodReferenceExpression(
                         new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_indexer"),
                         "Mark"),
-                        new CodePrimitiveExpression(((IMapper)field.MetaInfo).IndexOf(field.FieldName)));
+                        new CodePrimitiveExpression(field.MetaInfo.IndexOf(field.PropertyName)));
                 var condtion1 = new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
                         new CodePropertySetValueReferenceExpression(),

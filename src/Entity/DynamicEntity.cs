@@ -11,29 +11,8 @@ namespace Sparrow.CommonLibrary.Entity
     /// <summary>
     /// 动态生成的数据表的映射实体类.适用于编码时表结构不确定,运行时表结构为动态定义的环境.
     /// </summary>
-    public sealed class DynamicEntity : DynamicObject, IEntityFieldAccessor
+    public sealed class DynamicEntity : DynamicObject, IEntityExplain
     {
-        #region IEntityFieldAccessor
-
-        public object this[string field]
-        {
-            get { return GetFieldValue(field); }
-            set { SetFieldValue(field, value); }
-        }
-
-        public IEnumerable<string> GetSettedFields()
-        {
-            return _fieldModified.ToArray();
-        }
-
-        public IEnumerable<ItemValue> GetValues(IEnumerable<string> fields)
-        {
-            if (fields == null) throw new ArgumentNullException("fields");
-
-            return from field in fields select new ItemValue(field, this[field]);
-        }
-
-        #endregion
 
         private readonly Dictionary<string, object> _fieldValues;
         private readonly HashSet<string> _fieldModified;
@@ -90,7 +69,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// 
         /// </summary>
         /// <param name="record"></param>
-        public DynamicEntity Import(IDataRecord record)
+        public void Import(IDataRecord record)
         {
             if (record == null)
                 throw new ArgumentNullException("record");
@@ -101,14 +80,13 @@ namespace Sparrow.CommonLibrary.Entity
                 SetFieldValue(record.GetName(i), record[i]);
             }
             _isImporting = false;
-            return this;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="row"></param>
-        public DynamicEntity Import(DataRow row)
+        public void Import(DataRow row)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -119,10 +97,9 @@ namespace Sparrow.CommonLibrary.Entity
                 SetFieldValue(row.Table.Columns[i].ColumnName, row.ItemArray[i]);
             }
             _isImporting = false;
-            return this;
         }
 
-        public DynamicEntity Import(string[] fields, object[] values)
+        public void Import(string[] fields, object[] values)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -138,10 +115,9 @@ namespace Sparrow.CommonLibrary.Entity
                 SetFieldValue(fields[i], values[i]);
             }
             _isImporting = false;
-            return this;
         }
 
-        public DynamicEntity Import(IDictionary<string, object> keyValues)
+        public void Import(IDictionary<string, object> keyValues)
         {
             if (keyValues == null)
                 throw new ArgumentNullException("keyValues");
@@ -151,7 +127,6 @@ namespace Sparrow.CommonLibrary.Entity
             foreach (var item in keyValues)
                 SetFieldValue(item.Key, item.Value);
             _isImporting = false;
-            return this;
         }
 
         #region DynamicObject
@@ -175,5 +150,94 @@ namespace Sparrow.CommonLibrary.Entity
 
         #endregion
 
+        #region IEntityFieldAccessor
+
+        object IEntityFieldAccessor.this[string field]
+        {
+            get { return GetFieldValue(field); }
+            set { SetFieldValue(field, value); }
+        }
+
+        IEnumerable<string> IEntityFieldAccessor.GetSettedFields()
+        {
+            return _fieldModified.ToArray();
+        }
+
+        IEnumerable<ItemValue> IEntityFieldAccessor.GetFieldValues(IEnumerable<string> fields)
+        {
+            if (fields == null) throw new ArgumentNullException("fields");
+
+            return from field in fields select new ItemValue(field, ((IEntityFieldAccessor)this)[field]);
+        }
+
+        #endregion
+
+        #region IEntityExplain
+
+        Mapper.IMapper IEntityExplain.Mapper
+        {
+            get { return null; }
+        }
+
+        string IEntityExplain.TableName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        DbIncrementMetaPropertyInfo IEntityExplain.Increment
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        bool IEntityExplain.IsKey(string columnName)
+        {
+            throw new NotImplementedException();
+        }
+
+        string[] IEntityExplain.GetKeys()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IEntity
+
+        public DataState OperationState
+        {
+            get;
+            set;
+        }
+
+        public Type EntityType
+        {
+            get { return null; }
+        }
+
+        public bool IsSetted(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AnySetted()
+        {
+            return _fieldModified.Count > 0;
+        }
+
+        #endregion
+
+        #region IMappingTrigger
+
+        public void Begin()
+        {
+            _isImporting = true;
+        }
+
+        public void End()
+        {
+            _isImporting = false;
+        }
+
+        #endregion
     }
 }

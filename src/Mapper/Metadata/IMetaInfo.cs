@@ -1,9 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Sparrow.CommonLibrary.Mapper.Metadata
 {
     /// <summary>
-    /// 实体的源数据描述
+    /// 元数据描述
     /// </summary>
     public interface IMetaInfo
     {
@@ -12,47 +13,58 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
         /// </summary>
         string Name { get; }
         /// <summary>
-        /// 具有主键标识的成员字段数量
+        /// 实体类型
         /// </summary>
-        int KeyCount { get; }
+        Type EntityType { get; }
         /// <summary>
-        /// 成员字段个数
+        /// 属性个数
         /// </summary>
-        int FieldCount { get; }
+        int PropertyCount { get; }
         /// <summary>
-        /// 获取指定的成员字段
+        /// 获取指定的属性
         /// </summary>
-        /// <param name="field"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        IMetaFieldInfo this[string field] { get; }
+        IMetaPropertyInfo this[int index] { get; }
         /// <summary>
-        /// 获取指定的成员字段
+        /// 获取指定的属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        IMetaPropertyInfo this[string propertyName] { get; }
+        /// <summary>
+        /// 获取指定的属性
         /// </summary>
         /// <param name="propertyInfo"></param>
         /// <returns></returns>
-        IMetaFieldInfo this[PropertyInfo propertyInfo] { get; }
+        IMetaPropertyInfo this[PropertyInfo propertyInfo] { get; }
         /// <summary>
-        /// 主键检测
+        /// 获取指定属性的下标
         /// </summary>
-        /// <param name="field"></param>
+        /// <param name="propertyName"></param>
         /// <returns></returns>
-        bool IsKey(string field);
+        int IndexOf(string propertyName);
         /// <summary>
-        /// 具有主键标识的成员字段名称
+        /// 所有属性名称
         /// </summary>
-        string[] GetKeys();
+        string[] GetPropertyNames();
         /// <summary>
-        /// 所有成员字段名称
+        /// 获取所有的属性
         /// </summary>
-        string[] GetFieldNames();
+        IMetaPropertyInfo[] GetProperties();
         /// <summary>
-        /// 获取所有的成员字段
+        /// 添加属性
         /// </summary>
-        IMetaFieldInfo[] GetFields();
+        /// <param name="metaPropertyInfo"></param>
+        void AddPropertyInfo(IMetaPropertyInfo metaPropertyInfo);
         /// <summary>
-        /// 元数据扩张
+        /// 移除属性
         /// </summary>
-        /// <returns></returns>
-        IMetaInfoExtend[] GetExtends();
+        /// <param name="metaPropertyInfo"></param>
+        void RemovePropertyInfo(IMetaPropertyInfo metaPropertyInfo);
+        /// <summary>
+        /// 标记为只读的元数据
+        /// </summary>
+        void MakeReadonly();
     }
 }

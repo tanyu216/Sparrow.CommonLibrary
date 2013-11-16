@@ -13,9 +13,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <summary>
         /// 获取对象指定成员对象的属性读写器
         /// </summary>
-        /// <param name="field"></param>
+        /// <param name="propertyName"></param>
         /// <returns></returns>
-        IPropertyAccessor this[string field] { get; }
+        IPropertyAccessor this[string propertyName] { get; }
         /// <summary>
         /// 获取对象指定成员对象的属性读写器
         /// </summary>
@@ -27,22 +27,6 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <returns></returns>
         IMetaInfo MetaInfo { get; }
-        /// <summary>
-        /// 实体类型
-        /// </summary>
-        Type EntityType { get; }
-        /// <summary>
-        /// 获取成员字段的编号
-        /// </summary>
-        /// <param name="field"></param>
-        /// <returns></returns>
-        int IndexOf(string field);
-        /// <summary>
-        /// 获取成员字段名称
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        string FieldName(int index);
         /// <summary>
         /// 创建一个实体对象
         /// </summary>

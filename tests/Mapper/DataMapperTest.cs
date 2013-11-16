@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Data;
+using Sparrow.CommonLibrary.Entity;
 
 namespace Sparrow.CommonLibrary.Test.Mapper
 {
@@ -103,19 +104,18 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         {
             var mapper = UserProfile.GetIMapper();
 
-            Assert.AreEqual(mapper.FieldName(0), "Id");
-            Assert.AreEqual(mapper.FieldName(1), "Name");
-            Assert.AreEqual(mapper.IndexOf("Email"), 3);
+            Assert.AreEqual(mapper.MetaInfo[0].PropertyName, "Id");
+            Assert.AreEqual(mapper.MetaInfo[1].PropertyName, "Name");
+            Assert.AreEqual(mapper.MetaInfo.IndexOf("Email"), 3);
 
             Assert.IsNull(mapper.MetaInfo.Name);
-            Assert.IsNotNull(mapper.MetaInfo.GetFieldNames());
-            Assert.IsNotNull(mapper.MetaInfo.GetKeys());
+            Assert.AreEqual(mapper.MetaInfo.GetPropertyNames()[3], "Email");
+            Assert.AreEqual(mapper.MetaInfo.PropertyCount, 5);
 
-            Assert.IsTrue(mapper.MetaInfo.IsKey("Id"));
-            Assert.IsFalse(mapper.MetaInfo.IsKey("Sex"));
-
-            Assert.AreEqual(mapper.MetaInfo.FieldCount, 5);
-            Assert.AreEqual(mapper.MetaInfo.KeyCount, 1);
+            Assert.IsTrue(((DbMetaInfo)mapper.MetaInfo).IsKey("Id"));
+            Assert.IsFalse(((DbMetaInfo)mapper.MetaInfo).IsKey("Sex"));
+            Assert.AreEqual(((DbMetaInfo)mapper.MetaInfo).KeyCount, 1);
+            Assert.AreEqual(((DbMetaInfo)mapper.MetaInfo).GetKeys()[0], "Id");
 
         }
 
@@ -123,11 +123,11 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public void MetaInfoTest2()
         {
             var mapper = UserProfile.GetIMapper();
-            var field1 = mapper.MetaInfo.GetFields()[0];
-            var field2 = mapper.MetaInfo.GetFields()[3];
+            var field1 = (DbMetaPropertyInfo)mapper.MetaInfo.GetProperties()[0];
+            var field2 = (DbMetaPropertyInfo)mapper.MetaInfo.GetProperties()[3];
 
-            Assert.AreEqual(field1.FieldName, "Id");
-            Assert.AreEqual(field2.FieldName, "Email");
+            Assert.AreEqual(field1.PropertyName, "Id");
+            Assert.AreEqual(field2.PropertyName, "Email");
             Assert.IsTrue(field1.IsKey);
             Assert.IsFalse(field2.IsKey);
 

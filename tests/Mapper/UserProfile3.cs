@@ -21,11 +21,11 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public static IMapper<UserProfile3> GetIMapper()
         {
             return new DataMapper<UserProfile3>()
-                .AppendField(x => x.Id, "Id").MakeKey().MakeIncrement()
-                .AppendField(x => x.Name, "Name")
-                .AppendField(x => x.Sex, "Sex")
-                .AppendField(x => x.Email, "Email")
-                .AppendField(x => x.FixPhone, "FixPhone")
+                .AppendProperty(x => x.Id, "Id")
+                .AppendProperty(x => x.Name, "Name")
+                .AppendProperty(x => x.Sex, "Sex")
+                .AppendProperty(x => x.Email, "Email")
+                .AppendProperty(x => x.FixPhone, "FixPhone")
                 .Complete();
 
         }

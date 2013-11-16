@@ -21,6 +21,6 @@ namespace Sparrow.CommonLibrary.Entity
         /// </summary>
         /// <param name="fields">成员字段（字段名称）</param>
         /// <returns></returns>
-        IEnumerable<ItemValue> GetValues(IEnumerable<string> fields);
+        IEnumerable<ItemValue> GetFieldValues(IEnumerable<string> fields);
     }
 }

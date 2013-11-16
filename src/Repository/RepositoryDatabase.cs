@@ -28,6 +28,7 @@ namespace Sparrow.CommonLibrary.Repository
         protected DatabaseHelper Database { get { return _database; } }
 
         private readonly IMapper<T> mapper;
+        private readonly DbMetaInfo metaInfo;
 
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
@@ -35,6 +36,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
             _database = database;
             mapper = Mapper.Map.GetIMapper<T>();
+            metaInfo = mapper.MetaInfo as DbMetaInfo;
         }
 
         protected ISqlBuilder SqlBuilder { get { return _database.Builder; } }
@@ -51,7 +53,7 @@ namespace Sparrow.CommonLibrary.Repository
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
             var fieldMap = mapper.MetaInfo[propertyInfo];
             if (fieldMap != null)
-                return fieldMap.FieldName;
+                return fieldMap.PropertyName;
 
             throw new ArgumentException("参数不支持作为查询条件，因为无法获取该属性所映射的成员字段。");
         }
@@ -94,11 +96,11 @@ namespace Sparrow.CommonLibrary.Repository
         {
             //
             string identityFieldName = null;
-            if (expl.Identity != null)
+            if (expl.Increment != null)
             {
                 if (incrementEntity == null)
                     incrementEntity = new Dictionary<string, T>();
-                identityFieldName = expl.Identity.FieldInfo.FieldName + incrementEntity.Count;
+                identityFieldName = expl.Increment.PropertyName + incrementEntity.Count;
             }
             //
             string innerSql;
@@ -144,7 +146,7 @@ namespace Sparrow.CommonLibrary.Repository
                 var entyExpl = entity as IEntityExplain;
                 if (entyExpl != null)
                 {
-                    entyExpl[((IMetaInfoForDbTable)entyExpl).Identity.Name] = incrementReader.GetValue(0);
+                    entyExpl[entyExpl.Increment.PropertyName] = incrementReader.GetValue(0);
                 }
                 else
                 {
@@ -153,7 +155,7 @@ namespace Sparrow.CommonLibrary.Repository
                     else
                         entityExplain.Switch(entity);
                     //
-                    entityExplain[((IMetaInfoForDbTable)entyExpl).Identity.Name] = incrementReader.GetValue(0);
+                    entityExplain[entityExplain.Increment.PropertyName] = incrementReader.GetValue(0);
                 }
 
                 if (received == false)
@@ -319,7 +321,7 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IList<T> GetList()
         {
-            return _database.ExecuteList<T>(SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetFieldNames(), SqlOptions.NoLock));
+            return _database.ExecuteList<T>(SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetPropertyNames(), SqlOptions.NoLock));
         }
 
         public IList<T> GetList(int startIndex, int rowCount)
@@ -332,7 +334,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            return _database.ExecuteList<T>(condition, SqlOptions.NoLock);
+            return new Queryable<T>(_database).Where(condition).ExecuteList();
         }
 
         public IList<T> GetList(ConditionExpression condition)
@@ -340,7 +342,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            return _database.ExecuteList<T>(condition, SqlOptions.NoLock);
+            return new Queryable<T>(_database).Where(condition).ExecuteList();
         }
 
         public IList<T> GetList(ConditionExpression condition, int startIndex, int rowCount)
@@ -353,20 +355,29 @@ namespace Sparrow.CommonLibrary.Repository
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
+            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+            {
+                return mapper.MapSingle(read);
+            }
         }
 
         public T Get(object id)
         {
             if (id == null)
                 throw new ArgumentNullException("id");
-            if (mapper.MetaInfo.KeyCount < 1)
-                throw new ArgumentException("没有主键信息");
-            if (mapper.MetaInfo.KeyCount != 1)
-                throw new ArgumentException("复合主键的实体对象，无法使用该方法。");
 
-            var condition = SqlExpression.Equal(mapper.MetaInfo.GetKeys()[0], id);
-            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
+            if (metaInfo == null)
+                throw new MapperException(string.Format("实体{0}缺少数据库映射信息", typeof(T).FullName));
+            if (metaInfo.KeyCount < 1)
+                throw new MapperException("缺少主键信息");
+            if (metaInfo.KeyCount != 1)
+                throw new MapperException("复合主键的实体对象，无法使用该方法。");
+
+            var condition = SqlExpression.Equal(metaInfo.GetKeys()[0], id);
+            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+            {
+                return mapper.MapSingle(read);
+            }
         }
 
         public T Get(ConditionExpression condition)
@@ -374,7 +385,10 @@ namespace Sparrow.CommonLibrary.Repository
             if (condition == null)
                 throw new ArgumentNullException("condition");
 
-            return _database.ExecuteFirst<T>(condition, SqlOptions.NoLock);
+            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+            {
+                return mapper.MapSingle(read);
+            }
         }
 
         #endregion
