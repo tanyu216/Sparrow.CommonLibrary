@@ -39,7 +39,7 @@ namespace Sparrow.CommonLibrary.Retrying
         }
 
         public IncrementalInterval(int retryCount, TimeSpan interval, bool firstFastRetry)
-            : this(DefaultMaxRetryCount, interval, firstFastRetry, null)
+            : this(retryCount, interval, firstFastRetry, null)
         {
         }
 
@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Retrying
         {
             if (retryCount < MaxRetryCount)
             {
-                delay = TimeSpan.FromMilliseconds(this.interval.TotalMilliseconds * 2 + this.interval.TotalMilliseconds);
+                delay = TimeSpan.FromMilliseconds(this.interval.TotalMilliseconds * retryCount + this.interval.TotalMilliseconds);
                 return true;
             }
             //

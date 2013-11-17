@@ -47,6 +47,7 @@
     <Compile Include="Cryptography\HashTest.cs" />
     <Compile Include="Database\DatabaseTest.cs" />
     <Compile Include="Database\SqlBuilderTest.cs" />
+    <Compile Include="Entity\DynamicEntityTest.cs" />
     <Compile Include="Entity\EntityExplainTest.cs" />
     <Compile Include="Entity\EntityTest.cs" />
     <Compile Include="Extenssions\CollectionExtenssionsTest.cs" />
@@ -63,6 +64,9 @@
     <Compile Include="Query\QuerableTest.cs" />
     <Compile Include="Common\BufferedTest.cs" />
     <Compile Include="Common\PathBuilderTest.cs" />
+    <Compile Include="Retrying\FixedIntervalTest.cs" />
+    <Compile Include="Retrying\ExponentialBackoffIntervalTest.cs" />
+    <Compile Include="Retrying\IncrementalIntervalTest.cs" />
     <Compile Include="Web\RecognizeSpiderTest.cs" />
     <Compile Include="Common\TimestampTest.cs" />
   </ItemGroup>

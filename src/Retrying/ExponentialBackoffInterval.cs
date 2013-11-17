@@ -37,7 +37,7 @@ namespace Sparrow.CommonLibrary.Retrying
         }
 
         public ExponentialBackoffInterval(int retryCount, TimeSpan minInterval, TimeSpan maxInterval, TimeSpan delta, bool firstFastRetry)
-            : this(DefaultMaxRetryCount, minInterval, maxInterval, delta, firstFastRetry, null)
+            : this(retryCount, minInterval, maxInterval, delta, firstFastRetry, null)
         {
         }
 

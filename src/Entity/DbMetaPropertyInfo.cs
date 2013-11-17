@@ -6,8 +6,10 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 
 namespace Sparrow.CommonLibrary.Entity
 {
-    public class DbMetaPropertyInfo : MetaPropertyInfo
+    public class DbMetaPropertyInfo : MetaPropertyInfo, IDbMetaPropertyInfo
     {
+        public string ColumnName { get { return base.PropertyName; } }
+
         private readonly bool _isKey;
 
         public bool IsKey { get { return _isKey; } }
@@ -22,6 +24,6 @@ namespace Sparrow.CommonLibrary.Entity
         {
             _isKey = isKey;
         }
-
+        
     }
 }

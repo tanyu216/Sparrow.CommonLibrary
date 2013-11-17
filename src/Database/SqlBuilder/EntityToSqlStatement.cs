@@ -103,7 +103,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <param name="entity"></param>
         /// <param name="output"></param>
         /// <param name="includeIncrement"></param>
-        /// <param name="incrementFieldName"> </param>
+        /// <param name="incrementFieldName"></param>
         /// <returns></returns>
         public virtual string GenerateInsertOrUpdate(IEntityExplain entity, ParameterCollection output, bool includeIncrement, out bool hasIncrement, string incrementFieldName = null)
         {
@@ -111,7 +111,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (entity.Increment != null)
             {
                 // 实体对象如果包含主键信息，则只生成update语句,否则只生成insert语句。
-                var val = entity[entity.Increment.PropertyName];
+                var val = entity[entity.Increment.ColumnName];
                 if (val != null && val != DBNull.Value && DbValueCast.Cast<int>(val) >= entity.Increment.StartVal)
                 {
                     hasIncrement = false;
@@ -122,14 +122,15 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
                     return GenerateInsert(entity, output, includeIncrement, out hasIncrement, incrementFieldName);
                 }
             }
-            //
+
             var keys = entity.GetKeys();
             if (keys == null || keys.Length == 0)
                 throw new ArgumentException("实体对象缺少主键值。");
             var conditions = entity.GetFieldValues(keys);
             if (conditions == null || conditions.Any() == false)
                 throw new ArgumentException("实体对象缺少主键值。");
-            var ifConditionSql = _stmBuilder.Query(entity.Mapper.MetaInfo, new[] { keys[0] }, conditions, output, SqlOptions.None);
+
+            var ifConditionSql = _stmBuilder.QueryFormat(null, _stmBuilder.BuildField(keys[0]), _stmBuilder.BuildTableName(entity.TableName), _stmBuilder.Where(conditions, output, SqlOptions.None), null, null, null, SqlOptions.None);
             var ifTrueSql = GenerateUpdate(entity, output);
             var ifFalseSql = GenerateInsert(entity, output, includeIncrement, out hasIncrement, incrementFieldName);
             return _stmBuilder.IfExistsFormat(ifConditionSql, ifTrueSql, ifFalseSql, SqlOptions.None);
@@ -163,10 +164,10 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
                 throw new ArgumentException("参数id不能为空。");
 
             var mapper = Map.GetIMapper<T>();
-            if (!(mapper.MetaInfo is DbMetaInfo))
+            if (!(mapper.MetaInfo is IDbMetaInfo))
                 throw new MapperException("实体未实现数据库表的元数据。");
 
-            var keys = ((DbMetaInfo)mapper.MetaInfo).GetKeys();
+            var keys = ((IDbMetaInfo)mapper.MetaInfo).GetKeys();
             if (keys.Length != 1)
                 throw new MapperException(keys.Length > 0 ? "主键不能为复合主键。" : "该对象没有设置主键，无法执行删除命令。");
 

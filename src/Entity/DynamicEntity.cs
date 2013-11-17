@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
+using Sparrow.CommonLibrary.Mapper;
 
 namespace Sparrow.CommonLibrary.Entity
 {
@@ -17,6 +18,10 @@ namespace Sparrow.CommonLibrary.Entity
         private readonly Dictionary<string, object> _fieldValues;
         private readonly HashSet<string> _fieldModified;
 
+        private readonly string _tableName;
+        private readonly string[] _keys;
+        private readonly IDbIncrementMetaPropertyInfo _increment;
+
         /// <summary>
         /// 
         /// </summary>
@@ -25,6 +30,25 @@ namespace Sparrow.CommonLibrary.Entity
         {
             _fieldValues = new Dictionary<string, object>();
             _fieldModified = new HashSet<string>();
+        }
+
+        public DynamicEntity(string tableName)
+            : this(tableName, null, null, null)
+        {
+        }
+
+        public DynamicEntity(string tableName, string[] keys)
+            : this(tableName, keys, null, null)
+        {
+        }
+
+        public DynamicEntity(string tableName, string[] keys, string incrementColumn, string incrementName)
+            : this()
+        {
+            _tableName = tableName;
+            _keys = keys ?? new string[0];
+            if (!string.IsNullOrEmpty(incrementColumn))
+                _increment = new DbIncrementMetaPropertyInfo(incrementName, 1, incrementColumn, keys.Any(x => x == incrementColumn));
         }
 
         /// <summary>
@@ -99,6 +123,11 @@ namespace Sparrow.CommonLibrary.Entity
             _isImporting = false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="values"></param>
         public void Import(string[] fields, object[] values)
         {
             if (fields == null)
@@ -117,6 +146,10 @@ namespace Sparrow.CommonLibrary.Entity
             _isImporting = false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyValues"></param>
         public void Import(IDictionary<string, object> keyValues)
         {
             if (keyValues == null)
@@ -174,52 +207,69 @@ namespace Sparrow.CommonLibrary.Entity
 
         #region IEntityExplain
 
-        Mapper.IMapper IEntityExplain.Mapper
+        object IEntityExplain.EntityData
         {
-            get { return null; }
+            get { return this; }
         }
 
-        string IEntityExplain.TableName
+        #endregion
+
+        #region IDbMetaInfo
+
+        string IDbMetaInfo.TableName
         {
-            get { throw new NotImplementedException(); }
+            get { return _tableName; }
         }
 
-        DbIncrementMetaPropertyInfo IEntityExplain.Increment
+        IDbIncrementMetaPropertyInfo IDbMetaInfo.Increment
         {
-            get { throw new NotImplementedException(); }
+            get { return _increment; }
         }
 
-        bool IEntityExplain.IsKey(string columnName)
+        int IDbMetaInfo.KeyCount { get { return _keys.Length; } }
+
+        int IDbMetaInfo.ColumnCount { get { return _fieldValues.Count; } }
+
+        bool IDbMetaInfo.IsKey(string columnName)
         {
-            throw new NotImplementedException();
+            return _keys.Any(x => x == columnName);
         }
 
-        string[] IEntityExplain.GetKeys()
+        string[] IDbMetaInfo.GetKeys()
         {
-            throw new NotImplementedException();
+            var keys = new string[_keys.Length];
+            _keys.CopyTo(keys, 0);
+            return keys;
+        }
+
+        string[] IDbMetaInfo.GetColumnNames()
+        {
+            return _fieldValues.Keys.ToArray();
         }
 
         #endregion
 
         #region IEntity
 
-        public DataState OperationState
+        DataState IEntity.OperationState
         {
             get;
             set;
         }
 
-        public Type EntityType
+        Type IEntity.EntityType
         {
-            get { return null; }
+            get { return typeof(DynamicEntity); }
         }
 
-        public bool IsSetted(int index)
+        bool IEntity.IsSetted(int index)
         {
-            throw new NotImplementedException();
+            if (_fieldValues.Count - 1 < index)
+                return false;
+            return _fieldModified.Contains(_fieldValues.Keys.Skip(index).First());
         }
 
-        public bool AnySetted()
+        bool IEntity.AnySetted()
         {
             return _fieldModified.Count > 0;
         }
@@ -239,5 +289,41 @@ namespace Sparrow.CommonLibrary.Entity
         }
 
         #endregion
+
+        private class DbIncrementMetaPropertyInfo : IDbIncrementMetaPropertyInfo
+        {
+            private readonly string _incrementName;
+            private readonly int _startVal;
+            private readonly string _columnName;
+            private readonly bool _isKey;
+
+            public DbIncrementMetaPropertyInfo(string incrementName, int startVal, string columnName, bool isKey)
+            {
+                _incrementName = incrementName;
+                _startVal = startVal;
+                _columnName = columnName;
+                _isKey = isKey;
+            }
+
+            public string IncrementName
+            {
+                get { return _incrementName; }
+            }
+
+            public int StartVal
+            {
+                get { return _startVal; }
+            }
+
+            public string ColumnName
+            {
+                get { return _columnName; }
+            }
+
+            public bool IsKey
+            {
+                get { return _isKey; }
+            }
+        }
     }
 }

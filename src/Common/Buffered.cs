@@ -86,11 +86,11 @@ namespace Sparrow.CommonLibrary.Common
         public void Flush()
         {
             TestDisposed();
+
             int max = _queue.Count;
             if (max < 1)
                 return;
-            if (max > MaxBufer)
-                max = MaxBufer;
+
             if (Flushing)
                 return;
             lock (SyncFlushing)
@@ -99,7 +99,7 @@ namespace Sparrow.CommonLibrary.Common
                     return;
                 Flushing = true;
             }
-            //
+
             var list = new List<T>(max);
             for (int i = 0; i < max; i++)
             {
@@ -113,7 +113,7 @@ namespace Sparrow.CommonLibrary.Common
                     break;
                 }
             }
-            //
+
             Flushing = false;
             // 触发Flush事件
             if (list.Count > 0 && OnFlush != null)

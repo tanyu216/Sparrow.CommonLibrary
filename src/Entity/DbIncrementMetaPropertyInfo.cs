@@ -6,7 +6,7 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 
 namespace Sparrow.CommonLibrary.Entity
 {
-    public class DbIncrementMetaPropertyInfo : DbMetaPropertyInfo
+    public class DbIncrementMetaPropertyInfo : DbMetaPropertyInfo, IDbIncrementMetaPropertyInfo
     {
         private readonly string _incrementName;
 

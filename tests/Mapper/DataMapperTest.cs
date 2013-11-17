@@ -112,10 +112,10 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             Assert.AreEqual(mapper.MetaInfo.GetPropertyNames()[3], "Email");
             Assert.AreEqual(mapper.MetaInfo.PropertyCount, 5);
 
-            Assert.IsTrue(((DbMetaInfo)mapper.MetaInfo).IsKey("Id"));
-            Assert.IsFalse(((DbMetaInfo)mapper.MetaInfo).IsKey("Sex"));
-            Assert.AreEqual(((DbMetaInfo)mapper.MetaInfo).KeyCount, 1);
-            Assert.AreEqual(((DbMetaInfo)mapper.MetaInfo).GetKeys()[0], "Id");
+            Assert.IsTrue(((IDbMetaInfo)mapper.MetaInfo).IsKey("Id"));
+            Assert.IsFalse(((IDbMetaInfo)mapper.MetaInfo).IsKey("Sex"));
+            Assert.AreEqual(((IDbMetaInfo)mapper.MetaInfo).KeyCount, 1);
+            Assert.AreEqual(((IDbMetaInfo)mapper.MetaInfo).GetKeys()[0], "Id");
 
         }
 

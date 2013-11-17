@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Logging
 {
@@ -73,14 +74,12 @@ namespace Sparrow.CommonLibrary.Logging
         /// </summary>
         public IDictionary<string, object> Properties { get; set; }
 
-        private readonly long _unix = (new DateTime(1970, 1, 1)).Ticks;
-
         /// <summary>
         /// 
         /// </summary>
         public LogEntry()
         {
-            Timestamp = (DateTime.UtcNow.Ticks - _unix) / 10000000;
+            Timestamp = Common.Timestamp.Now;
         }
 
         /// <summary>

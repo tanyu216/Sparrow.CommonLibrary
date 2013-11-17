@@ -18,13 +18,13 @@ namespace Sparrow.CommonLibrary.Entity
         {
             get
             {
-                var entity = Data as IEntity;
+                var entity = EntityData as IEntity;
                 // 如果Data不是IEntity类型,则始终返回DataState.New
                 return entity == null ? DataState.NewOrModify : entity.OperationState;
             }
             set
             {
-                var entity = Data as IEntity;
+                var entity = EntityData as IEntity;
                 if (entity != null) { entity.OperationState = value; }
             }
         }
@@ -33,7 +33,7 @@ namespace Sparrow.CommonLibrary.Entity
         {
             get
             {
-                var entity = Data as IEntity;
+                var entity = EntityData as IEntity;
                 if (entity == null)
                     return this.GetType();
                 return entity.EntityType;
@@ -42,7 +42,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public bool IsSetted(int index)
         {
-            var entity = Data as IEntity;
+            var entity = EntityData as IEntity;
             if (entity == null)
                 return true;
             return entity.IsSetted(index);
@@ -50,7 +50,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public bool AnySetted()
         {
-            var entity = Data as IEntity;
+            var entity = EntityData as IEntity;
             if (entity == null)
                 return true;
             return entity.AnySetted();
@@ -62,7 +62,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public void Begin()
         {
-            var entity = Data as IMappingTrigger;
+            var entity = EntityData as IMappingTrigger;
             if (entity == null)
                 return;
             entity.Begin();
@@ -70,7 +70,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public void End()
         {
-            var entity = Data as IMappingTrigger;
+            var entity = EntityData as IMappingTrigger;
             if (entity == null)
                 return;
             entity.End();
@@ -87,20 +87,20 @@ namespace Sparrow.CommonLibrary.Entity
                 var property = _mapper[field];
                 if (property == null)
                     return null;
-                return property.GetValue(Data);
+                return property.GetValue(EntityData);
             }
             set
             {
                 var property = _mapper[field];
                 if (property == null)
                     return;
-                property.SetValue(Data, value);
+                property.SetValue(EntityData, value);
             }
         }
 
         public IEnumerable<string> GetSettedFields()
         {
-            var entity = Data as IEntity;
+            var entity = EntityData as IEntity;
             if (entity == null)
                 return _mapper.MetaInfo.GetPropertyNames();
             //
@@ -118,31 +118,40 @@ namespace Sparrow.CommonLibrary.Entity
 
         #endregion
 
-        #region IEntityExplain
-
-        private IMapper _mapper;
-
-        public IMapper Mapper { get { return _mapper; } }
+        #region IDbMetaInfo
 
         public string TableName
         {
             get { return _mapper.MetaInfo.Name; }
         }
 
-        public DbIncrementMetaPropertyInfo Increment
+        public IDbIncrementMetaPropertyInfo Increment
         {
             get
             {
-                var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+                var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
                 if (dbMeta != null)
                     return dbMeta.Increment;
                 return null;
             }
         }
 
+        public int KeyCount
+        {
+            get
+            {
+                var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
+                if (dbMeta != null)
+                    return dbMeta.KeyCount;
+                return 0;
+            }
+        }
+
+        public int ColumnCount { get { return _mapper.MetaInfo.PropertyCount; } }
+
         public bool IsKey(string columnName)
         {
-            var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+            var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
             if (dbMeta != null)
                 return dbMeta.IsKey(columnName);
             return false;
@@ -150,18 +159,33 @@ namespace Sparrow.CommonLibrary.Entity
 
         public string[] GetKeys()
         {
-            var dbMeta = _mapper.MetaInfo as DbMetaInfo;
+            var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
             if (dbMeta != null)
                 return dbMeta.GetKeys();
             return new string[0];
         }
 
+        public string[] GetColumnNames()
+        {
+            return _mapper.MetaInfo.GetPropertyNames();
+        }
+
         #endregion
 
-        /// <summary>
-        /// 实体对象
-        /// </summary>
-        public object Data { get; private set; }
+        #region IEntityExplain
+
+        public object EntityData { get; private set; }
+
+        #endregion
+
+        private IMapper _mapper;
+
+        public IMapper Mapper { get { return _mapper; } }
+
+        public IMetaInfo MetaInfo
+        {
+            get { return _mapper.MetaInfo; }
+        }
 
         /// <summary>
         /// 
@@ -182,7 +206,7 @@ namespace Sparrow.CommonLibrary.Entity
                 throw new ArgumentNullException("data");
             if (data is IEntityExplain)
                 throw new ArgumentException(string.Format("类型[{0}]已经继承[{1}].", data.GetType().FullName, typeof(IEntityExplain).FullName));
-            if (Data == null || data.GetType() != Data.GetType())
+            if (EntityData == null || data.GetType() != EntityData.GetType())
             {
                 if (data is IEntity)
                 {
@@ -193,7 +217,7 @@ namespace Sparrow.CommonLibrary.Entity
                     _mapper = Map.GetIMapper(data.GetType());
                 }
             }
-            Data = data;
+            EntityData = data;
         }
 
     }
@@ -204,10 +228,7 @@ namespace Sparrow.CommonLibrary.Entity
     public class EntityExplain<T> : EntityExplain, IEntityExplain<T>
     {
 
-        /// <summary>
-        /// 实体对象
-        /// </summary>
-        public new T Data { get; private set; }
+        public new T EntityData { get; private set; }
 
         /// <summary>
         /// 
@@ -226,7 +247,7 @@ namespace Sparrow.CommonLibrary.Entity
         public void Switch(T data)
         {
             base.Switch(data);
-            Data = data;
+            EntityData = data;
         }
 
         public new IMapper<T> Mapper

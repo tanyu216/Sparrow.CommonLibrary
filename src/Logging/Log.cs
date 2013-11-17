@@ -31,6 +31,11 @@ namespace Sparrow.CommonLibrary.Logging
         private static Func<string> _currentUserId;
         public static Func<string> CurrentUserId { get { return _currentUserId; } }
 
+        public static void Flush()
+        {
+            bufer.Flush();
+        }
+
         static Log()
         {
             _currentUserId = null;
@@ -61,7 +66,8 @@ namespace Sparrow.CommonLibrary.Logging
 
         private void Add(LogLevel level, string message, int eventId, string code, IDictionary<string, object> properties, Exception exception)
         {
-            var logEntry = new LogEntry()
+            var isDebug = level == LogLevel.Debug;
+            var logEntry = new LogEntry(true, isDebug, isDebug, isDebug)
                                {
                                    Categories = _categories,
                                    Properties = properties,
@@ -515,7 +521,8 @@ namespace Sparrow.CommonLibrary.Logging
             catch (Exception ex)
             {
                 GetLog(LoggingSettings.SparrowCategory).Error("日志输出至存储介质时失败。", ex);
-                OnFail(null, new LogEventArgs<LogEntry>(e.List));
+                if (OnFail != null)
+                    OnFail(null, new LogEventArgs<LogEntry>(e.List));
             }
         }
 

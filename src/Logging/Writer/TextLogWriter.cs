@@ -70,12 +70,23 @@ namespace Sparrow.CommonLibrary.Logging.Writer
             sw.WriteLine("UnixTimestamp:{0}", log.Timestamp);
             sw.WriteLine("UTC:{0}", ((DateTime)(Timestamp)log.Timestamp).ToString());
             sw.WriteLine("Machine:{0}", log.Machine);
-            sw.WriteLine("ThreadId:{0}", log.ThreadId);
-            sw.WriteLine("ThreadName:{0}", log.ThreadName);
-            sw.WriteLine("ProcessId:{0}", log.ProcessId);
-            sw.WriteLine("ProcessName:{0}", log.ProcessName);
-            sw.WriteLine("AppDomainId:{0}", log.AppDomainId);
-            sw.WriteLine("AppDomainName:{0}", log.AppDomainName);
+
+            if (log.ThreadId != 0)
+            {
+                sw.WriteLine("ThreadId:{0}", log.ThreadId);
+                sw.WriteLine("ThreadName:{0}", log.ThreadName);
+            }
+            if (log.ProcessId != 0)
+            {
+                sw.WriteLine("ProcessId:{0}", log.ProcessId);
+                sw.WriteLine("ProcessName:{0}", log.ProcessName);
+            }
+            if (log.AppDomainId != 0)
+            {
+                sw.WriteLine("AppDomainId:{0}", log.AppDomainId);
+                sw.WriteLine("AppDomainName:{0}", log.AppDomainName);
+            }
+
             sw.WriteLine("ExtendProperties:{0}", PropertiesSerializer(log.Properties));
             sw.WriteLine("Exception:{0}", ExceptionSerializer(log.Exception));
             sw.WriteLine("[<<END]");

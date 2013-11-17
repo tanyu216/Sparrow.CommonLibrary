@@ -17,18 +17,18 @@ namespace Sparrow.CommonLibrary.Test.Entity
         public void Test1()
         {
             var mapper = Map.GetIMapper<UserProfile>();
-            var dbMetaInfo = mapper.MetaInfo as DbMetaInfo;
+            var dbMetaInfo = mapper.MetaInfo as IDbMetaInfo;
             var user = mapper.Create();
             user.Id = 1;
             user.Name = "test";
             user.Email = "test@hotmail.com";
 
-            Assert.AreEqual(dbMetaInfo.PropertyCount, 5);
+            Assert.AreEqual(mapper.MetaInfo.PropertyCount, 5);
             Assert.AreEqual(dbMetaInfo.KeyCount, 1);
-            Assert.AreEqual(dbMetaInfo.GetPropertyNames()[0], "Id");
-            Assert.AreEqual(dbMetaInfo.GetPropertyNames()[1], "Name");
+            Assert.AreEqual(mapper.MetaInfo.GetPropertyNames()[0], "Id");
+            Assert.AreEqual(mapper.MetaInfo.GetPropertyNames()[1], "Name");
             Assert.AreEqual(dbMetaInfo.GetKeys()[0], "Id");
-            Assert.AreEqual(dbMetaInfo.GetProperties()[1].PropertyName, "Name");
+            Assert.AreEqual(mapper.MetaInfo.GetProperties()[1].PropertyName, "Name");
 
             var explain = new EntityExplain(user);
             Assert.AreEqual(explain["Id"], 1);

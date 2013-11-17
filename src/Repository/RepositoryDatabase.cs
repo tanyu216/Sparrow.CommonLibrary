@@ -28,7 +28,7 @@ namespace Sparrow.CommonLibrary.Repository
         protected DatabaseHelper Database { get { return _database; } }
 
         private readonly IMapper<T> mapper;
-        private readonly DbMetaInfo metaInfo;
+        private readonly IDbMetaInfo metaInfo;
 
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
@@ -36,7 +36,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
             _database = database;
             mapper = Mapper.Map.GetIMapper<T>();
-            metaInfo = mapper.MetaInfo as DbMetaInfo;
+            metaInfo = mapper.MetaInfo as IDbMetaInfo;
         }
 
         protected ISqlBuilder SqlBuilder { get { return _database.Builder; } }
@@ -100,7 +100,7 @@ namespace Sparrow.CommonLibrary.Repository
             {
                 if (incrementEntity == null)
                     incrementEntity = new Dictionary<string, T>();
-                identityFieldName = expl.Increment.PropertyName + incrementEntity.Count;
+                identityFieldName = expl.Increment.ColumnName + incrementEntity.Count;
             }
             //
             string innerSql;
@@ -120,7 +120,7 @@ namespace Sparrow.CommonLibrary.Repository
                     throw new ArgumentException("不支持枚举：" + expl.OperationState);
             }
             if (hasIncrement)
-                incrementEntity.Add(identityFieldName, expl.Data);
+                incrementEntity.Add(identityFieldName, expl.EntityData);
             return innerSql;
         }
 
@@ -146,7 +146,7 @@ namespace Sparrow.CommonLibrary.Repository
                 var entyExpl = entity as IEntityExplain;
                 if (entyExpl != null)
                 {
-                    entyExpl[entyExpl.Increment.PropertyName] = incrementReader.GetValue(0);
+                    entyExpl[entyExpl.Increment.ColumnName] = incrementReader.GetValue(0);
                 }
                 else
                 {
@@ -155,7 +155,7 @@ namespace Sparrow.CommonLibrary.Repository
                     else
                         entityExplain.Switch(entity);
                     //
-                    entityExplain[entityExplain.Increment.PropertyName] = incrementReader.GetValue(0);
+                    entityExplain[entityExplain.Increment.ColumnName] = incrementReader.GetValue(0);
                 }
 
                 if (received == false)
@@ -321,7 +321,7 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IList<T> GetList()
         {
-            return _database.ExecuteList<T>(SqlBuilder.Query(mapper.MetaInfo, mapper.MetaInfo.GetPropertyNames(), SqlOptions.NoLock));
+            return new Queryable<T>(_database).ExecuteList();
         }
 
         public IList<T> GetList(int startIndex, int rowCount)

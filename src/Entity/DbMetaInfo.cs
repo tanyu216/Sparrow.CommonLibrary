@@ -6,15 +6,16 @@ using Sparrow.CommonLibrary.Mapper.Metadata;
 
 namespace Sparrow.CommonLibrary.Entity
 {
-    public class DbMetaInfo : MetaInfo
+    public class DbMetaInfo : MetaInfo, IDbMetaInfo
     {
-        private DbIncrementMetaPropertyInfo _increment;
+        #region IDbMetaInfo
+
+        private IDbIncrementMetaPropertyInfo _increment;
         private string[] _keys;
 
-        /// <summary>
-        /// 自动增长序列
-        /// </summary>
-        public DbIncrementMetaPropertyInfo Increment
+        public string TableName { get { return base.Name; } }
+
+        public IDbIncrementMetaPropertyInfo Increment
         {
             get
             {
@@ -23,9 +24,6 @@ namespace Sparrow.CommonLibrary.Entity
             }
         }
 
-        /// <summary>
-        /// 表中主键的数量
-        /// </summary>
         public int KeyCount
         {
             get
@@ -35,32 +33,32 @@ namespace Sparrow.CommonLibrary.Entity
             }
         }
 
-        public DbMetaInfo(string tableName, Type entityType)
-            : base(tableName, entityType)
-        {
-        }
+        public int ColumnCount { get { return base.PropertyCount; } }
 
-        /// <summary>
-        /// 验证是否为主键主字段
-        /// </summary>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
         public bool IsKey(string columnName)
         {
             Reorganize();
             return _keys.Any(x => x == columnName);
         }
 
-        /// <summary>
-        /// 获取所有的主键字段
-        /// </summary>
-        /// <returns></returns>
         public string[] GetKeys()
         {
             Reorganize();
             var keys = new string[_keys.Length];
             _keys.CopyTo(keys, 0);
             return keys;
+        }
+
+        public string[] GetColumnNames()
+        {
+            return base.GetPropertyNames();
+        }
+
+        #endregion
+
+        public DbMetaInfo(string tableName, Type entityType)
+            : base(tableName, entityType)
+        {
         }
 
         private object _syncObj = new object();
@@ -78,7 +76,7 @@ namespace Sparrow.CommonLibrary.Entity
                     isReorganize = true;
 
                     _increment = (DbIncrementMetaPropertyInfo)GetProperties().FirstOrDefault(x => x is DbIncrementMetaPropertyInfo);
-                    
+
                     var keyList = new List<string>();
                     foreach (var property in GetProperties())
                         if (property is DbMetaPropertyInfo && ((DbMetaPropertyInfo)property).IsKey)

@@ -39,7 +39,7 @@ namespace Sparrow.CommonLibrary.Retrying
         }
 
         public FixedInterval(int retryCount, TimeSpan interval, bool firstFastRetry)
-            : this(DefaultMaxRetryCount, interval, firstFastRetry, null)
+            : this(retryCount, interval, firstFastRetry, null)
         {
         }
 

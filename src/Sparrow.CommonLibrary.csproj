@@ -91,10 +91,16 @@
     <Compile Include="Database\ImporterManager.cs" />
     <Compile Include="Database\Importer.cs" />
     <Compile Include="Database\ParameterCollection.cs" />
+    <Compile Include="Database\SqlBuilder\SqlBuilderExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Entity\DbIncrementMetaPropertyInfo.cs" />
     <Compile Include="Entity\DbMetaInfo.cs" />
     <Compile Include="Entity\DbMetaPropertyInfo.cs" />
     <Compile Include="Entity\DataMapperExtenssions.cs" />
+    <Compile Include="Entity\IDbIncrementMetaPropertyInfo.cs" />
+    <Compile Include="Entity\IDbMetaInfo.cs" />
+    <Compile Include="Entity\IDbMetaPropertyInfo.cs" />
     <Compile Include="Mapper\Metadata\MetaInfo.cs" />
     <Compile Include="Mapper\Metadata\MetaPropertyInfo.cs" />
     <Compile Include="Query\AliasExpression.cs" />
@@ -149,7 +155,6 @@
     <Compile Include="Query\VariableNameExpression.cs" />
     <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Repository\RepositoryDatabase.cs" />
-    <Compile Include="Database\SqlBuilder\SqlBuilderExtensions.cs" />
     <Compile Include="Database\SqlBuilder\SqlBuilderManager.cs" />
     <Compile Include="Database\SqlBuilder\CommonBuilder.cs" />
     <Compile Include="Database\SqlBuilder\EntityToSqlStatement.cs" />

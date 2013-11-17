@@ -30,7 +30,7 @@ namespace Sparrow.CommonLibrary.Logging
             //
             defaultWriterType = typeof(TextLogWriter);
             defaultWriterParameters = new Dictionary<string, string>();
-            defaultWriterParameters.Add(TextLogWriter.FolderParamName, "%appdir%\\sprlog\\%year%_%month%\\%day%log.log");
+            defaultWriterParameters.Add(TextLogWriter.FolderParamName, "%appdir%\\sprlog\\%year%%month%\\%day%log.log");
             defaultWriterParameters.Add(TextLogWriter.MaxSizeParamName, "8MB");
             //
             filters = new List<ILogFilter>();
@@ -116,14 +116,24 @@ namespace Sparrow.CommonLibrary.Logging
         internal static IList<ILogWriter> GetWriters()
         {
             if (writers.Count > 0)
-                return writers.ToList();
-            //
-            var writer = (ILogWriter)Activator.CreateInstance(defaultWriterType);
-            foreach (var keyVal in defaultWriterParameters)
             {
-                writer.AddParameter(keyVal.Key, keyVal.Value);
+                return writers.ToList();
             }
-            return new List<ILogWriter>() { writer };
+
+            lock (writers)
+            {
+                if (writers.Count > 0)
+                    return writers.ToList();
+
+                var writer = (ILogWriter)Activator.CreateInstance(defaultWriterType);
+                foreach (var keyVal in defaultWriterParameters)
+                {
+                    writer.AddParameter(keyVal.Key, keyVal.Value);
+                }
+                writers.Add(writer);
+
+                return new List<ILogWriter>() { writer };
+            }
         }
     }
 }
