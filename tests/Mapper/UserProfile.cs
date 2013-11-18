@@ -21,7 +21,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public static IMapper<UserProfile> GetIMapper()
         {
             return DataMapperExtenssions.Create<UserProfile>("UserProfile")
-                .AppendProperty(x => x.Id, "Id", true)
+                .AppendProperty(x => x.Id, "Id", true).Increment("UserProfileId")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")
                 .AppendProperty(x => x.Email, "Email")

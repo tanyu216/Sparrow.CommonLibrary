@@ -27,13 +27,6 @@ namespace Sparrow.CommonLibrary.Test.Cache
         }
 
         [Test]
-        public void SetICacheCreaterTest()
-        {
-            CacheManager.SetICacheCreater(x => new LocalCache(x));
-            Assert.AreEqual(true, true);
-        }
-
-        [Test]
         public void AddCacheTest()
         {
             var result = CacheManager.AddCache("test", new LocalCache("test"));
@@ -50,7 +43,7 @@ namespace Sparrow.CommonLibrary.Test.Cache
         [Test]
         public void GetCacheTest2()
         {
-            var result = CacheManager.GetCache(CacheManager.DefaultRegionName);
+            var result = CacheManager.GetCache(CacheSettings.DefaultRegionName);
             Assert.IsNotNull(result);
         }
 
