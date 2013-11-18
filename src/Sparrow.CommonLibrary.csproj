@@ -48,6 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheSettings.cs" />
+    <Compile Include="Cache\Configuration\CacheConfigurationSection.cs" />
+    <Compile Include="Cache\Configuration\CacheElement.cs" />
+    <Compile Include="Cache\Configuration\CacheElementCollection.cs" />
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LocalCache.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\AsymmetricCryptoBase.cs" />

@@ -13,26 +13,10 @@ namespace Sparrow.CommonLibrary.Cache
     public static class CacheManager
     {
         private static readonly ConcurrentDictionary<string, ICache> cachers;
-        private static Func<string, ICache> creater;
-
-        /// <summary>
-        /// 缓存默认的区域名称
-        /// </summary>
-        public static readonly string DefaultRegionName;
 
         static CacheManager()
         {
             cachers = new ConcurrentDictionary<string, ICache>();
-            DefaultRegionName = "region:default";
-        }
-
-        /// <summary>
-        /// 设置缓存对象创建方法，可以创建<see cref="ICache"/>的自定义实现。
-        /// </summary>
-        /// <param name="creater"></param>
-        public static void SetICacheCreater(Func<string, ICache> creater)
-        {
-            CacheManager.creater = creater;
         }
 
         /// <summary>
@@ -57,13 +41,24 @@ namespace Sparrow.CommonLibrary.Cache
             return cachers.TryRemove(regionName, out cache);
         }
 
+        private static ICache CreateCache(string regionName)
+        {
+            Type type;
+            string conn;
+            CacheSettings.GetCache(regionName, out type, out conn);
+            if (string.IsNullOrEmpty(conn))
+                return (ICache)Activator.CreateInstance(type, new object[] { regionName });
+            else
+                return (ICache)Activator.CreateInstance(type, new object[] { regionName, conn });
+        }
+
         /// <summary>
         /// 获取默认的缓存对象
         /// </summary>
         /// <returns></returns>
         public static ICache GetCache()
         {
-            return GetCache(DefaultRegionName);
+            return GetCache(CacheSettings.DefaultRegionName);
         }
 
         /// <summary>
@@ -73,7 +68,7 @@ namespace Sparrow.CommonLibrary.Cache
         /// <returns></returns>
         public static ICache GetCache(string regionName)
         {
-            return cachers.GetOrAdd(regionName, x => creater == null ? new LocalCache(x) : creater(x));
+            return cachers.GetOrAdd(regionName, x => CreateCache(x));
         }
 
         /// <summary>
