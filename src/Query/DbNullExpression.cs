@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Query
 {
-    public class DbNullExpression : SqlExpression
+    public class DbNullExpression : ConstantExpression
     {
         public static readonly DbNullExpression Instance;
 
@@ -15,6 +15,7 @@ namespace Sparrow.CommonLibrary.Query
         }
 
         private DbNullExpression()
+            : base(null)
         {
         }
 

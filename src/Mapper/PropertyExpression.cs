@@ -21,15 +21,37 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static MemberExpression ExtractMemberExpression<T>(Expression<Func<T, object>> exp)
         {
-            MemberExpression member;
-            if (exp.Body.NodeType == ExpressionType.Convert)
-                member = (MemberExpression)((UnaryExpression)exp.Body).Operand;
-            else if (exp.Body.NodeType == ExpressionType.MemberAccess)
-                member = (MemberExpression)exp.Body;
+            MemberExpression member = null;
+            if (exp.Body.NodeType == ExpressionType.Convert && ((UnaryExpression)exp.Body).Operand.NodeType == ExpressionType.MemberAccess)
+            {
+                member = ExtractMemberExpression(((UnaryExpression)exp.Body).Operand);
+            }
             else
-                throw new MapperException("Lambda表达示不符合映射的标准，标准示例：x=>x.ID。");
-            //
-            return member;
+            {
+                member = ExtractMemberExpression(exp.Body);
+            }
+
+            if (member.Expression.Type == typeof(T))
+                return member;
+
+            throw new MapperException("Lambda表达示不符合映射的标准，标准示例：x=>x.ID。");
+        }
+
+        /// <summary>
+        /// 获取表达未成员类型信息
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        public static MemberExpression ExtractMemberExpression(Expression exp)
+        {
+            if (exp.NodeType == ExpressionType.MemberAccess)
+            {
+                if (((MemberExpression)exp).Expression.NodeType == ExpressionType.Parameter)
+                    return (MemberExpression)exp;
+            }
+
+            throw new MapperException("Lambda表达示不符合映射的标准，标准示例：x=>x.ID。");
         }
     }
 

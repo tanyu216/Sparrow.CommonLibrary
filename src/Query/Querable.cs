@@ -11,6 +11,7 @@ using System.Data;
 using Sparrow.CommonLibrary.Query;
 using System.Collections;
 using Sparrow.CommonLibrary.Database.SqlBuilder;
+using System.Data.Common;
 
 namespace Sparrow.CommonLibrary.Query
 {
@@ -191,77 +192,70 @@ namespace Sparrow.CommonLibrary.Query
 
         public Queryable<T> Where(Expression<Func<T, object>> field, Operator op, object value)
         {
-            CompareExpression compare;
+            LogicalBinaryExpression logical;
             switch (op)
             {
                 case Operator.Equal:
-                    compare = SqlExpression.Equal(field, value);
+                    logical = SqlExpression.Equal(field, value);
                     break;
                 case Operator.LessThan:
-                    compare = SqlExpression.LessThan(field, value);
+                    logical = SqlExpression.LessThan(field, value);
                     break;
                 case Operator.LessThanOrEqual:
-                    compare = SqlExpression.LessThanOrEqual(field, value);
+                    logical = SqlExpression.LessThanOrEqual(field, value);
                     break;
                 case Operator.GreaterThan:
-                    compare = SqlExpression.GreaterThan(field, value);
+                    logical = SqlExpression.GreaterThan(field, value);
                     break;
                 case Operator.GreaterThanOrEqual:
-                    compare = SqlExpression.GreaterThanOrEqual(field, value);
+                    logical = SqlExpression.GreaterThanOrEqual(field, value);
                     break;
                 case Operator.In:
-                    compare = SqlExpression.In(field, value);
+                    logical = SqlExpression.In(field, value);
                     break;
                 case Operator.StartWith:
-                    compare = SqlExpression.Like(field, value, true, false);
+                    logical = SqlExpression.Like(field, value, true, false);
                     break;
                 case Operator.EndWith:
-                    compare = SqlExpression.Like(field, value, false, true);
+                    logical = SqlExpression.Like(field, value, false, true);
                     break;
                 case Operator.Like:
-                    compare = SqlExpression.Like(field, value, true, true);
+                    logical = SqlExpression.Like(field, value, true, true);
                     break;
                 case Operator.NotEqual:
-                    compare = SqlExpression.NotEqual(field, value);
+                    logical = SqlExpression.NotEqual(field, value);
                     break;
                 case Operator.Between:
                     var values = ((ICollection)value).Cast<object>();
                     if (values.Count() < 2)
                         throw new ArgumentException("value集合未包含两个元素。");
-                    compare = SqlExpression.Between(field, values.First(), values.Skip(1).First());
+                    logical = SqlExpression.Between(field, values.First(), values.Skip(1).First());
                     break;
                 default:
                     throw new NotSupportedException(string.Format("不受支持的{0}", op));
             }
-            return Where(compare);
+            return Where(logical);
         }
 
-        public Queryable<T> Where(CompareExpression condition)
+        public Queryable<T> Where(LogicalBinaryExpression logical)
         {
-            if (condition == null)
+            if (logical == null)
                 throw new ArgumentNullException("condition");
 
-            if (_condition == null)
-                _condition = SqlExpression.AndAlso(condition, null);
-            else
-                _condition = SqlExpression.AndAlso(_condition, condition);
-            return this;
-        }
-
-        public Queryable<T> Where(ConditionExpression condition)
-        {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
-
-            if (_condition == null)
+            if (_where == null)
             {
-                _condition = condition;
+                _where = logical;
             }
             else
             {
-                _condition = SqlExpression.AndAlso(_condition, condition);
+                _where = SqlExpression.AndAlso(_where, logical);
             }
             return this;
+        }
+
+        public Queryable<T> Where(Expression<Func<T, bool>> logical)
+        {
+            return Where(LogicalBinaryExpression.Expression(logical));
         }
 
         public Queryable<T> GroupBy(Expression<Func<T, object>> field)
@@ -276,7 +270,7 @@ namespace Sparrow.CommonLibrary.Query
             return this;
         }
 
-        public Queryable<T> GroupBy(Expression<Func<T, object>> field, ConditionExpression having)
+        public Queryable<T> GroupBy(Expression<Func<T, object>> field, LogicalBinaryExpression having)
         {
             Groups.Add(SqlExpression.Field(field));
             if (having != null)
@@ -296,7 +290,7 @@ namespace Sparrow.CommonLibrary.Query
             return this;
         }
 
-        public Queryable<T> GroupBy(SqlExpression field, ConditionExpression having)
+        public Queryable<T> GroupBy(SqlExpression field, LogicalBinaryExpression having)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -356,7 +350,7 @@ namespace Sparrow.CommonLibrary.Query
             var topExpressions = top > 0 ? builder.Constant(top) : string.Empty;
             var fieldExpressions = Fields.OutputSqlString(builder, output);
             var tableExpression = builder.BuildTableName(mapper.MetaInfo.Name);
-            var conditionExpressions = _condition != null ? _condition.OutputSqlString(builder, output) : string.Empty;
+            var conditionExpressions = _where != null ? _where.OutputSqlString(builder, output) : string.Empty;
             var groupbyExpression = _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty;
             var havingExpression = _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty;
             var orderbyExpression = _orders != null && _orders.Count > 0 ? string.Join(",", _orders.Select(x => string.Concat(x.Key.OutputSqlString(builder, output), " ", x.Value ? "DESC" : "ASC"))) : string.Empty;
@@ -395,11 +389,20 @@ namespace Sparrow.CommonLibrary.Query
             return OutputSqlString(database.Builder, output);
         }
 
+        #region Execute
+
         public IDataReader ExecuteReader()
         {
             var parameters = database.CreateParamterCollection();
             var sql = OutputSqlString(parameters);
             return database.ExecuteReader(sql, parameters);
+        }
+
+        public IDataReader ExecuteReader(DbTransaction dbTransaction)
+        {
+            var parameters = database.CreateParamterCollection();
+            var sql = OutputSqlString(parameters);
+            return database.ExecuteReader(sql, parameters, dbTransaction);
         }
 
         public IList<T> ExecuteList()
@@ -409,12 +412,28 @@ namespace Sparrow.CommonLibrary.Query
             return database.ExecuteList<T>(sql, parameters);
         }
 
+        public IList<T> ExecuteList(DbTransaction dbTransaction)
+        {
+            var parameters = database.CreateParamterCollection();
+            var sql = OutputSqlString(parameters);
+            return database.ExecuteList<T>(sql, parameters, dbTransaction);
+        }
+
         public IList<TEntity> ExecuteList<TEntity>()
         {
             var parameters = database.CreateParamterCollection();
             var sql = OutputSqlString(parameters);
             return database.ExecuteList<TEntity>(sql, parameters);
         }
+
+        public IList<TEntity> ExecuteList<TEntity>(DbTransaction dbTransaction)
+        {
+            var parameters = database.CreateParamterCollection();
+            var sql = OutputSqlString(parameters);
+            return database.ExecuteList<TEntity>(sql, parameters, dbTransaction);
+        }
+
+        #endregion
 
         private string GetFieldName(Expression<Func<T, object>> field)
         {
@@ -436,12 +455,12 @@ namespace Sparrow.CommonLibrary.Query
         private CollectionExpression _fields;
         private CollectionExpression Fields { get { return _fields = _fields ?? new CollectionExpression(); } }
 
-        private ConditionExpression _condition;
+        private LogicalBinaryExpression _where;
 
-        private CollectionExpression<T> _groups;
-        private CollectionExpression<T> Groups { get { return _groups = _groups ?? new CollectionExpression<T>(); } }
+        private CollectionExpression _groups;
+        private CollectionExpression Groups { get { return _groups = _groups ?? new CollectionExpression(); } }
 
-        private ConditionExpression _having;
+        private LogicalBinaryExpression _having;
 
         private IDictionary<SqlExpression, bool> _orders;
         private IDictionary<SqlExpression, bool> Orders { get { return _orders = _orders ?? new Dictionary<SqlExpression, bool>(); } }

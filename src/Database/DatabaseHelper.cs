@@ -305,7 +305,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <param name="obj"></param>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
+        private new bool Equals(object obj)
         {
             return base.Equals(obj);
         }
@@ -314,7 +314,7 @@ namespace Sparrow.CommonLibrary.Database
         /// </summary>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode()
+        private new int GetHashCode()
         {
             return base.GetHashCode();
         }
@@ -323,7 +323,7 @@ namespace Sparrow.CommonLibrary.Database
         /// </summary>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override string ToString()
+        private new string ToString()
         {
             return base.ToString();
         }

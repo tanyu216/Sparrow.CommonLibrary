@@ -1,26 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Sparrow.CommonLibrary.Query
 {
-    /// <summary>
-    /// 条件比较表达式
-    /// </summary>
-    public abstract class CompareExpression : SqlExpression
+    public abstract class LogicalBinaryExpression : BinaryExpression
     {
-        public SqlExpression Left { get; protected set; }
 
-        public SqlExpression Right { get; protected set; }
-
-        protected abstract string Operator { get; }
-
-        protected CompareExpression()
-        {
-        }
-
-        internal static CompareExpression Expression(ExpressionType nodeType, SqlExpression left, SqlExpression right)
+        internal static LogicalBinaryExpression Expression(ExpressionType nodeType, SqlExpression left, SqlExpression right)
         {
             if (left == null)
                 throw new ArgumentNullException("left");
@@ -31,10 +20,10 @@ namespace Sparrow.CommonLibrary.Query
             {
                 case ExpressionType.Equal:
                     return new EqualExpression() { Left = left, Right = right };
-                case ExpressionType.IsNull:
-                    return new EqualNullExpression() { Left = left, Right = right };
-                case ExpressionType.IsNotNull:
-                    return new EqualNullExpression() { Left = left, Right = right };
+                case ExpressionType.Is:
+                    return new IsExpression() { Left = left, Right = right };
+                case ExpressionType.IsNot:
+                    return new IsNotExpression() { Left = left, Right = right };
                 case ExpressionType.GreaterThan:
                     return new GreaterThanExpression() { Left = left, Right = right };
                 case ExpressionType.GreaterThanOrEqual:
@@ -46,30 +35,23 @@ namespace Sparrow.CommonLibrary.Query
                 case ExpressionType.NotEqual:
                     return new NotEqualExpression() { Left = left, Right = right };
                 case ExpressionType.In:
+                    if (!(right is CollectionExpression))
+                        throw new ArgumentException("right不是一个集合表达式。");
                     return new InExpression() { Left = left, Right = (CollectionExpression)right };
                 case ExpressionType.Between:
+                    if (!(right is CollectionExpression))
+                        throw new ArgumentException("right不是一个集合表达式。");
                     return new BetweenExpression() { Left = left, Right = (CollectionExpression)right };
+                case ExpressionType.AndAlso:
+                    return new AndAlsoExpression() { Left = left, Right = right };
+                case ExpressionType.OrElse:
+                    return new OrElseExpression() { Left = left, Right = right };
                 default:
                     throw new NotSupportedException(string.Format("不受支持的{0}", nodeType.ToString()));
             }
         }
 
-        internal static CompareExpression ExpressionForLike(SqlExpression left, SqlExpression right, bool startWith, bool endWith)
-        {
-            if (left == null)
-                throw new ArgumentNullException("left");
-            if (right == null)
-                throw new ArgumentNullException("right");
-
-            return new LikeExpression() { Left = left, Right = right, StartWith = startWith, EndWith = endWith };
-        }
-
-        public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
-        {
-            return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
-        }
-
-        private class BetweenExpression : CompareExpression
+        private class BetweenExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -100,7 +82,7 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class InExpression : CompareExpression
+        private class InExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -118,7 +100,7 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class EqualExpression : CompareExpression
+        private class EqualExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -131,25 +113,20 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class EqualNullExpression : CompareExpression
+        private class IsExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
-                get { return ExpressionType.IsNull; }
+                get { return ExpressionType.Is; }
             }
 
             protected override string Operator
             {
                 get { return " IS "; }
             }
-
-            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
-            {
-                return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
-            }
         }
 
-        private class GreaterThanExpression : CompareExpression
+        private class GreaterThanExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -162,7 +139,7 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class GreaterThanOrEqualExpression : CompareExpression
+        private class GreaterThanOrEqualExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -176,7 +153,7 @@ namespace Sparrow.CommonLibrary.Query
 
         }
 
-        private class LessThanExpression : CompareExpression
+        private class LessThanExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -190,7 +167,7 @@ namespace Sparrow.CommonLibrary.Query
 
         }
 
-        private class LessThanOrEqualExpression : CompareExpression
+        private class LessThanOrEqualExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -203,7 +180,7 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class LikeExpression : CompareExpression
+        private class LikeExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -214,26 +191,9 @@ namespace Sparrow.CommonLibrary.Query
             {
                 get { return " LIKE "; }
             }
-
-            public bool StartWith { get; set; }
-
-            public bool EndWith { get; set; }
-
-            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
-            {
-                var condition = new StringBuilder();
-                condition.Append(Left.OutputSqlString(builder, output));
-                condition.Append(" LIKE ");
-                if (StartWith)
-                { condition.Append("'%'+"); }
-                condition.Append(Right.OutputSqlString(builder, output));
-                if (EndWith)
-                { condition.Append("+'%'"); }
-                return condition.ToString();
-            }
         }
 
-        private class NotEqualExpression : CompareExpression
+        private class NotEqualExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
@@ -246,22 +206,51 @@ namespace Sparrow.CommonLibrary.Query
             }
         }
 
-        private class NotEqualNullExpression : CompareExpression
+        private class IsNotExpression : LogicalBinaryExpression
         {
             public override ExpressionType NodeType
             {
-                get { return ExpressionType.IsNotNull; }
+                get { return ExpressionType.IsNot; }
             }
 
             protected override string Operator
             {
                 get { return " IS NOT "; }
             }
+        }
+
+        private class AndAlsoExpression : LogicalBinaryExpression
+        {
+            public override ExpressionType NodeType
+            {
+                get { return ExpressionType.AndAlso; }
+            }
+
+            protected override string Operator
+            {
+                get { return " AND "; }
+            }
+        }
+
+        private class OrElseExpression : LogicalBinaryExpression
+        {
+            public override ExpressionType NodeType
+            {
+                get { return ExpressionType.OrElse; }
+            }
+
+            protected override string Operator
+            {
+                get { return " OR "; }
+            }
 
             public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
-                return string.Concat(Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output));
+                if (Right == null)
+                    return Left.OutputSqlString(builder, output);
+                return string.Concat("(", Left.OutputSqlString(builder, output), Operator, Right.OutputSqlString(builder, output), ")");
             }
         }
     }
+
 }

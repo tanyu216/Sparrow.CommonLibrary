@@ -63,13 +63,13 @@ namespace Sparrow.CommonLibrary.Query
         /// </summary>
         GroupBy,
         /// <summary>
-        /// 判断不为空
+        /// Is
         /// </summary>
-        IsNotNull,
+        Is,
         /// <summary>
-        /// 判断空
+        /// Is Not
         /// </summary>
-        IsNull,
+        IsNot,
         /// <summary>
         /// 小于运算
         /// </summary>

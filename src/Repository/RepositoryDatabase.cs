@@ -293,24 +293,24 @@ namespace Sparrow.CommonLibrary.Repository
             return DoExecute(sql, parameters, null);
         }
 
-        public int Delete(CompareExpression condition)
+        public int Delete(Expression<Func<T, bool>> logical)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
+            if (logical == null)
+                throw new ArgumentNullException("logical");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, condition.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, LogicalBinaryExpression.Expression(logical).OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
 
-        public int Delete(ConditionExpression condition)
+        public int Delete(LogicalBinaryExpression logical)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
+            if (logical == null)
+                throw new ArgumentNullException("logical");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, condition.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, logical.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
@@ -329,33 +329,38 @@ namespace Sparrow.CommonLibrary.Repository
             return new Queryable<T>(_database).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
-        public IList<T> GetList(CompareExpression condition)
+        public IList<T> GetList(Expression<Func<T, bool>> logical)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
+            if (logical == null)
+                throw new ArgumentNullException("logical");
 
-            return new Queryable<T>(_database).Where(condition).ExecuteList();
+            return new Queryable<T>(_database).Where(logical).ExecuteList();
         }
 
-        public IList<T> GetList(ConditionExpression condition)
+        public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
-
-            return new Queryable<T>(_database).Where(condition).ExecuteList();
+            return new Queryable<T>(_database).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
-        public IList<T> GetList(ConditionExpression condition, int startIndex, int rowCount)
+        public IList<T> GetList(LogicalBinaryExpression logical)
         {
-            return new Queryable<T>(_database).Where(condition).RowLimit(startIndex, rowCount).ExecuteList();
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            return new Queryable<T>(_database).Where(logical).ExecuteList();
         }
 
-        public T Get(CompareExpression condition)
+        public IList<T> GetList(LogicalBinaryExpression logical, int startIndex, int rowCount)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
+            return new Queryable<T>(_database).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
+        }
 
-            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+        public T Get(Expression<Func<T, bool>> logical)
+        {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
             {
                 return mapper.MapSingle(read);
             }
@@ -380,12 +385,12 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public T Get(ConditionExpression condition)
+        public T Get(LogicalBinaryExpression logical)
         {
-            if (condition == null)
-                throw new ArgumentNullException("condition");
+            if (logical == null)
+                throw new ArgumentNullException("logical");
 
-            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+            using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
             {
                 return mapper.MapSingle(read);
             }
@@ -404,22 +409,22 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Sum<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
+        public TValue Sum<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Sum(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Sum(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
@@ -433,22 +438,22 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Min<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
+        public TValue Min<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Min(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Min<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public TValue Min<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Min(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
@@ -462,22 +467,22 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Max<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
+        public TValue Max<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Max(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Max<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public TValue Max<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Max(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
@@ -491,7 +496,7 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Avg<TValue>(Expression<Func<T, object>> field, CompareExpression condition)
+        public TValue Avg<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> condition)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
@@ -501,12 +506,12 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
 
-        public TValue Avg<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public TValue Avg<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Avg(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<TValue>(sql, parameters);
         }
@@ -520,22 +525,22 @@ namespace Sparrow.CommonLibrary.Repository
             return Database.ExecuteScalar<int>(sql, parameters);
         }
 
-        public int Count(Expression<Func<T, object>> field, CompareExpression condition)
+        public int Count(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Count(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<int>(sql, parameters);
         }
 
-        public int Count(System.Linq.Expressions.Expression<Func<T, object>> field, ConditionExpression condition)
+        public int Count(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Count(field)
-                .Where(condition)
+                .Where(logical)
                 .OutputSqlString(parameters);
             return Database.ExecuteScalar<int>(sql, parameters);
         }
@@ -554,13 +559,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Sum(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -569,13 +574,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Sum(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -598,13 +603,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Min(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -613,13 +618,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Min(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -642,13 +647,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Max(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -657,13 +662,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Max(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -686,13 +691,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, CompareExpression condition)
+        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Avg(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -701,13 +706,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, ConditionExpression condition)
+        public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(keyField)
                 .Avg(valueField)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -730,13 +735,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, CompareExpression condition)
+        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(field)
                 .Count(field)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(field)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))
@@ -745,13 +750,13 @@ namespace Sparrow.CommonLibrary.Repository
             }
         }
 
-        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, ConditionExpression condition)
+        public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
             string sql = new Queryable<T>(Database)
                 .Select(field)
                 .Count(field)
-                .Where(condition)
+                .Where(logical)
                 .GroupBy(field)
                 .OutputSqlString(parameters);
             using (var reader = Database.ExecuteReader(sql, parameters))

@@ -144,11 +144,10 @@
     <Compile Include="Mapper\PropertyExpression.cs" />
     <Compile Include="Query\BinaryExpression.cs" />
     <Compile Include="Query\CollectionExpression.cs" />
-    <Compile Include="Query\CompareExpression.cs" />
-    <Compile Include="Query\ConditionExpression.cs" />
+    <Compile Include="Query\LogicalBinaryExpression.cs" />
     <Compile Include="Query\ConstantExpression.cs" />
+    <Compile Include="Query\SimpleBinaryExpression.cs" />
     <Compile Include="Query\SqlExpression.cs" />
-    <Compile Include="Query\ExpressionExtensions.cs" />
     <Compile Include="Query\ExpressionType.cs" />
     <Compile Include="Query\FieldExpression.cs" />
     <Compile Include="Query\FunctionExpression.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Query\ParameterExpression.cs" />
     <Compile Include="Query\Querable.cs" />
     <Compile Include="Query\VariableNameExpression.cs" />
+    <Compile Include="Query\WildcardsExpression.cs" />
     <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Repository\RepositoryDatabase.cs" />
     <Compile Include="Database\SqlBuilder\SqlBuilderManager.cs" />

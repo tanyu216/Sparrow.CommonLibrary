@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sparrow.CommonLibrary.Common;
+using Sparrow.CommonLibrary.Extenssions;
 
 namespace Sparrow.CommonLibrary.Test.Common
 {
@@ -53,6 +54,13 @@ namespace Sparrow.CommonLibrary.Test.Common
             var now5 = now4 + new TimeSpan(0, 0, 100000);
             Assert.IsTrue(now4 < now5);
             Assert.IsTrue(now == now5);
+        }
+
+        [Test]
+        public void Test4()
+        {
+            var val = 100000;
+            var timestamp = val.Cast<Timestamp>();
         }
 
     }

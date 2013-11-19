@@ -124,21 +124,4 @@ namespace Sparrow.CommonLibrary.Query
         #endregion
     }
 
-    public class CollectionExpression<T> : CollectionExpression
-    {
-        public CollectionExpression()
-        {
-        }
-
-        public CollectionExpression(int capacity)
-            : base(capacity)
-        {
-        }
-
-        public CollectionExpression(IEnumerable<SqlExpression> collection)
-            : base(collection)
-        {
-        }
-
-    }
 }
