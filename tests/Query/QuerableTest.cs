@@ -10,6 +10,7 @@ using Sparrow.CommonLibrary.Query;
 using Sparrow.CommonLibrary.Test.Mapper;
 using System.Linq.Expressions;
 using System.Collections;
+using Sparrow.CommonLibrary.Extenssions;
 
 namespace Sparrow.CommonLibrary.Test.Query
 {
@@ -17,10 +18,85 @@ namespace Sparrow.CommonLibrary.Test.Query
     public class QuerableTest
     {
         [Test]
-        public void Test1()
+        public void QueryableTest1()
         {
             var database = DatabaseHelper.GetHelper("test");
+            var parameter = database.CreateParamterCollection();
+
             var queryable = database.CreateQueryable<UserProfile>();
+            var sql = queryable.Select(x => x.Id, x => x.Name)
+                .Where(x => x.Id >= 1 && x.Id < 11 && (x.Name == "test" || x.Name == "test2"))
+                .OutputSqlString(parameter);
+            Assert.IsNotNullOrEmpty(sql);
+        }
+
+        [Test]
+        public void QueryableTest2()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+            var parameter = database.CreateParamterCollection();
+
+            var queryable = database.CreateQueryable<UserProfile>();
+            var sql = queryable.Select(x => x.Id, x => x.Name)
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .Where(x => x.Name == "test")
+                .OutputSqlString(parameter);
+            Assert.IsNotNullOrEmpty(sql);
+        }
+
+        [Test]
+        public void QueryableTest3()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+            var parameter = database.CreateParamterCollection();
+
+            var sql = database.CreateQueryable<UserProfile>()
+                .Select(x => x.Id, x => x.Name)
+                .Where(x => x.Id == 4 || (x.Id >= 1 && x.Id <= 10) || x.Id == null || (x.Id != 3 && x.Id != null))
+                .OutputSqlString(parameter);
+
+            Assert.IsNotNullOrEmpty(sql);
+        }
+
+        [Test]
+        public void QueryableListTest1()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .ExecuteList();
+
+            Assert.IsNotNull(list);
+        }
+
+        [Test]
+        public void QueryableListTest2()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Select(x => x.Id, x => x.Name)
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .ExecuteList();
+
+            Assert.IsNotNull(list);
+        }
+
+        [Test]
+        public void QueryableListTest3()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            using (var read = database.CreateQueryable<UserProfile>()
+                .Select(x => x.Name)
+                .Count(x => x.Id)
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .GroupBy(x => x.Name)
+                .ExecuteReader())
+            {
+                var values = read.ToDictionary<string, int>();
+            }
 
         }
 

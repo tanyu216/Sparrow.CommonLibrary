@@ -158,7 +158,7 @@ namespace Sparrow.CommonLibrary.Query
 
         public Queryable<T> Count(Expression<Func<T, object>> field, string alias)
         {
-            Fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", SqlExpression.Field(field)), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("COUNT", SqlExpression.Field(field)), alias));
             return this;
         }
 
@@ -167,7 +167,7 @@ namespace Sparrow.CommonLibrary.Query
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            Fields.Add(SqlExpression.Alias(SqlExpression.Function("Count", expression), alias));
+            Fields.Add(SqlExpression.Alias(SqlExpression.Function("COUNT", expression), alias));
             return this;
         }
 

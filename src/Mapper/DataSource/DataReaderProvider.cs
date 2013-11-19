@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Mapper.DataSource
 
             public object[] Read(int[] ordinal)
             {
-                if (_reader.Read())
+                if (!_reader.Read())
                     return null;
 
                 var data = new object[ordinal.Length];
