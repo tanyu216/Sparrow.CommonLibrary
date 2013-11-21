@@ -64,6 +64,7 @@
     <Compile Include="Query\QuerableTest.cs" />
     <Compile Include="Common\BufferedTest.cs" />
     <Compile Include="Common\PathBuilderTest.cs" />
+    <Compile Include="Repository\RepositoryTest.cs" />
     <Compile Include="Retrying\FixedIntervalTest.cs" />
     <Compile Include="Retrying\ExponentialBackoffIntervalTest.cs" />
     <Compile Include="Retrying\IncrementalIntervalTest.cs" />
@@ -79,6 +80,7 @@
       <Name>Sparrow.CommonLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

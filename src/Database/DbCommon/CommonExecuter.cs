@@ -25,7 +25,11 @@ namespace Sparrow.CommonLibrary.Database.DbCommon
 
             DbProvider = dbProvider;
             ConnName = connName;
-            _connectionString = connectionString;
+            // test connection
+            using (var conn = dbProvider.GetNotWrapperedConnection(connectionString))
+            {
+                _connectionString = connectionString;
+            }
         }
 
         public ConnectionWrapper GetWrapperedConnection()

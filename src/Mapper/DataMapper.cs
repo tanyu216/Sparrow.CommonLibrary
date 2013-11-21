@@ -168,6 +168,27 @@ namespace Sparrow.CommonLibrary.Mapper
             return this;
         }
 
+        /// <summary>
+        /// 自动映射实体属性
+        /// </summary>
+        /// <returns></returns>
+        public DataMapper<T> AutoAppendProperty()
+        {
+            foreach (var property in typeof(T).GetProperties())
+            {
+                if (MetaInfo[property] != null)
+                    continue;
+
+                if (property.CanRead && property.CanWrite)
+                {
+                    var handler = Expression.Parameter(typeof(T), "x");
+                    var exp = Expression.Lambda<Func<T, object>>(Expression.Convert(Expression.MakeMemberAccess(handler, property), typeof(object)), handler);
+                    AppendProperty(exp, property.Name);
+                }
+            }
+            return this;
+        }
+
         private bool isReorganize;
 
         private void Reorganize()
@@ -207,6 +228,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public DataMapper<T> Complete()
         {
+            if (MetaInfo.PropertyCount == 0)
+                AutoAppendProperty();
+
             Reorganize();
 
             var ctor = typeof(T).GetConstructor(new Type[0]);
@@ -227,6 +251,9 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
+
+            if (MetaInfo.PropertyCount == 0)
+                AutoAppendProperty();
 
             Reorganize();
 

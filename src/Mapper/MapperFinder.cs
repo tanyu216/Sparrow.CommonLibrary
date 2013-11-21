@@ -123,15 +123,7 @@ namespace Sparrow.CommonLibrary.Mapper
             public override IMapper<T> FindIMapper<T>()
             {
                 var mapper = new DataMapper<T>();
-                foreach (var property in typeof(T).GetProperties())
-                {
-                    if (property.CanRead && property.CanWrite)
-                    {
-                        var handler = Expression.Parameter(typeof(T), "x");
-                        var exp = Expression.Lambda<Func<T, object>>(Expression.Convert(Expression.MakeMemberAccess(handler, property), typeof(object)), handler);
-                        mapper.AppendProperty(exp, property.Name);
-                    }
-                }
+                mapper.AutoAppendProperty();
                 if (mapper.MetaInfo.PropertyCount == 0)
                     throw new ArgumentException(string.Format("{0}没有公开任何可读写的成员属性。", typeof(T).FullName));
                 //
