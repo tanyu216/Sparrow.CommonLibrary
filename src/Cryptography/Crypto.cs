@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using Sparrow.CommonLibrary.Cryptography.AsymmetricAlgorithm;
 using Sparrow.CommonLibrary.Cryptography.HashAlgorithm;
 using Sparrow.CommonLibrary.Cryptography.SymmetricAlgorithm;
+using System.Text;
 
 namespace Sparrow.CommonLibrary.Cryptography
 {
@@ -243,5 +244,42 @@ namespace Sparrow.CommonLibrary.Cryptography
         }
 
         #endregion
+
+        /// <summary>
+        /// 将byte数组<paramref name="data"/>转换为16进制的字符串形式
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ToHexString(byte[] data)
+        {
+            if (data == null) 
+                throw new ArgumentNullException("data");
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < data.Length; i++)
+                sb.Append(data[i].ToString("x2"));
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 将16进制字符串<paramref name="data"/>转换成byte数组
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] FromHexString(string data)
+        {
+            if (data == null) 
+                throw new ArgumentNullException("data");
+
+            if (data.Length % 2 != 0) 
+                throw new ArgumentException("数据不合格。");
+
+            var bt = new byte[data.Length / 2];
+            for (var i = 0; i < data.Length; i += 2)
+                bt[i / 2] = Convert.ToByte("0x" + data.Substring(i, 2));
+
+            return bt;
+        }
     }
 }

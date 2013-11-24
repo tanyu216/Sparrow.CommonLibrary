@@ -10,6 +10,10 @@ namespace Sparrow.CommonLibrary.Test.Database
     [TestFixture]
     public class DatabaseTest
     {
-
+        [Test]
+        public void Test1()
+        {
+            var guid = Guid.NewGuid().ToString();
+        }
     }
 }

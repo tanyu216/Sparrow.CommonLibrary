@@ -78,9 +78,19 @@ namespace Sparrow.CommonLibrary.Cryptography.AsymmetricAlgorithm
             return VerifySign(Encoding.GetBytes(s), sign);
         }
 
+        public bool VerifySign(string s, string sign)
+        {
+            return VerifySign(Encoding.GetBytes(s), Crypto.FromHexString(sign));
+        }
+
         public bool VerifySign(Stream inputStream, byte[] sign)
         {
             return VerifySign(ReadStream(inputStream), sign);
+        }
+
+        public bool VerifySign(System.IO.Stream inputStream, string sign)
+        {
+            return VerifySign(inputStream, Crypto.FromHexString(sign));
         }
 
         #endregion

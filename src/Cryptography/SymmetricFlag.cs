@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Sparrow.CommonLibrary.Cryptography.SymmetricAlgorithm
+namespace Sparrow.CommonLibrary.Cryptography
 {
     public enum SymmetricFlag
     {

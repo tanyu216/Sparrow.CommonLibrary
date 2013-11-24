@@ -1,4 +1,4 @@
-﻿namespace Sparrow.CommonLibrary.Cryptography.AsymmetricAlgorithm
+﻿namespace Sparrow.CommonLibrary.Cryptography
 {
     /// <summary>
     /// 算法标识

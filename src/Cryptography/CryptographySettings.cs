@@ -13,17 +13,17 @@ namespace Sparrow.CommonLibrary.Cryptography
         /// <summary>
         /// 默认使用的Hash算法
         /// </summary>
-        public static HashAlgorithm.HashFlag HashFlag { get { return HashAlgorithm.HashFlag.SHA256; } }
+        public static HashFlag HashFlag { get { return HashFlag.SHA256; } }
 
         /// <summary>
         /// 默认使用的非对称算法
         /// </summary>
-        public static AsymmetricAlgorithm.AsymmetricFlag AsymmetricFlag { get { return AsymmetricAlgorithm.AsymmetricFlag.RSA; } }
+        public static AsymmetricFlag AsymmetricFlag { get { return AsymmetricFlag.RSA; } }
 
         /// <summary>
         /// 默认使用的对称算法
         /// </summary>
-        public static SymmetricAlgorithm.SymmetricFlag SymmetricFlag { get { return SymmetricAlgorithm.SymmetricFlag.Rijndael; } }
+        public static SymmetricFlag SymmetricFlag { get { return SymmetricFlag.Rijndael; } }
 
         /// <summary>
         /// 默认编码

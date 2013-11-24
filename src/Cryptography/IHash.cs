@@ -51,10 +51,24 @@ namespace Sparrow.CommonLibrary.Cryptography
         /// <summary>
         /// 通过将指定的签名数据与为指定数据计算的签名进行比较来验证指定的签名数据
         /// </summary>
+        /// <param name="s">要计算签名的数据输入。</param>
+        /// <param name="sign">要验证的数据签名。</param>
+        /// <returns>签名验证结果。</returns>
+        bool VerifySign(string s, string sign);
+        /// <summary>
+        /// 通过将指定的签名数据与为指定数据计算的签名进行比较来验证指定的签名数据
+        /// </summary>
         /// <param name="inputStream">要计算签名的数据输入。</param>
         /// <param name="sign">要验证的数据签名。</param>
         /// <returns>签名验证结果。</returns>
         bool VerifySign(Stream inputStream, byte[] sign);
+        /// <summary>
+        /// 通过将指定的签名数据与为指定数据计算的签名进行比较来验证指定的签名数据
+        /// </summary>
+        /// <param name="inputStream">要计算签名的数据输入。</param>
+        /// <param name="sign">要验证的数据签名。</param>
+        /// <returns>签名验证结果。</returns>
+        bool VerifySign(Stream inputStream, string sign);
 
     }
 }

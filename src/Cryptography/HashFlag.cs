@@ -1,4 +1,4 @@
-﻿namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
+﻿namespace Sparrow.CommonLibrary.Cryptography
 {
     public enum HashFlag
     {

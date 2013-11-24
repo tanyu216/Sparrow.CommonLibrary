@@ -98,9 +98,19 @@ namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
             return Compare(SignData(s), sign) == 0;
         }
 
+        public bool VerifySign(string s, string sign)
+        {
+            return Compare(SignData(s), Crypto.FromHexString(sign)) == 0;
+        }
+
         public bool VerifySign(System.IO.Stream inputStream, byte[] sign)
         {
             return Compare(SignData(inputStream), sign) == 0;
+        }
+
+        public bool VerifySign(System.IO.Stream inputStream, string sign)
+        {
+            return Compare(SignData(inputStream), Crypto.FromHexString(sign)) == 0;
         }
 
         protected virtual System.Security.Cryptography.HashAlgorithm Create()
@@ -108,25 +118,6 @@ namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
             if (string.IsNullOrWhiteSpace(AlgorithmName))
                 return System.Security.Cryptography.HashAlgorithm.Create();
             return System.Security.Cryptography.HashAlgorithm.Create(AlgorithmName);
-        }
-
-        public string ToHexString(byte[] data)
-        {
-            if (data == null) throw new ArgumentNullException("data");
-            var sb = new StringBuilder();
-            for (var i = 0; i < data.Length; i++)
-                sb.Append(data[i].ToString("x2"));
-            return sb.ToString();
-        }
-
-        public byte[] FromHexString(string s)
-        {
-            if (s == null) throw new ArgumentNullException("s");
-            if (s.Length % 2 != 0) throw new ArgumentException("数据不合格。");
-            var bt = new byte[s.Length / 2];
-            for (var i = 0; i < s.Length; i += 2)
-                bt[i / 2] = Convert.ToByte("0x" + s.Substring(i, 2));
-            return bt;
         }
 
         [DllImport("msvcrt.dll")]
@@ -142,5 +133,6 @@ namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
         {
             return memcmp(b1, b2, new IntPtr(b1.Length)).ToInt32();
         }
+
     }
 }

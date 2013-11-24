@@ -55,14 +55,14 @@
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LocalCache.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\AsymmetricCryptoBase.cs" />
-    <Compile Include="Cryptography\AsymmetricAlgorithm\AsymmetricFlag.cs" />
+    <Compile Include="Cryptography\AsymmetricFlag.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\BaseCertificate.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\BaseCspParameters.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\BaseXmlString.cs" />
     <Compile Include="Cryptography\Crypto.cs" />
     <Compile Include="Cryptography\CryptographySettings.cs" />
     <Compile Include="Cryptography\HashAlgorithm\Hash.cs" />
-    <Compile Include="Cryptography\HashAlgorithm\HashFlag.cs" />
+    <Compile Include="Cryptography\HashFlag.cs" />
     <Compile Include="Cryptography\HashAlgorithm\HashMAC.cs" />
     <Compile Include="Cryptography\IAsymmetricCrypto.cs" />
     <Compile Include="Cryptography\ICrypto.cs" />
@@ -70,7 +70,7 @@
     <Compile Include="Cryptography\IKeyedHash.cs" />
     <Compile Include="Cryptography\ISymmetricCrypto.cs" />
     <Compile Include="Cryptography\SymmetricAlgorithm\SymmetricCrypto.cs" />
-    <Compile Include="Cryptography\SymmetricAlgorithm\SymmetricFlag.cs" />
+    <Compile Include="Cryptography\SymmetricFlag.cs" />
     <Compile Include="Database\Configuration\ExecuterElement.cs" />
     <Compile Include="Database\Configuration\DatabaseConfigurationSection.cs" />
     <Compile Include="Database\Configuration\ProviderElementCollection.cs" />
