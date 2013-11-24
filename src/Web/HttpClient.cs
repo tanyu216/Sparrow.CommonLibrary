@@ -51,7 +51,7 @@ namespace Sparrow.CommonLibrary.Web
             set { _form = value; }
         }
 
-        public NameValueCollection _headers;
+        private NameValueCollection _headers;
         /// <summary>
         /// 自定义Http请求的头
         /// </summary>
@@ -109,7 +109,10 @@ namespace Sparrow.CommonLibrary.Web
 
         public HttpClient(string url)
         {
-            Url = url;
+            var uri = new Uri(url);
+            Url = string.Concat(uri.Scheme, "://", uri.Host, uri.IsDefaultPort ? "" : uri.Port.ToString(), uri.AbsolutePath);
+            if (!string.IsNullOrEmpty(uri.Query))
+                _queryString = HttpUtility.ParseQueryString(uri.Query);
             Timeout = 10 * 1000;
             Encoding = Encoding.UTF8;
             CompressData = true;
@@ -150,6 +153,7 @@ namespace Sparrow.CommonLibrary.Web
 
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
+            request.AllowAutoRedirect = false;
             return request;
         }
 

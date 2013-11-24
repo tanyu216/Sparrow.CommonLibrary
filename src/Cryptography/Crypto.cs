@@ -252,7 +252,7 @@ namespace Sparrow.CommonLibrary.Cryptography
         /// <returns></returns>
         public static string ToHexString(byte[] data)
         {
-            if (data == null) 
+            if (data == null)
                 throw new ArgumentNullException("data");
 
             var sb = new StringBuilder();
@@ -269,15 +269,15 @@ namespace Sparrow.CommonLibrary.Cryptography
         /// <returns></returns>
         public static byte[] FromHexString(string data)
         {
-            if (data == null) 
+            if (data == null)
                 throw new ArgumentNullException("data");
 
-            if (data.Length % 2 != 0) 
+            if (data.Length % 2 != 0)
                 throw new ArgumentException("数据不合格。");
 
             var bt = new byte[data.Length / 2];
             for (var i = 0; i < data.Length; i += 2)
-                bt[i / 2] = Convert.ToByte("0x" + data.Substring(i, 2));
+                bt[i / 2] = Convert.ToByte(data.Substring(i, 2), 16);
 
             return bt;
         }

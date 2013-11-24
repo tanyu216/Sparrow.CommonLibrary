@@ -38,7 +38,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <returns></returns>
         public static T GetValue<T>(string name)
         {
-            return GetValue<T>(name);
+            return GetValue<T>(name, default(T));
         }
 
         /// <summary>
