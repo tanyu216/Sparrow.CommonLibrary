@@ -27,6 +27,7 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
         /// </summary>
         [ConfigurationProperty(ElementType)]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationICollecterValidator))]
         public Type Type
         {
             get { return (Type)this[ElementType]; }

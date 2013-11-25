@@ -12,7 +12,6 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
     {
         private const string ElementName = "name";
         private const string ElementFilter = "filter";
-        private const string ElementMode = "mode";
         private const string ElementType = "type";
 
         private ConfigurationProperty _ParamsProperty;
@@ -50,33 +49,14 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         }
 
         /// <summary>
-        /// 写日志的模式（db/text/custom)
-        /// </summary>
-        [ConfigurationProperty(ElementMode, IsRequired = true)]
-        public string Mode
-        {
-            get { return (string)this[ElementMode]; }
-            set { this[ElementMode] = value; }
-        }
-
-        /// <summary>
         /// 实现<see cref="Sparrow.CommonLibrary.Logging.Writer.ILogWriter"/>接口的实例类
         /// </summary>
-        [ConfigurationProperty(ElementType)]
+        [ConfigurationProperty(ElementType, DefaultValue = typeof(TextLogWriter))]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationILogWriterValidator))]
         public Type Type
         {
-            get
-            {
-                switch ((Mode ?? string.Empty).ToLower())
-                {
-                    case "db":
-                        return typeof(DbLogWriter);
-                    case "text":
-                        return typeof(TextLogWriter);
-                }
-                return (Type)this[ElementType];
-            }
+            get { return (Type)this[ElementType]; }
             set { this[ElementType] = value; }
         }
 

@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Database.Import
+namespace Sparrow.CommonLibrary.Database
 {
     /// <summary>
     /// 适用于SqlServer数据库的导入工具

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Sparrow.CommonLibrary.Database.DbCommon;
 
-namespace Sparrow.CommonLibrary.Database.Import
+namespace Sparrow.CommonLibrary.Database
 {
     /// <summary>
     /// 提供获取<see cref="Importer"/>接口的实例

@@ -11,6 +11,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
     {
         [ConfigurationProperty("type", IsRequired = true)]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationISqlBuilderTypeValidator))]
         public Type Type
         {
             get { return (Type)this["type"]; }

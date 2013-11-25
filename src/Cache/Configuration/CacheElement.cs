@@ -50,6 +50,7 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
         /// </summary>
         [ConfigurationProperty(ElementType)]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationICacheValidator))]
         public Type Type
         {
             get { return (Type)this[ElementType]; }

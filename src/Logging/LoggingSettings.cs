@@ -54,7 +54,7 @@ namespace Sparrow.CommonLibrary.Logging
                         var filter = (ILogFilter)Activator.CreateInstance(filterElement.Type);
                         filter.Name = filterElement.Name;
                         filter.Categories = (filterElement.Categories ?? string.Empty).Split(',');
-                        filter.LogLevel = (filterElement.LogLevel ?? "Debug").Split(',').Select(x => (LogLevel)Enum.Parse(typeof(LogLevel), x)).ToArray();
+                        filter.LogLevel = filterElement.LogLevel;
                         filters.Add(filter);
                     }
                     catch (Exception ex)

@@ -52,6 +52,7 @@
     <Compile Include="Cache\Configuration\CacheConfigurationSection.cs" />
     <Compile Include="Cache\Configuration\CacheElement.cs" />
     <Compile Include="Cache\Configuration\CacheElementCollection.cs" />
+    <Compile Include="Cache\Configuration\ConfigurationICacheValidator.cs" />
     <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\LocalCache.cs" />
     <Compile Include="Cryptography\AsymmetricAlgorithm\AsymmetricCryptoBase.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Cryptography\ISymmetricCrypto.cs" />
     <Compile Include="Cryptography\SymmetricAlgorithm\SymmetricCrypto.cs" />
     <Compile Include="Cryptography\SymmetricFlag.cs" />
+    <Compile Include="Database\Configuration\ConfigurationTypeValidator.cs" />
     <Compile Include="Database\Configuration\ExecuterElement.cs" />
     <Compile Include="Database\Configuration\DatabaseConfigurationSection.cs" />
     <Compile Include="Database\Configuration\ProviderElementCollection.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Entity\IDbIncrementMetaPropertyInfo.cs" />
     <Compile Include="Entity\IDbMetaInfo.cs" />
     <Compile Include="Entity\IDbMetaPropertyInfo.cs" />
+    <Compile Include="Logging\Configuration\ConfigurationTypeValidator.cs" />
     <Compile Include="Mapper\Metadata\MetaInfo.cs" />
     <Compile Include="Mapper\Metadata\MetaPropertyInfo.cs" />
     <Compile Include="Query\AliasExpression.cs" />
@@ -206,6 +209,7 @@
     <Compile Include="Weblog\Collect\Collecters.cs" />
     <Compile Include="Weblog\Collect\ICollecter.cs" />
     <Compile Include="Weblog\Configuration\CollectElement.cs" />
+    <Compile Include="Weblog\Configuration\ConfigurationTypeValidator.cs" />
     <Compile Include="Weblog\Configuration\IgnoreElementCollection.cs" />
     <Compile Include="Weblog\Configuration\IgnoreElement.cs" />
     <Compile Include="Weblog\Configuration\ParamElementCollection.cs" />

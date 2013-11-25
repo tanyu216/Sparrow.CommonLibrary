@@ -10,7 +10,6 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
 {
     public class WriterElement : ConfigurationElement
     {
-        private const string ElementMode = "mode";
         private const string ElementType = "type";
 
         private ConfigurationProperty _ParamsProperty;
@@ -22,34 +21,14 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
         }
 
         /// <summary>
-        /// 写日志的模式（db/text/msmq/custom)
-        /// </summary>
-        [ConfigurationProperty(ElementMode, IsRequired = true)]
-        //[TypeConverter(typeof(EnumConverter))]
-        public string Mode
-        {
-            get { return (string)this[ElementMode]; }
-            set { this[ElementMode] = value; }
-        }
-
-        /// <summary>
         /// 实现<see cref="Sparrow.CommonLibrary.Weblog.Writer.IWeblogWriter"/>接口的实例类
         /// </summary>
-        [ConfigurationProperty(ElementType)]
+        [ConfigurationProperty(ElementType, DefaultValue = typeof(TextWeblogWriter))]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationIWeblogWriterValidator))]
         public Type Type
         {
-            get
-            {
-                switch ((Mode ?? string.Empty).ToLower())
-                {
-                    case "db":
-                        return typeof(DbWeblogWriter);
-                    case "text":
-                        return typeof(TextWeblogWriter);
-                }
-                return (Type)this[ElementType];
-            }
+            get { return (Type)this[ElementType]; }
             set { this[ElementType] = value; }
         }
 

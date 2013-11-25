@@ -9,7 +9,7 @@ namespace Sparrow.CommonLibrary.Logging.Filter
     {
         string Name { get; set; }
         string[] Categories { get; set; }
-        LogLevel[] LogLevel { get; set; }
+        LogLevel LogLevel { get; set; }
         IList<LogEntry> Filter(IList<LogEntry> logs);
     }
 }

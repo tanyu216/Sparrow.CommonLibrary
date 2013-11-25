@@ -34,7 +34,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             _properties = new ConfigurationPropertyCollection();
             _clientProperty1 = new ConfigurationProperty("filters", typeof(FilterElementCollection), null, ConfigurationPropertyOptions.None);
             _clientProperty2 = new ConfigurationProperty("writers", typeof(WriterElementCollection), null, ConfigurationPropertyOptions.IsRequired);
-            _clientProperty3 = new ConfigurationProperty("lowLevel", typeof(LogLevel), LogLevel.Debug, ConfigurationPropertyOptions.None);
+            _clientProperty3 = new ConfigurationProperty("lowLevel", typeof(LogLevel), LogLevel.Debug, new GenericEnumConverter(typeof(LogLevel)), null, ConfigurationPropertyOptions.None);
             _properties.Add(_clientProperty1);
             _properties.Add(_clientProperty2);
             _properties.Add(_clientProperty3);

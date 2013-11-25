@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Sparrow.CommonLibrary.Database.DbCommon;
 
-namespace Sparrow.CommonLibrary.Database.Import
+namespace Sparrow.CommonLibrary.Database
 {
     /// <summary>
     /// 批量数据导入工具

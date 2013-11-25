@@ -49,10 +49,11 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         /// <summary>
         /// 日志筛选器筛选日志依据的日志级别
         /// </summary>
-        [ConfigurationProperty(ElementLogLevel)]
-        public string LogLevel
+        [ConfigurationProperty(ElementLogLevel, DefaultValue = LogLevel.Debug)]
+        [TypeConverter(typeof(GenericEnumConverter))]
+        public LogLevel LogLevel
         {
-            get { return (string)this[ElementLogLevel]; }
+            get { return (LogLevel)this[ElementLogLevel]; }
             set { this[ElementLogLevel] = value; }
         }
 
@@ -61,6 +62,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         /// </summary>
         [ConfigurationProperty(ElementType, DefaultValue = typeof(LogFilter))]
         [TypeConverter(typeof(TypeNameConverter))]
+        [ConfigurationValidator(typeof(ConfigurationILogFilterValidator))]
         public Type Type
         {
             get { return (Type)this[ElementType]; }

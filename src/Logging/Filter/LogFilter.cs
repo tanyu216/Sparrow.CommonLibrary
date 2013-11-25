@@ -19,7 +19,7 @@ namespace Sparrow.CommonLibrary.Logging.Filter
             set;
         }
 
-        public LogLevel[] LogLevel
+        public LogLevel LogLevel
         {
             get;
             set;
@@ -29,7 +29,7 @@ namespace Sparrow.CommonLibrary.Logging.Filter
         {
             if (logs == null)
                 return new List<LogEntry>(0);
-            return logs.Where(x => (LogLevel == null || LogLevel.Contains(x.Level)) && (Categories == null || Categories.Length == 0 || x.Categories.Any(cty => Categories.Contains(cty)))).ToList();
+            return logs.Where(x => ((int)LogLevel & (int)x.Level) > 0 && (Categories == null || Categories.Length == 0 || x.Categories.Any(cty => Categories.Contains(cty)))).ToList();
         }
     }
 }
