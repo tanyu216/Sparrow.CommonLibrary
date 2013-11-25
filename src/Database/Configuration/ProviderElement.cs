@@ -15,9 +15,9 @@ namespace Sparrow.CommonLibrary.Database.Configuration
 
         public ProviderElement()
         {
-            _builderProperty = new ConfigurationProperty("builder", typeof(BuilderElement));
-            _executerProperty = new ConfigurationProperty("executer", typeof(ExecuterElement));
-            _importerProperty = new ConfigurationProperty("importer", typeof(ImporterElement));
+            _builderProperty = new ConfigurationProperty("builder", typeof(BuilderElement), null);
+            _executerProperty = new ConfigurationProperty("executer", typeof(ExecuterElement), null);
+            _importerProperty = new ConfigurationProperty("importer", typeof(ImporterElement), null);
             Properties.Add(_builderProperty);
             Properties.Add(_executerProperty);
             Properties.Add(_importerProperty);
@@ -38,14 +38,14 @@ namespace Sparrow.CommonLibrary.Database.Configuration
 
         public ExecuterElement Executer
         {
-            get { return (ExecuterElement)this[_builderProperty]; }
-            set { this[_builderProperty] = value; }
+            get { return (ExecuterElement)this[_executerProperty]; }
+            set { this[_executerProperty] = value; }
         }
 
         public ImporterElement Importer
         {
-            get { return (ImporterElement)this[_builderProperty]; }
-            set { this[_builderProperty] = value; }
+            get { return (ImporterElement)this[_importerProperty]; }
+            set { this[_importerProperty] = value; }
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Logging
                     {
                         var filter = (ILogFilter)Activator.CreateInstance(filterElement.Type);
                         filter.Name = filterElement.Name;
-                        filter.Categories = (filterElement.Categories ?? string.Empty).Split(',');
+                        filter.Categories = (filterElement.Categories ?? string.Empty).Split(',').Where(x => x != null && x.Trim() != string.Empty).ToArray();
                         filter.LogLevel = filterElement.LogLevel;
                         filters.Add(filter);
                     }

@@ -87,14 +87,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
                 var providerElement = configuration.Providers[name];
                 if (providerElement != null && providerElement.Builder != null)
                 {
-                    try
-                    {
-                        return (ISqlBuilder)Activator.CreateInstance(providerElement.Builder.Type);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new ConfigurationErrorsException(string.Format("data/providers[name={0}]/builder[type]未继承指定类型:{1}.", name, typeof(ISqlBuilder).FullName), ex);
-                    }
+                    return (ISqlBuilder)Activator.CreateInstance(providerElement.Builder.Type);
                 }
             }
             return null;

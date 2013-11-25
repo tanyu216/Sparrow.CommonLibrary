@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// </summary>
         public static readonly SqlServerStatementBuilder Default = new SqlServerStatementBuilder();
 
-        protected SqlServerStatementBuilder()
+        public SqlServerStatementBuilder()
         {
 
         }
@@ -154,13 +154,13 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (string.IsNullOrEmpty(tableExpression))
                 throw new ArgumentNullException("tableExpression");
 
-            string tmpl = string.IsNullOrEmpty(orderbyExpression) ? tmplPageOfSql1 : tmplPageOfSql2;
+            string tmpl = string.IsNullOrEmpty(orderbyExpression) ? tmplPageOfSql2 : tmplPageOfSql1;
 
             return string.Format(tmpl, fieldExpressions, tableExpression,
                 string.IsNullOrEmpty(conditionExpressions) ? null : string.Concat(KeyWordWhere, conditionExpressions),
                 string.IsNullOrEmpty(groupbyExpression) ? null : string.Concat(KeyWordGroupby, groupbyExpression),
                 string.IsNullOrEmpty(groupbyExpression) || string.IsNullOrEmpty(havingExpression) ? null : string.Concat(KeyWordHaving, havingExpression),
-                string.IsNullOrEmpty(orderbyExpression) ? null : string.Concat(KeyWordOrderby, orderbyExpression),
+                orderbyExpression,
                 Constant(startIndex), Constant(rowCount), LockOption(options));
         }
     }

@@ -101,6 +101,33 @@ namespace Sparrow.CommonLibrary.Test.Query
         }
 
         [Test]
+        public void QueryablePageOfListTest1()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .RowLimit(0, 10)
+                .OrderBy(x => x.Id)
+                .ExecuteList();
+
+            Assert.IsNotNull(list);
+        }
+
+        [Test]
+        public void QueryablePageOfListTest2()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .RowLimit(0, 10)
+                .ExecuteList();
+
+            Assert.IsNotNull(list);
+        }
+
+        [Test]
         public void LogicalExpressionTest()
         {
             int i = new Random().Next();

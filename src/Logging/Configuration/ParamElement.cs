@@ -18,7 +18,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             set { this[NAME] = value; }
         }
 
-        [ConfigurationProperty(VALUE, IsRequired = true, IsKey = true)]
+        [ConfigurationProperty(VALUE)]
         public string Value
         {
             get { return (string)this[VALUE]; }

@@ -70,7 +70,11 @@ namespace Sparrow.CommonLibrary.Weblog.Collect
 
         public string GetValue(System.Web.HttpApplication app)
         {
-            return app.Request.Url.Query;
+            var query = app.Request.Url.Query;
+            if (string.IsNullOrEmpty(query))
+                return null;
+            else
+                return query.Substring(1);
         }
     }
 
