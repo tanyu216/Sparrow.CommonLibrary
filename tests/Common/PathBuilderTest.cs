@@ -15,7 +15,7 @@ namespace Sparrow.CommonLibrary.Test.Common
         public void Test()
         {
             var pbuilder = new PathBuilder();
-            var path = pbuilder.Build("%appdir%\\sprlog\\%year%_%month%\\%day%log.log");
+            var path = pbuilder.BuildWithVariant("%appdir%\\sprlog\\%year%_%month%\\%day%log.log");
             Assert.IsNotNullOrEmpty(path);
         }
     }

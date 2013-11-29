@@ -6,6 +6,7 @@ using Sparrow.CommonLibrary.Weblog.Collect;
 using System.Collections.Generic;
 using Sparrow.CommonLibrary.Weblog.Writer;
 using System.Text.RegularExpressions;
+using Sparrow.CommonLibrary.Weblog.Configuration;
 
 namespace Sparrow.CommonLibrary.Weblog
 {
@@ -24,7 +25,7 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly Weblogger weblogger;
 
-        private Logging.Log Log { get { return Logging.Log.GetLog("weblog"); } }
+        protected Logging.Log Log { get { return Logging.Log.GetLog(WeblogSettings.Settings.LogCategory); } }
 
         public WeblogHttpModule()
         {
@@ -32,7 +33,7 @@ namespace Sparrow.CommonLibrary.Weblog
             {
                 //ignores
                 var ignoreList = new List<Regex>();
-                foreach (var ignore in WeblogSettings.Ignores)
+                foreach (var ignore in WeblogSettings.Settings.Ignores)
                 {
                     try
                     {
@@ -45,7 +46,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 }
                 Ignores = ignoreList.ToArray();
                 //weblogger
-                weblogger = new Weblogger(WeblogSettings.Version, WeblogSettings.Items, WeblogSettings.Writer, WeblogSettings.WriterParameters);
+                weblogger = new Weblogger(WeblogSettings.Settings.Version, WeblogSettings.Settings.Items, WeblogSettings.Settings.Writer, WeblogSettings.Settings.WriterParameters);
             }
             catch (Exception ex)
             {

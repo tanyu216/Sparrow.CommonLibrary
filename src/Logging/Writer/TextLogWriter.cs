@@ -30,13 +30,32 @@ namespace Sparrow.CommonLibrary.Logging.Writer
 
         public override void Write(IList<LogEntry> logs)
         {
-            using (var sm = CreateStream(GetPath()))
+            var limit = _pathBuilder.ParseFileSize(GetParameter(MaxSizeParamName));
+            var path = GetPath();
+            var sm = CreateStream(path);
+            var sw = new StreamWriter(sm, Encoding.UTF8);
+
+            try
             {
-                using (var sw = new StreamWriter(sm, Encoding.UTF8))
+                foreach (var entry in logs)
                 {
-                    foreach (var entry in logs)
-                        OutputToStream(sw, entry);
+                    OutputToStream(sw, entry);
+                    if (sm.Length >= limit)
+                    {
+                        path = _pathBuilder.RebuildNextPath(path);
+                        sw.Dispose();
+                        sm.Dispose();
+                        sm = CreateStream(path);
+                        sw = new StreamWriter(sm, Encoding.UTF8);
+                    }
                 }
+            }
+            finally
+            {
+                sm.Flush();
+                try { sw.Dispose(); }
+                finally
+                { sm.Dispose(); }
             }
         }
 
@@ -44,8 +63,8 @@ namespace Sparrow.CommonLibrary.Logging.Writer
 
         protected virtual string GetPath()
         {
-            var filepath = _pathBuilder.Build(GetParameter(FolderParamName), this);
-            filepath = _pathBuilder.RebuildPathByFileSize(filepath, GetParameter(MaxSizeParamName));
+            var filepath = _pathBuilder.BuildWithVariant(GetParameter(FolderParamName), this);
+            filepath = _pathBuilder.RebuildNextPathByFileSize(filepath, GetParameter(MaxSizeParamName));
             //
             if (!Directory.Exists(Path.GetDirectoryName(filepath)))
             {
@@ -56,7 +75,7 @@ namespace Sparrow.CommonLibrary.Logging.Writer
 
         protected virtual Stream CreateStream(string filepath)
         {
-            return new FileStream(filepath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 1024 * 8);
+            return new FileStream(filepath, FileMode.Append, FileAccess.Write, FileShare.None, 1024 * 32);
         }
 
         protected virtual void OutputToStream(StreamWriter sw, LogEntry log)

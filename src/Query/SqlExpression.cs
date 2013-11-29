@@ -123,7 +123,6 @@ namespace Sparrow.CommonLibrary.Query
                 default:
                     throw new NotSupportedException(string.Format("不受支持的Lambda表达式类型：{0}", expression.NodeType));
             }
-            return null;
         }
 
         public static LogicalBinaryExpression Expression<T>(System.Linq.Expressions.Expression<Func<T, bool>> logical)

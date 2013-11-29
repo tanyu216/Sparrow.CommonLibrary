@@ -520,7 +520,7 @@ namespace Sparrow.CommonLibrary.Logging
             }
             catch (Exception ex)
             {
-                GetLog(LoggingSettings.Settings.SparrowCategory).Error("日志输出至存储介质时失败。", ex);
+                GetLog(LoggingSettings.Settings.LogCategory).Error("日志输出至存储介质时失败。", ex);
                 if (OnFail != null)
                     OnFail(null, new LogEventArgs<LogEntry>(e.List));
             }

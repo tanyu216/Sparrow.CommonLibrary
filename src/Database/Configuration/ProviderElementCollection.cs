@@ -38,5 +38,10 @@ namespace Sparrow.CommonLibrary.Database.Configuration
         {
             return ((ProviderElement)(element)).Name;
         }
+
+        public void Add(ProviderElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

@@ -91,18 +91,8 @@ namespace Sparrow.CommonLibrary.Database.DbCommon
 
         private static Type GetICommandExecuterTypeFromConfig(string name)
         {
-            if (string.IsNullOrEmpty(name))
-                return null;
-
-            var configuration = Configuration.DatabaseConfigurationSection.GetSection();
-            if (configuration == null)
-                return null;
-
-            var providerElement = configuration.Providers[name];
-            if (providerElement != null && providerElement.Executer != null)
-            {
-                return providerElement.Executer.Type;
-            }
+            if (!string.IsNullOrEmpty(name))
+                return Configuration.DatabaseSettings.Settings.GetICommonExecuterType(name);
 
             return null;
         }

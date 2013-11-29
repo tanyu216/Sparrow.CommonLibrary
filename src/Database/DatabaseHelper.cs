@@ -334,12 +334,29 @@ namespace Sparrow.CommonLibrary.Database
 
         private static readonly ConcurrentDictionary<string, DatabaseHelper> _databaseHelpers;
 
+        private static ISqlBuilder GetISqlBuilder(string connName, string providerName)
+        {
+            if (!string.IsNullOrEmpty(connName))
+            {
+                var builder = Configuration.DatabaseSettings.Settings.GetISqlBuilder(connName);
+                if (builder != null)
+                    return builder;
+            }
+            if (!string.IsNullOrEmpty(providerName))
+            {
+                var builder = Configuration.DatabaseSettings.Settings.GetISqlBuilder(providerName);
+                if (builder != null)
+                    return builder;
+            }
+            throw new System.Configuration.ConfigurationErrorsException(string.Format("未配置{0}/{1}对应的{2}实例。", connName, providerName, typeof(ISqlBuilder)));
+        }
+
         public static DatabaseHelper GetHelper(string connectionName)
         {
             return _databaseHelpers.GetOrAdd(connectionName, x =>
             {
                 var cmdExecuter = ExecuterManager.Create(connectionName);
-                var database = new DatabaseHelper(cmdExecuter, SqlBuilderManager.GetSqlBuilder(connectionName, cmdExecuter.DbProvider.ProviderName));
+                var database = new DatabaseHelper(cmdExecuter, GetISqlBuilder(connectionName, cmdExecuter.DbProvider.ProviderName));
                 return database;
             });
         }
@@ -349,7 +366,7 @@ namespace Sparrow.CommonLibrary.Database
             return _databaseHelpers.GetOrAdd(connectionString, x =>
             {
                 var cmdExecuter = ExecuterManager.Create(connectionString, providerName);
-                var database = new DatabaseHelper(cmdExecuter, SqlBuilderManager.GetSqlBuilder(null, cmdExecuter.DbProvider.ProviderName));
+                var database = new DatabaseHelper(cmdExecuter, GetISqlBuilder(null, cmdExecuter.DbProvider.ProviderName));
                 return database;
             });
         }

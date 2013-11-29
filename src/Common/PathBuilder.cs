@@ -98,32 +98,49 @@ namespace Sparrow.CommonLibrary.Common
         /// <param name="path"></param>
         /// <param name="fileSizeLimit"></param>
         /// <returns></returns>
-        public string RebuildPathByFileSize(string path, string fileSizeLimit)
+        public string RebuildNextPathByFileSize(string path, string fileSizeLimit)
         {
             var size = ParseFileSize(fileSizeLimit);
-            return RebuildPathByFileSize(path, 1, size);
+            return RebuildNextPathByFileSize(path, 1, size);
         }
 
-        private string RebuildPathByFileSize(string path, int startIndex, int sizeLimit)
+        /// <summary>
+        /// 生成一个新的文件路径（新路径在原有的路径上加上一个从1开始的序号）。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="fileSizeLimit"></param>
+        /// <returns></returns>
+        public string RebuildNextPath(string path)
+        {
+            return RebuildNextPathByFileSize(path, 1, 0);
+        }
+
+        private string RebuildNextPathByFileSize(string path, int startIndex, int fileSizeLimit)
         {
             // 计算日志文件的大小，日志文件超出配置大小时，重新分配一个新日志文件。
-            if (sizeLimit > 0 && File.Exists(path))
+            if (File.Exists(path))
             {
-                var fileInfo = new FileInfo(path);
-                if (fileInfo.Length >= sizeLimit)
+                if (fileSizeLimit > 0 && fileSizeLimit > new FileInfo(path).Length)
+                    return path;
+
+                var ext = Path.GetExtension(path);
+                //不带扩展名的文件
+                if (string.IsNullOrEmpty(ext))
                 {
-                    var ext = Path.GetExtension(path);
-                    if (string.IsNullOrEmpty(ext))
-                    {
-                        //不带扩展名的文件
-                        path = string.Concat(path, "-", startIndex.ToString());
-                    }
+                    if (Regex.IsMatch(path, "\\d+$"))
+                        path = Regex.Replace(path, "\\d+$", startIndex.ToString());
                     else
-                    {
-                        path = new StringBuilder(path).Insert(path.Length - ext.Length, "_" + startIndex.ToString()).ToString();
-                    }
-                    return RebuildPathByFileSize(path, startIndex + 1, sizeLimit);
+                        path = string.Concat(path, "_", startIndex.ToString());
                 }
+                else
+                {
+                    var pattern = string.Concat("\\d+\\", ext, "$");
+                    if (Regex.IsMatch(path, pattern))
+                        path = Regex.Replace(path, pattern, string.Concat(startIndex.ToString(), ext));
+                    else
+                        path = new StringBuilder(path).Insert(path.Length - ext.Length, "_" + startIndex.ToString()).ToString();
+                }
+                return RebuildNextPathByFileSize(path, startIndex + 1, fileSizeLimit);
             }
             return path;
         }
@@ -133,9 +150,9 @@ namespace Sparrow.CommonLibrary.Common
         /// </summary>
         /// <param name="path">文件路径</param>
         /// <returns></returns>
-        public string Build(string path)
+        public string BuildWithVariant(string path)
         {
-            return Build(path, null);
+            return BuildWithVariant(path, null);
         }
 
         /// <summary>
@@ -144,7 +161,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <param name="path">文件路径</param>
         /// <param name="state">变量的上下文</param>
         /// <returns></returns>
-        public string Build(string path, object state)
+        public string BuildWithVariant(string path, object state)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException("path");
@@ -175,7 +192,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <returns></returns>
         public string Combine(object state, string path1, string path2)
         {
-            return Build(Path.Combine(path1, path2), state);
+            return BuildWithVariant(Path.Combine(path1, path2), state);
         }
 
         /// <summary>
@@ -188,7 +205,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <returns></returns>
         public string Combine(object state, string path1, string path2, string path3)
         {
-            return Build(Path.Combine(path1, path2, path3), state);
+            return BuildWithVariant(Path.Combine(path1, path2, path3), state);
         }
 
         /// <summary>
@@ -202,7 +219,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <returns></returns>
         public string Combine(object state, string path1, string path2, string path3, string path4)
         {
-            return Build(Path.Combine(path1, path2, path3, path4), state);
+            return BuildWithVariant(Path.Combine(path1, path2, path3, path4), state);
         }
 
         /// <summary>
@@ -213,7 +230,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <returns></returns>
         public string Combine(object state, params string[] paths)
         {
-            return Build(Path.Combine(paths), state);
+            return BuildWithVariant(Path.Combine(paths), state);
         }
     }
 }

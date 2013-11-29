@@ -15,7 +15,7 @@ namespace Sparrow.CommonLibrary.Test.Database
         [Test]
         public void LoadConfigTest1()
         {
-            var configuration = DatabaseConfigurationSection.GetSection();
+            var settings = DatabaseSettings.Settings;
         }
     }
 }

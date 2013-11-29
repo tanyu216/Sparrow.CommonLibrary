@@ -39,5 +39,10 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
         {
             return ((ParamElement)(element)).Name;
         }
+
+        public void Add(ParamElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

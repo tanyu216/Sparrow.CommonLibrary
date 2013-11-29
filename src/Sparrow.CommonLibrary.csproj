@@ -163,7 +163,6 @@
     <Compile Include="Query\WildcardsExpression.cs" />
     <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Repository\RepositoryDatabase.cs" />
-    <Compile Include="Database\SqlBuilder\SqlBuilderManager.cs" />
     <Compile Include="Database\SqlBuilder\CommonBuilder.cs" />
     <Compile Include="Database\SqlBuilder\EntityToSqlStatement.cs" />
     <Compile Include="Database\SqlBuilder\ISqlBuilder.cs" />
@@ -171,7 +170,6 @@
     <Compile Include="Database\SqlBuilder\OracleStatementBuilder.cs" />
     <Compile Include="Database\SqlBuilder\SqlOptions.cs" />
     <Compile Include="Database\SqlBuilder\SqlServerStatementBuilder.cs" />
-    <Compile Include="Common\DefaultSettings.cs" />
     <Compile Include="Logging\Configuration\FilterElementCollection.cs" />
     <Compile Include="Logging\Configuration\FilterElement.cs" />
     <Compile Include="Logging\Configuration\LoggingConfigurationSection.cs" />

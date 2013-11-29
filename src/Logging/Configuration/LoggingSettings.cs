@@ -36,7 +36,9 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         /// <summary>
         /// Sparrow.CommonLibrary日志分类。
         /// </summary>
-        public string SparrowCategory { get; protected set; }
+        internal protected string LogCategory { get; protected set; }
+
+        protected Log Log { get { return Log.GetLog(LogCategory); } }
 
         /// <summary>
         /// 日志默认的分类。
@@ -48,13 +50,19 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         /// </summary>
         public LogLevel LowLevel { get; protected set; }
 
-        private LoggingSettings()
+        public LoggingSettings()
         {
-            SparrowCategory = "sprlogging";
+            LogCategory = "sprlogging";
             DefaultCategory = "default";
 
             filters = new List<ILogFilter>();
             writers = new List<ILogWriter>();
+        }
+
+        public LoggingSettings(LoggingConfigurationSection configuration)
+            :this()
+        {
+            LoadConfig(configuration);
         }
 
         public void LoadConfig()
@@ -95,7 +103,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
                     }
                     catch (Exception ex)
                     {
-                        Log.GetLog(SparrowCategory).Error("加载日志ILogFilter错误。", ex, new { Name = filterElement.Name, Type = filterElement.Type.FullName });
+                        Log.Error("加载日志ILogFilter错误。", ex, new { Name = filterElement.Name, Type = filterElement.Type.FullName });
                     }
                 }
             }
@@ -114,7 +122,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
                     }
                     catch (Exception ex)
                     {
-                        Log.GetLog(SparrowCategory).Error("加载日志ILogWriter错误。", ex, new { Name = writerElement.Name, Type = writerElement.Type.FullName });
+                        Log.Error("加载日志ILogWriter错误。", ex, new { Name = writerElement.Name, Type = writerElement.Type.FullName });
                     }
                 }
             }
@@ -132,6 +140,14 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             }
         }
 
+        public IList<ILogFilter> GetFilters()
+        {
+            lock (filters)
+            {
+                return filters.ToList();
+            }
+        }
+
         private readonly IList<ILogWriter> writers;
 
         public void AddWriter(ILogWriter writer)
@@ -144,15 +160,7 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             }
         }
 
-        internal IList<ILogFilter> GetFilters()
-        {
-            lock (filters)
-            {
-                return filters.ToList();
-            }
-        }
-
-        internal IList<ILogWriter> GetWriters()
+        public IList<ILogWriter> GetWriters()
         {
             if (writers.Count > 0)
             {
@@ -162,6 +170,17 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             lock (writers)
             {
                 return writers.ToList();
+            }
+        }
+
+        public static void ResetSettings(LoggingSettings settings)
+        {
+            if (settings == null)
+                throw new ArgumentNullException("settings");
+
+            lock (syncObj)
+            {
+                _settings = settings;
             }
         }
     }

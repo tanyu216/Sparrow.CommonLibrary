@@ -13,26 +13,6 @@ namespace Sparrow.CommonLibrary.Database
     /// </summary>
     public static class ImporterManager
     {
-        static readonly ConcurrentDictionary<string, Type> importers;
-
-        static ImporterManager()
-        {
-            importers = new ConcurrentDictionary<string, Type>();
-            importers["provider:system.data.sqlclient"] = typeof(ImporterForSqlServer);
-        }
-
-        public static void SetImporterType(string providerName, Type type)
-        {
-            if (string.IsNullOrEmpty(providerName))
-                throw new ArgumentNullException("providerName");
-            if (type == null)
-                throw new ArgumentNullException("type");
-            if (!type.GetInterfaces().Any(x => x == typeof(Importer)))
-                throw new ArgumentException(string.Format("{0}未实现接口:{1}", type.FullName, typeof(Importer).FullName));
-
-            importers["provider:" + providerName.ToLower()] = type;
-        }
-
         public static Importer Create(string connectionName)
         {
             if (string.IsNullOrEmpty(connectionName))
@@ -64,26 +44,14 @@ namespace Sparrow.CommonLibrary.Database
             if (type != null)
                 return CreateImporter(type, executer);
 
-            if (importers.TryGetValue("provider:" + executer.DbProvider.ProviderName.ToLower(), out type))
-                return CreateImporter(type, executer);
-
-            throw new NotSupportedException(string.Format("{0}不支持数据导入。", executer.DbProvider.ProviderName));
+            throw new NotSupportedException(string.Format("{0}不支持数据导入工具。", executer.DbProvider.ProviderName));
         }
 
         private static Type GetImporterTypeFromConfig(string name)
         {
-            if (string.IsNullOrEmpty(name))
-                return null;
+            if (!string.IsNullOrEmpty(name))
+                return Configuration.DatabaseSettings.Settings.GetImporterType(name);
 
-            var configuration = Configuration.DatabaseConfigurationSection.GetSection();
-            if (configuration != null)
-            {
-                var providerElement = configuration.Providers[name];
-                if (providerElement != null && providerElement.Importer != null)
-                {
-                    return providerElement.Importer.Type;
-                }
-            }
             return null;
         }
 

@@ -37,7 +37,7 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly IWeblogWriter Writer;
 
-        private Logging.Log Log { get { return Logging.Log.GetLog("weblog"); } }
+        private Logging.Log Log { get { return Logging.Log.GetLog(Configuration.WeblogSettings.Settings.LogCategory); } }
 
         public Weblogger(string version, string[] items, Type writer, IDictionary<string, string> parameters)
         {

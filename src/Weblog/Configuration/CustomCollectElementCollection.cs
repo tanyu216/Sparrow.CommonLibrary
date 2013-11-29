@@ -38,5 +38,10 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
         {
             return ((CustomCollectElement)(element)).Name;
         }
+
+        public void Add(CustomCollectElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

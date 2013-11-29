@@ -114,10 +114,11 @@ namespace Sparrow.CommonLibrary.Common
                 }
             }
 
-            Flushing = false;
             // 触发Flush事件
             if (list.Count > 0 && OnFlush != null)
                 OnFlush(this, new BufferedFlushEventArgs<T>(list));
+
+            Flushing = false;
         }
 
         public void Write(T item)

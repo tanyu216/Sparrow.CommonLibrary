@@ -68,6 +68,10 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
+            var defaultElement = configuration.Caches.Cast<CacheElement>().FirstOrDefault(x => x.Default);
+            if (defaultElement != null)
+                DefaultRegionName = defaultElement.RegionName;
+
             foreach (CacheElement element in configuration.Caches)
             {
                 SetCache(element.RegionName, element.Type, element.ConnectionString, element.Default);

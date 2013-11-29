@@ -33,7 +33,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             _properties.Add(_clientProperty1);
         }
 
-        public static string DefaultSectionName
+        public static string SectionName
         {
             get
             {
@@ -43,7 +43,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
 
         public static DatabaseConfigurationSection GetSection()
         {
-            var configuration = (DatabaseConfigurationSection)System.Configuration.ConfigurationManager.GetSection(DefaultSectionName);
+            var configuration = (DatabaseConfigurationSection)System.Configuration.ConfigurationManager.GetSection(SectionName);
             return configuration;
         }
 

@@ -38,5 +38,10 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
         {
             return ((IgnoreElement)(element)).Name;
         }
+
+        public void Add(IgnoreElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

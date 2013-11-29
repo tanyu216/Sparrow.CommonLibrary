@@ -24,13 +24,29 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             }
         }
 
-        public string Version { get { return (string)this[_clientProperty]; } }
+        public string Version
+        {
+            get { return (string)this[_clientProperty]; }
+            set { this[_clientProperty] = value; }
+        }
 
-        public IgnoreElementCollection Ignores { get { return (IgnoreElementCollection)this[_clientProperty1]; } }
+        public IgnoreElementCollection Ignores
+        {
+            get { return (IgnoreElementCollection)this[_clientProperty1]; }
+            set { this[_clientProperty1] = value; }
+        }
 
-        public WriterElement Writer { get { return (WriterElement)this[_clientProperty2]; } }
+        public WriterElement Writer
+        {
+            get { return (WriterElement)this[_clientProperty2]; }
+            set { this[_clientProperty2] = value; }
+        }
 
-        public CollectElement Collect { get { return (CollectElement)this[_clientProperty3]; } }
+        public CollectElement Collect
+        {
+            get { return (CollectElement)this[_clientProperty3]; }
+            set { this[_clientProperty3] = value; }
+        }
 
         public WeblogConfigurationSection()
         {
@@ -45,36 +61,18 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             _properties.Add(_clientProperty3);
         }
 
-        public static string DefaultSectionName
+        public static string SectionName
         {
             get
             {
-                if (string.IsNullOrEmpty(DefaultSettings.ConfigurationName))
-                    return "weblog";
-                return string.Concat(DefaultSettings.ConfigurationName, "/", "weblog");
+                return "sparrow.CommonLibrary/weblog";
             }
         }
 
-        private static bool nonConfiguration = false;
-
         public static WeblogConfigurationSection GetSection()
         {
-            if (nonConfiguration)
-            {
-                return null;
-            }
-            try
-            {
-                var configuration = (WeblogConfigurationSection)ConfigurationManager.GetSection(DefaultSectionName);
-                nonConfiguration = false;
-                return configuration;
-            }
-            catch (Exception ex)
-            {
-                nonConfiguration = true;
-                Log.GetLog(LoggingSettings.Settings.SparrowCategory).Warning("WeblogConfiguration加载失败。", ex);
-            }
-            return null;
+            var configuration = (WeblogConfigurationSection)ConfigurationManager.GetSection(SectionName);
+            return configuration;
         }
     }
 }
