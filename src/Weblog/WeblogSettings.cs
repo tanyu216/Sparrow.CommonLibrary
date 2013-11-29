@@ -74,7 +74,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 _ignores = new string[0];
                 Writer = typeof(TextWeblogWriter);
                 WriterParameters = new Dictionary<string, string>();
-                WriterParameters[TextWeblogWriter.FolderParamName] = "%appdir%\\sprweblog\\%year%_%month%\\%day%weblog.log";
+                WriterParameters[TextWeblogWriter.FolderParamName] = "%appdir%/sprweblog/%year%_%month%/%day%weblog.log";
                 WriterParameters[TextWeblogWriter.MaxSizeParamName] = "8MB";
                 //
                 Logging.Log.GetLog(LoggingSettings.SparrowCategory).Info("Weblog启用默认配置。", ex);

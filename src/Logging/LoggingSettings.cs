@@ -30,7 +30,7 @@ namespace Sparrow.CommonLibrary.Logging
             //
             defaultWriterType = typeof(TextLogWriter);
             defaultWriterParameters = new Dictionary<string, string>();
-            defaultWriterParameters.Add(TextLogWriter.FolderParamName, "%appdir%\\sprlog\\%year%%month%\\%day%log.log");
+            defaultWriterParameters.Add(TextLogWriter.FolderParamName, "%appdir%/sprlog/%year%%month%//%day%log.log");
             defaultWriterParameters.Add(TextLogWriter.MaxSizeParamName, "8MB");
             //
             filters = new List<ILogFilter>();
