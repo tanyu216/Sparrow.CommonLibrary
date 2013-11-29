@@ -17,9 +17,9 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly string Version;
         /// <summary>
-        /// 指定版本下采集的数据选项
+        /// 采集器名称
         /// </summary>
-        private readonly string[] Items;
+        private readonly string[] CollecterNames;
         /// <summary>
         /// 采集器
         /// </summary>
@@ -39,43 +39,24 @@ namespace Sparrow.CommonLibrary.Weblog
 
         private Logging.Log Log { get { return Logging.Log.GetLog(Configuration.WeblogSettings.Settings.LogCategory); } }
 
-        public Weblogger(string version, string[] items, Type writer, IDictionary<string, string> parameters)
+        public Weblogger(string version, IEnumerable<ICollecter> collecters, IWeblogWriter writer)
         {
-            //
             if (string.IsNullOrEmpty(version))
                 throw new ArgumentNullException("version");
             Version = version;
-            //
-            if (items == null)
-                throw new ArgumentNullException("item");
-            if (items.Length == 0)
-                throw new ArgumentException("items数组长度不能为0.");
-            Items = items;
+
             if (writer == null)
                 throw new ArgumentNullException("writer");
-            Writer = (IWeblogWriter)Activator.CreateInstance(writer);
-            if (parameters != null)
-                foreach (KeyValuePair<string, string> keyVal in parameters)
-                    Writer.AddParameter(keyVal.Key, keyVal.Value);
+            Writer = writer;
+
             // 初始化采集器
-            Collecters = new ICollecter[Items.Length];
-            var list = new List<ICollecterWithContext>();
-            for (var i = Items.Length - 1; i > -1; i--)
-            {
-                var collect = CollecterTypeContainer.GetCollectType(Items[i]);
-                if (collect != null)
-                {
-                    Collecters[i] = (ICollecter)Activator.CreateInstance(collect);
-                    //将实现接口ICollecterWithContext的对象单独列出来
-                    if (Collecters[i] is ICollecterWithContext)
-                        list.Add((ICollecterWithContext)Collecters[i]);
-                }
-            }
-            Collecter2s = list.ToArray();
+            CollecterNames = collecters.Select(x => x.Name).ToArray();
+            Collecters = collecters.ToArray();
+            Collecter2s = collecters.Where(x => x is ICollecterWithContext).Cast<ICollecterWithContext>().ToArray();
+
             //初始化缓冲区
             buffer = new Buffered<WeblogEntry>();
             buffer.OnFlush += new EventHandler<BufferedFlushEventArgs<WeblogEntry>>(buffer_OnFlush);
-            //
         }
 
         public void Begin(HttpApplication context)
@@ -116,7 +97,7 @@ namespace Sparrow.CommonLibrary.Weblog
         {
             if (disposed)
                 throw new ObjectDisposedException(this.GetType().Name);
-            var data = new string[Items.Length];
+            var data = new string[Collecters.Length];
             for (var i = data.Length - 1; i > -1; i--)
             {
                 try
@@ -146,7 +127,7 @@ namespace Sparrow.CommonLibrary.Weblog
         {
             try
             {
-                var weblogs = new WeblogEntryCollection(Version, Items, e.List);
+                var weblogs = new WeblogEntryCollection(Version, CollecterNames, e.List);
                 Writer.Write(weblogs);
             }
             catch (Exception ex)

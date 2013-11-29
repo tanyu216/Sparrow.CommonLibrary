@@ -45,8 +45,28 @@ namespace Sparrow.CommonLibrary.Weblog
                     }
                 }
                 Ignores = ignoreList.ToArray();
+
+                var writer = (IWeblogWriter)Activator.CreateInstance(WeblogSettings.Settings.Writer);
+                var parameters = WeblogSettings.Settings.WriterParameters;
+                if (parameters != null)
+                {
+                    foreach (KeyValuePair<string, string> keyVal in parameters)
+                        writer.AddParameter(keyVal.Key, keyVal.Value);
+                }
+
+                // 初始化采集器
+                var collecterNames = WeblogSettings.Settings.Collecters;
+                var collecters = new ICollecter[collecterNames.Length];
+                for (var i = collecterNames.Length - 1; i > -1; i--)
+                {
+                    var collect = CollecterTypeContainer.GetCollectType(collecterNames[i]);
+                    if (collect != null)
+                    {
+                        collecters[i] = (ICollecter)Activator.CreateInstance(collect);
+                    }
+                }
                 //weblogger
-                weblogger = new Weblogger(WeblogSettings.Settings.Version, WeblogSettings.Settings.Items, WeblogSettings.Settings.Writer, WeblogSettings.Settings.WriterParameters);
+                weblogger = new Weblogger(WeblogSettings.Settings.Version, collecters, writer);
             }
             catch (Exception ex)
             {

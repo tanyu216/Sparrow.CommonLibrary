@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 namespace Sparrow.CommonLibrary.Test.Weblog
 {
     [TestFixture]
-    public class ConfigurationTest
+    public class WeblogHttpModuleTest
     {
         [Test]
-        public void LoadConfigTest1()
+        public void Test1()
         {
-            var configuration = WeblogSettings.Settings;
+            var module = new WeblogHttpModule();
         }
     }
 }

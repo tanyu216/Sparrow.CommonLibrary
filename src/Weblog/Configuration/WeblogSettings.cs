@@ -1,4 +1,5 @@
-﻿using Sparrow.CommonLibrary.Weblog.Configuration;
+﻿using Sparrow.CommonLibrary.Weblog.Collect;
+using Sparrow.CommonLibrary.Weblog.Configuration;
 using Sparrow.CommonLibrary.Weblog.Writer;
 using System;
 using System.Collections.Generic;
@@ -34,16 +35,16 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
 
         public string Version { get; protected set; }
 
-        private string[] _items;
-        public string[] Items
+        private string[] _collecters;
+        public string[] Collecters
         {
             get
             {
-                var dest = new string[_items.Length];
-                Array.Copy(_items, 0, dest, 0, _items.Length);
+                var dest = new string[_collecters.Length];
+                Array.Copy(_collecters, 0, dest, 0, _collecters.Length);
                 return dest;
             }
-            protected set { _items = value; }
+            protected set { _collecters = value; }
         }
 
         private string[] _ignores;
@@ -103,7 +104,9 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             try
             {
                 Version = configuration.Version;
-                _items = configuration.Collect.Value.Split(',');
+                _collecters = configuration.Collect.Value.Split(',').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                if (_collecters.Length == 0)
+                    throw new System.Configuration.ConfigurationErrorsException(string.Format("Weblog没有配置任何一个可用的采集选项({0})。", typeof(ICollecter).FullName));
 
                 var ignoreList = new List<string>();
                 if (configuration.Ignores != null)
@@ -112,6 +115,7 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
                         if (!string.IsNullOrWhiteSpace(ignore.Match))
                             ignoreList.Add(ignore.Match);
                 }
+                _ignores = ignoreList.ToArray();
 
                 Writer = configuration.Writer.Type;
 

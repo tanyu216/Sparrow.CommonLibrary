@@ -36,6 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -73,6 +74,7 @@
     <Compile Include="Retrying\ExponentialBackoffIntervalTest.cs" />
     <Compile Include="Retrying\IncrementalIntervalTest.cs" />
     <Compile Include="Weblog\ConfigurationTest.cs" />
+    <Compile Include="Weblog\WeblogHttpModuleTest.cs" />
     <Compile Include="Web\RecognizeSpiderTest.cs" />
     <Compile Include="Common\TimestampTest.cs" />
   </ItemGroup>
