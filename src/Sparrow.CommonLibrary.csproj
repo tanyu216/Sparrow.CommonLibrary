@@ -182,7 +182,7 @@
     <Compile Include="Logging\Filter\ILogFilter.cs" />
     <Compile Include="Logging\Filter\LogFilter.cs" />
     <Compile Include="Logging\ExtendProperties.cs" />
-    <Compile Include="Logging\LoggingSettings.cs" />
+    <Compile Include="Logging\Configuration\LoggingSettings.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\LogEntry.cs" />
     <Compile Include="Logging\LogLevel.cs" />
@@ -223,7 +223,7 @@
     <Compile Include="Weblog\WeblogEntryCollection.cs" />
     <Compile Include="Weblog\Weblogger.cs" />
     <Compile Include="Weblog\WeblogHttpModule.cs" />
-    <Compile Include="Weblog\WeblogSettings.cs" />
+    <Compile Include="Weblog\Configuration\WeblogSettings.cs" />
     <Compile Include="Weblog\Writer\DbWeblogWriter.cs" />
     <Compile Include="Weblog\Writer\IWeblogWriter.cs" />
     <Compile Include="Weblog\Writer\TextWeblogWriter.cs" />

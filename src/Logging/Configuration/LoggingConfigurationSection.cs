@@ -23,11 +23,23 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
             }
         }
 
-        public FilterElementCollection Filters { get { return (FilterElementCollection)this[_clientProperty1]; } }
+        public FilterElementCollection Filters
+        {
+            get { return (FilterElementCollection)this[_clientProperty1]; }
+            set { this[_clientProperty1] = value; }
+        }
 
-        public WriterElementCollection Writers { get { return (WriterElementCollection)this[_clientProperty2]; } }
+        public WriterElementCollection Writers
+        {
+            get { return (WriterElementCollection)this[_clientProperty2]; }
+            set { this[_clientProperty2] = value; }
+        }
 
-        public LogLevel LowLevel { get { return (LogLevel)this[_clientProperty3]; } }
+        public LogLevel LowLevel
+        {
+            get { return (LogLevel)this[_clientProperty3]; }
+            set { this[_clientProperty3] = value; }
+        }
 
         public LoggingConfigurationSection()
         {
@@ -42,36 +54,18 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
 
         #region
 
-        public static string DefaultSectionName
+        public static string SectionName
         {
             get
             {
-                if (string.IsNullOrEmpty(DefaultSettings.ConfigurationName))
-                    return "logging";
-                return string.Concat(DefaultSettings.ConfigurationName, "/", "logging");
+                return "sparrow.CommonLibrary/logging";
             }
         }
 
-        private static bool nonConfiguration = false;
-
         public static LoggingConfigurationSection GetSection()
         {
-            if (nonConfiguration)
-            {
-                return null;
-            }
-            try
-            {
-                var configuration = ((LoggingConfigurationSection)ConfigurationManager.GetSection(DefaultSectionName));
-                nonConfiguration = false;
-                return configuration;
-            }
-            catch (Exception ex)
-            {
-                nonConfiguration = true;
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Warning("LoggingConfiguration加载失败。", ex);
-            }
-            return null;
+            var configuration = ((LoggingConfigurationSection)ConfigurationManager.GetSection(SectionName));
+            return configuration;
         }
 
         #endregion

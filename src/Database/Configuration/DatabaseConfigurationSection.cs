@@ -37,32 +37,14 @@ namespace Sparrow.CommonLibrary.Database.Configuration
         {
             get
             {
-                if (string.IsNullOrEmpty(DefaultSettings.ConfigurationName))
-                    return "database";
-                return string.Concat(DefaultSettings.ConfigurationName, "/", "database");
+                return "sparrow.CommonLibrary/database";
             }
         }
 
-        private static bool nonConfiguration = false;
-
         public static DatabaseConfigurationSection GetSection()
         {
-            if (nonConfiguration)
-            {
-                return null;
-            }
-            try
-            {
-                var configuration = (DatabaseConfigurationSection)System.Configuration.ConfigurationManager.GetSection(DefaultSectionName);
-                nonConfiguration = false;
-                return configuration;
-            }
-            catch (Exception ex)
-            {
-                nonConfiguration = true;
-                Log.GetLog(LoggingSettings.SparrowCategory).Warning("DataConfiguration加载失败。", ex);
-            }
-            return null;
+            var configuration = (DatabaseConfigurationSection)System.Configuration.ConfigurationManager.GetSection(DefaultSectionName);
+            return configuration;
         }
 
     }

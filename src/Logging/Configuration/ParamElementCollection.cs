@@ -39,5 +39,10 @@ namespace Sparrow.CommonLibrary.Logging.Configuration
         {
             return ((ParamElement)(element)).Name;
         }
+
+        public void Add(ParamElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

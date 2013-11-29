@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sparrow.CommonLibrary.Logging.Configuration;
 
 namespace Sparrow.CommonLibrary.Weblog
 {
@@ -62,12 +63,12 @@ namespace Sparrow.CommonLibrary.Weblog
                 Writer = configuration.Writer.Type;
                 //
                 WriterParameters = new Dictionary<string, string>();
-                foreach (ParamElement param in configuration.Writer.Params)
+                foreach (Sparrow.CommonLibrary.Weblog.Configuration.ParamElement param in configuration.Writer.Params)
                     WriterParameters[param.Name] = param.Value;
             }
             catch (Exception ex)
             {
-                Log.GetLog(LoggingSettings.SparrowCategory).Error("载入Weblog配置失败。", ex);
+                Log.GetLog(LoggingSettings.Settings.SparrowCategory).Error("载入Weblog配置失败。", ex);
                 //
                 Version = "0.0.0.1";
                 _items = new string[] { "req_type", "domain", "absolute_path", "query_string", "user_agent", "url_referrer", "status_code", "server_host", "user_host", "visit_time", "load_time" };
@@ -77,7 +78,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 WriterParameters[TextWeblogWriter.FolderParamName] = "%appdir%/sprweblog/%year%_%month%/%day%weblog.log";
                 WriterParameters[TextWeblogWriter.MaxSizeParamName] = "8MB";
                 //
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Info("Weblog启用默认配置。", ex);
+                Logging.Log.GetLog(LoggingSettings.Settings.SparrowCategory).Info("Weblog启用默认配置。", ex);
             }
         }
     }

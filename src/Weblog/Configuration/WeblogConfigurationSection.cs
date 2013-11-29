@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using Sparrow.CommonLibrary.Logging.Configuration;
 
 namespace Sparrow.CommonLibrary.Weblog.Configuration
 {
@@ -71,7 +72,7 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             catch (Exception ex)
             {
                 nonConfiguration = true;
-                Log.GetLog(LoggingSettings.SparrowCategory).Warning("WeblogConfiguration加载失败。", ex);
+                Log.GetLog(LoggingSettings.Settings.SparrowCategory).Warning("WeblogConfiguration加载失败。", ex);
             }
             return null;
         }

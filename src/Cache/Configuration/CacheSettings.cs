@@ -34,7 +34,7 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
             }
         }
 
-        public string DefaultRegionName { get; private set; }
+        public string DefaultRegionName { get; protected set; }
 
         private readonly ConcurrentDictionary<string, KeyValuePair<Type, string>> _caches;
 

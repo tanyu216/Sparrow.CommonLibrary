@@ -6,7 +6,6 @@ using Sparrow.CommonLibrary.Weblog.Collect;
 using System.Collections.Generic;
 using Sparrow.CommonLibrary.Weblog.Writer;
 using System.Text.RegularExpressions;
-using Sparrow.CommonLibrary.Logging;
 
 namespace Sparrow.CommonLibrary.Weblog
 {
@@ -25,6 +24,8 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly Weblogger weblogger;
 
+        private Logging.Log Log { get { return Logging.Log.GetLog("weblog"); } }
+
         public WeblogHttpModule()
         {
             try
@@ -39,7 +40,7 @@ namespace Sparrow.CommonLibrary.Weblog
                     }
                     catch (Exception ex)
                     {
-                        Log.GetLog(LoggingSettings.SparrowCategory).Warning("weblog跟踪初始化Ignores", ex, new { Regex = ignore });
+                        Log.Warning("weblog跟踪初始化Ignores", ex, new { Regex = ignore });
                     }
                 }
                 Ignores = ignoreList.ToArray();
@@ -49,7 +50,7 @@ namespace Sparrow.CommonLibrary.Weblog
             catch (Exception ex)
             {
                 Skip = true;
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Error("WeblogHttpModule初始化失败。", ex);
+                Log.Error("WeblogHttpModule初始化失败。", ex);
             }
         }
 

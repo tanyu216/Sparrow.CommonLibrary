@@ -37,6 +37,8 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly IWeblogWriter Writer;
 
+        private Logging.Log Log { get { return Logging.Log.GetLog("weblog"); } }
+
         public Weblogger(string version, string[] items, Type writer, IDictionary<string, string> parameters)
         {
             //
@@ -88,7 +90,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log.GetLog(LoggingSettings.SparrowCategory).Warning("带有上下文的采集器错误，Begin", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
+                    Log.Warning("带有上下文的采集器错误，Begin", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
                 }
             }
         }
@@ -105,7 +107,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log.GetLog(LoggingSettings.SparrowCategory).Warning("带有上下文的采集器错误，End", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
+                    Log.Warning("带有上下文的采集器错误，End", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
                 }
             }
         }
@@ -126,7 +128,7 @@ namespace Sparrow.CommonLibrary.Weblog
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log.GetLog(LoggingSettings.SparrowCategory).Warning("采集器错误，GetValue", ex, new { Name = Collecters[i].Name, Type = Collecters[i].GetType().FullName });
+                    Log.Warning("采集器错误，GetValue", ex, new { Name = Collecters[i].Name, Type = Collecters[i].GetType().FullName });
                 }
             }
             //
@@ -136,7 +138,7 @@ namespace Sparrow.CommonLibrary.Weblog
             }
             catch (Exception ex)
             {
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Error("采集器采集的数据输出至缓冲区异常。", ex);
+                Log.Error("采集器采集的数据输出至缓冲区异常。", ex);
             }
         }
 
@@ -149,7 +151,7 @@ namespace Sparrow.CommonLibrary.Weblog
             }
             catch (Exception ex)
             {
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Error("weblog写日志错误。", ex);
+                Log.Error("weblog写日志错误。", ex);
             }
         }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sparrow.CommonLibrary.Logging.Configuration;
 
 namespace Sparrow.CommonLibrary.Test.Logging
 {
@@ -14,7 +15,7 @@ namespace Sparrow.CommonLibrary.Test.Logging
         [Test]
         public void LoadConfigTest1()
         {
-            var cty = LoggingSettings.DefaultCategory;
+            var cty = LoggingSettings.Settings.DefaultCategory;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Sparrow.CommonLibrary.Logging
 
         public static Log GetLog()
         {
-            return new Log(new[] { LoggingSettings.DefaultCategory });
+            return new Log(new[] { LoggingSettings.Settings.DefaultCategory });
         }
 
         public static Log GetLog(string category)
@@ -502,8 +502,8 @@ namespace Sparrow.CommonLibrary.Logging
         {
             try
             {
-                var filters = LoggingSettings.GetFilters();
-                var writers = LoggingSettings.GetWriters();
+                var filters = LoggingSettings.Settings.GetFilters();
+                var writers = LoggingSettings.Settings.GetWriters();
                 foreach (var writer in writers)
                 {
                     var filter = filters.FirstOrDefault(x => x.Name == writer.FilterName);
@@ -520,7 +520,7 @@ namespace Sparrow.CommonLibrary.Logging
             }
             catch (Exception ex)
             {
-                GetLog(LoggingSettings.SparrowCategory).Error("日志输出至存储介质时失败。", ex);
+                GetLog(LoggingSettings.Settings.SparrowCategory).Error("日志输出至存储介质时失败。", ex);
                 if (OnFail != null)
                     OnFail(null, new LogEventArgs<LogEntry>(e.List));
             }
