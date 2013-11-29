@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sparrow.CommonLibrary.Cache.Configuration;
 
 namespace Sparrow.CommonLibrary.Cache
 {
@@ -45,7 +46,7 @@ namespace Sparrow.CommonLibrary.Cache
         {
             Type type;
             string conn;
-            CacheSettings.GetCache(regionName, out type, out conn);
+            CacheSettings.Settings.GetCache(regionName, out type, out conn);
             if (string.IsNullOrEmpty(conn))
                 return (ICache)Activator.CreateInstance(type, new object[] { regionName });
             else
@@ -58,7 +59,7 @@ namespace Sparrow.CommonLibrary.Cache
         /// <returns></returns>
         public static ICache GetCache()
         {
-            return GetCache(CacheSettings.DefaultRegionName);
+            return GetCache(CacheSettings.Settings.DefaultRegionName);
         }
 
         /// <summary>

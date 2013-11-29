@@ -38,5 +38,10 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
         {
             return ((CacheElement)(element)).RegionName;
         }
+
+        public void Add(CacheElement element)
+        {
+            BaseAdd(element);
+        }
     }
 }

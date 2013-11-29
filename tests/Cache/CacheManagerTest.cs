@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sparrow.CommonLibrary.Cache;
+using Sparrow.CommonLibrary.Cache.Configuration;
 
 namespace Sparrow.CommonLibrary.Test.Cache
 {
@@ -43,7 +44,7 @@ namespace Sparrow.CommonLibrary.Test.Cache
         [Test]
         public void GetCacheTest2()
         {
-            var result = CacheManager.GetCache(CacheSettings.DefaultRegionName);
+            var result = CacheManager.GetCache(CacheSettings.Settings.DefaultRegionName);
             Assert.IsNotNull(result);
         }
 

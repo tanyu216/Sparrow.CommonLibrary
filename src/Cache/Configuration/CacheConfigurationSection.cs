@@ -23,6 +23,7 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
         public CacheElementCollection Caches
         {
             get { return (CacheElementCollection)this[_clientProperty1]; }
+            set { this[_clientProperty1] = value; }
         }
 
         public CacheConfigurationSection()
@@ -32,36 +33,18 @@ namespace Sparrow.CommonLibrary.Cache.Configuration
             _properties.Add(_clientProperty1);
         }
 
-        public static string DefaultSectionName
+        public static string SectionName
         {
             get
             {
-                if (string.IsNullOrEmpty(DefaultSettings.ConfigurationName))
-                    return "cache";
-                return string.Concat(DefaultSettings.ConfigurationName, "/", "cache");
+                return "sparrow.CommonLibrary/cache";
             }
         }
 
-        private static bool nonConfiguration = false;
-
         public static CacheConfigurationSection GetSection()
         {
-            if (nonConfiguration)
-            {
-                return null;
-            }
-            try
-            {
-                var configuration = ((CacheConfigurationSection)ConfigurationManager.GetSection(DefaultSectionName));
-                nonConfiguration = false;
-                return configuration;
-            }
-            catch (Exception ex)
-            {
-                nonConfiguration = true;
-                Logging.Log.GetLog(LoggingSettings.SparrowCategory).Warning("CacheConfiguration加载失败。", ex);
-            }
-            return null;
+            var configuration = ((CacheConfigurationSection)ConfigurationManager.GetSection(SectionName));
+            return configuration;
         }
 
     }

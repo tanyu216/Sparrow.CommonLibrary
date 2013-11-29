@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheManager.cs" />
-    <Compile Include="Cache\CacheSettings.cs" />
+    <Compile Include="Cache\Configuration\CacheSettings.cs" />
     <Compile Include="Cache\Configuration\CacheConfigurationSection.cs" />
     <Compile Include="Cache\Configuration\CacheElement.cs" />
     <Compile Include="Cache\Configuration\CacheElementCollection.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="Cryptography\SymmetricAlgorithm\SymmetricCrypto.cs" />
     <Compile Include="Cryptography\SymmetricFlag.cs" />
     <Compile Include="Database\Configuration\ConfigurationTypeValidator.cs" />
+    <Compile Include="Database\Configuration\DatabaseSettings.cs" />
     <Compile Include="Database\Configuration\ExecuterElement.cs" />
     <Compile Include="Database\Configuration\DatabaseConfigurationSection.cs" />
     <Compile Include="Database\Configuration\ProviderElementCollection.cs" />
