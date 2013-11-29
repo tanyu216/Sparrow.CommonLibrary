@@ -23,7 +23,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// </summary>
         public static readonly OracleStatementBuilder Default = new OracleStatementBuilder();
 
-        protected OracleStatementBuilder()
+        public OracleStatementBuilder()
         {
 
         }

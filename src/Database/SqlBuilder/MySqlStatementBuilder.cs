@@ -23,7 +23,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         readonly static Regex testNameRegex = new Regex(@"^(`\w+`)(\.`\w+`)*$", RegexOptions.Compiled);
         readonly static Regex matchNamesRegex = new Regex(@"(\w+)", RegexOptions.Compiled);
 
-        protected MySqlStatementBuilder()
+        public MySqlStatementBuilder()
         {
 
         }
