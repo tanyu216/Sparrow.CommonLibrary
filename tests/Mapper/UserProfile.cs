@@ -26,7 +26,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
                 .AppendProperty(x => x.Sex, "Sex")
                 .AppendProperty(x => x.Email, "Email")
                 .AppendProperty(x => x.FixPhone, "FixPhone")
-                .Complie();
+                .ComplieWithEntity();
 
         }
     }

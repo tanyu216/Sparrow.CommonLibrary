@@ -105,9 +105,11 @@ namespace Sparrow.CommonLibrary.Entity
         /// <typeparam name="T"></typeparam>
         /// <param name="dataMapper"></param>
         /// <returns></returns>
-        public static DataMapper<T> Complie<T>(this DataMapper<T> dataMapper)
+        public static DataMapper<T> ComplieWithEntity<T>(this DataMapper<T> dataMapper)
         {
-            return dataMapper.Complete(x => EntityBuilder.BuildEntityClass<T>(x.MetaInfo));
+            var subType = EntityBuilder.BuildEntityClass(typeof(T), dataMapper.MetaInfo);
+            var func = Expression.Lambda<Func<T>>(Expression.New(subType)).Compile();
+            return dataMapper.Complete(x => func);
         }
     }
 }

@@ -42,12 +42,6 @@ namespace Sparrow.CommonLibrary.Entity
             return new EntityBuilder().BuildEntityType(baseType, metaInfo);
         }
 
-        public static Func<T> BuildEntityClass<T>(IMetaInfo metaInfo)
-        {
-            var subType = BuildEntityClass(typeof(T), metaInfo);
-            return Expression.Lambda<Func<T>>(Expression.New(subType)).Compile();
-        }
-
         private static int _next = -1;
         //
         private CodeNamespace _codeNamespace;
