@@ -36,7 +36,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
             lock (Providers)
             {
-                Providers.Insert(0, provider);
+                Providers.Add(provider);
             }
         }
 

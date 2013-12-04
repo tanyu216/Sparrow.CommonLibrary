@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Web.Script.Serialization;
 
@@ -67,7 +68,13 @@ namespace Sparrow.CommonLibrary.Logging.Writer
 
         protected virtual string PropertiesSerializer(object data)
         {
-            return Sparrow.CommonLibrary.Common.JsonSerialize.Serialize(data);
+            using (var ms = new MemoryStream())
+            {
+                var ds = new DataContractJsonSerializer(data == null ? typeof(object) : data.GetType());
+                ds.WriteObject(ms, data);
+                string json = Encoding.UTF8.GetString(ms.ToArray());
+                return json;
+            }
         }
 
         #region implement

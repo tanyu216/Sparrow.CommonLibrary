@@ -201,7 +201,6 @@
     <Compile Include="Common\OperationException.cs" />
     <Compile Include="Extenssions\ConvertExtenssions.cs" />
     <Compile Include="Common\DynamicKeyValueContainer.cs" />
-    <Compile Include="Common\JsonSerialize.cs" />
     <Compile Include="Common\PathBuilder.cs" />
     <Compile Include="Common\Timestamp.cs" />
     <Compile Include="Weblog\Collect\CollecterTypeContainer.cs" />

@@ -69,7 +69,7 @@ namespace Sparrow.CommonLibrary.Logging
             _cookies = cookies;
         }
 
-        private bool IsSingleVariant(object value)
+        private bool IsScale(object value)
         {
             if (value is string || value is char)
                 return true;
@@ -94,7 +94,7 @@ namespace Sparrow.CommonLibrary.Logging
             // arguments
             if (_obj != null)
             {
-                if (IsSingleVariant(_obj))
+                if (IsScale(_obj))
                 {
                     _properties["__arguments"] = _obj;
                 }
