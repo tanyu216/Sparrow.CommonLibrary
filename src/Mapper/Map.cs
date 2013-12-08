@@ -94,6 +94,35 @@ namespace Sparrow.CommonLibrary.Mapper
         }
 
         /// <summary>
+        /// 复制<paramref name="source"/>的副本。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static T Clone<T>(T source)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+
+            var mapper = GetIMapper<T>();
+            var dest = mapper.Create();
+
+            if (dest is IMappingTrigger)
+                ((IMappingTrigger)dest).Begin();
+
+            for (var i = mapper.MetaInfo.PropertyCount - 1; i > -1; i--)
+            {
+                var property = mapper[i];
+                property.SetValue(dest, property.GetValue(source));
+            }
+
+            if (dest is IMappingTrigger)
+                ((IMappingTrigger)dest).End();
+
+            return dest;
+        }
+
+        /// <summary>
         /// 映射数据源中的一行数据到目标对象
         /// </summary>
         /// <typeparam name="TDestination"></typeparam>

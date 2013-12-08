@@ -34,7 +34,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
             lock (Finders)
             {
-                Finders.Insert(0, finder);
+                Finders.Insert(Finders.Count - 1, finder);
             }
         }
 
