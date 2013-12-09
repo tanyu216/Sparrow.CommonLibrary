@@ -116,7 +116,6 @@
     <Compile Include="Mapper\TypeMapper\BooleanTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\ByteTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\CharTypeMapper.cs" />
-    <Compile Include="Mapper\TypeMapper\CustomDictionaryTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DateTimeTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DecimalTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DictionaryTypeMapper.cs" />
@@ -124,7 +123,6 @@
     <Compile Include="Mapper\TypeMapper\EnumTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\GuidTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\HashSetTypeMapper.cs" />
-    <Compile Include="Mapper\TypeMapper\HashtableTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\Int16TypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\Int32TypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\Int64TypeMapper.cs" />

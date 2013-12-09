@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 {
-    public class HashSetTypeMapper<T> : ITypeMapper<T> where T : class
+    public class HashSetTypeMapper<T> : ITypeMapper<T>
     {
-        private Type newType;
+        private Type instanceType;
         private Type hashSetType;
-        private Action<T, object> hashSetAddCaller;
+        private Func<IEnumerable, T> hashSetConvert;
 
         public HashSetTypeMapper()
         {
@@ -19,23 +19,30 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             {
                 if (DesctinationType.GetGenericTypeDefinition() == typeof(ISet<>))
                 {
-                    newType = typeof(HashSet<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
+                    instanceType = typeof(HashSet<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
                     hashSetType = DesctinationType;
                 }
             }
+            else if (DesctinationType.IsAbstract)
+            {
+                throw new MapperException(string.Format("{0}不是一个有效的实例类型", DesctinationType.FullName));
+            }
 
-            if (!DesctinationType.IsAbstract)
-                newType = typeof(T);
+            if (instanceType == null)
+                instanceType = DesctinationType;
 
             if (hashSetType == null)
                 hashSetType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(ISet<>));
 
-            if (hashSetType != null)
+            if (hashSetType == null)
             {
-                var param1 = Expression.Parameter(typeof(T));
-                var param2 = Expression.Parameter(typeof(object));
-                hashSetAddCaller = Expression.Lambda<Action<T, object>>(Expression.Call(param1, hashSetType.GetMethod("Add", new Type[] { hashSetType.GetGenericArguments()[0] }), Expression.Convert(param2, hashSetType.GetGenericArguments()[0])), param1, param2).Compile();
+                throw new MapperException(string.Format("{0}未实现接口ISet<>", DesctinationType.FullName));
             }
+
+            var param1 = Expression.Parameter(typeof(IEnumerable));
+            var caller = Expression.Call(Expression.Constant(this), hashSetType.GetMethod("Convert").MakeGenericMethod(hashSetType.GetGenericArguments()), param1);
+            hashSetConvert = Expression.Lambda<Func<IEnumerable, T>>(caller, param1).Compile();
+
         }
 
         public T Cast(object value)
@@ -55,34 +62,27 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         private T Create()
         {
-            if (newType == null)
-                return null;
-            return Activator.CreateInstance(newType) as T;
+            return (T)Activator.CreateInstance(instanceType);
         }
 
         private T Convert(object value)
         {
             if (value is IEnumerable)
             {
-                var hashSet = Create();
-                if (hashSet == null)
-                    return default(T);
-
-                var argType = hashSetType.GetGenericArguments()[0];
-                var typeMapper = NativeTypeMapper.GetTypeMapper(argType);
-                foreach (var obj in (IEnumerable)value)
-                    hashSetAddCaller(hashSet, typeMapper.Cast(obj));
-
-                return hashSet;
+                return hashSetConvert((IEnumerable)value);
             }
             return default(T);
         }
 
-        private static void Convert<TElementType>(ISet<TElementType> dest, IEnumerable source)
+        private T Convert<TElementType>(IEnumerable source)
         {
+            var dest = (ISet<TElementType>)Create();
             var typeMapper = NativeTypeMapper.GetTypeMapper<TElementType>();
+
             foreach (var element in source)
                 dest.Add(typeMapper.Cast(element));
+
+            return (T)dest;
         }
     }
 }

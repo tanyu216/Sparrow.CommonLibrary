@@ -100,18 +100,28 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(arrayTypeMapperType));
             }
 
-            if (type.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
+            if (type.IsGenericType)
             {
-                var readOnlyTypeMapperType = typeof(ReadOnlyCollcetionTypeMapper<>).MakeGenericType(type.GetGenericArguments()[0]);
-                return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(readOnlyTypeMapperType));
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(Dictionary<,>) || genericType == typeof(IDictionary<,>))
+                {
+                    var readOnlyTypeMapperType = typeof(DictionaryTypeMapper<,>).MakeGenericType(type.GetGenericArguments());
+                    return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(readOnlyTypeMapperType));
+                }
+
+                if (genericType == typeof(ReadOnlyCollection<>))
+                {
+                    var readOnlyTypeMapperType = typeof(ReadOnlyCollcetionTypeMapper<>).MakeGenericType(type.GetGenericArguments());
+                    return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(readOnlyTypeMapperType));
+                }
             }
 
             // 接口转换
             var interfaces = type.GetInterfaces();
 
-            if (interfaces.Any(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            if (interfaces.Any(x => x == typeof(IDictionary) || x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
             {
-                var dictionaryTypeMapperType = typeof(DictionaryTypeMapper<>).MakeGenericType(type);
+                var dictionaryTypeMapperType = typeof(CustomDictionaryTypeMapper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(dictionaryTypeMapperType));
             }
 
@@ -125,12 +135,6 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             {
                 var collectionTypeMapperType = typeof(CollectionTypeMaper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(collectionTypeMapperType));
-            }
-
-            if (interfaces.Any(x => x == typeof(IDictionary)))
-            {
-                var dictionaryTypeMapperType = typeof(DictionaryTypeMapper<>).MakeGenericType(type);
-                return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(dictionaryTypeMapperType));
             }
 
             if (interfaces.Any(x => x == typeof(IEnumerable)))

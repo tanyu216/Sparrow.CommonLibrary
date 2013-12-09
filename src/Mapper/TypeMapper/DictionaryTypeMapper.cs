@@ -7,62 +7,28 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 {
-    public class DictionaryTypeMapper<T> : ITypeMapper<T> where T : class
+    public abstract class DictionaryTypeMapperBase<T> : ITypeMapper<T>
     {
-        /// <summary>
-        /// 创建字典实例的类型描述
-        /// </summary>
-        private Type instanceType;
-        /// <summary>
-        /// 字典接口信息描述
-        /// </summary>
-        private Type iDicType;
-        /// <summary>
-        /// 适用于泛型的集合的初始化
-        /// </summary>
-        private readonly Action<T, object> dicInit;
-
-        public DictionaryTypeMapper()
+        public DictionaryTypeMapperBase()
         {
-            if (DesctinationType.IsInterface)
-            {
-                if (DesctinationType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-                {
-                    instanceType = typeof(Dictionary<,>).MakeGenericType(DesctinationType.GetGenericArguments());
-                    iDicType = DesctinationType;
-                }
+            bool validated = false;
 
-                if (DesctinationType == typeof(IDictionary))
-                {
-                    instanceType = typeof(Hashtable);
-                    iDicType = DesctinationType;
-                }
-            }
-            else if (!DesctinationType.IsClass)
+            if (DesctinationType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
             {
-                throw new MapperException(string.Format("类型{0}不是一个有效的实例类型。", DesctinationType.FullName));
+                validated = true;
+            }
+            else if (DesctinationType == typeof(IDictionary))
+            {
+                validated = true;
+            }
+            else if (DesctinationType.GetInterfaces().Any(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>) || x == typeof(IDictionary)))
+            {
+                validated = true;
             }
 
-            if (instanceType == null)
-                instanceType = DesctinationType;
-
-            if (iDicType == null)
-                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
-
-            if (iDicType == null)
-                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x == typeof(IDictionary));
-
-            if (iDicType == null)
+            if (!validated)
                 throw new MapperException(string.Format("类型{0}未实现字典接口：IDictionary/IDictionary<TKey,TValue>。", typeof(T).FullName));
 
-            if (iDicType.IsGenericType)
-            {
-                var param1 = Expression.Parameter(DesctinationType);
-                var param2 = Expression.Parameter(typeof(object));
-                var args = iDicType.GetGenericArguments();
-                var caller = Expression.Call(null, this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args), typeof(object) }).MakeGenericMethod(args), Expression.Convert(param1, typeof(IDictionary<,>).MakeGenericType(args)), param2);
-                dicInit = Expression.Lambda<Action<T, object>>(caller, param1, param2).Compile();
-            }
         }
 
         public T Cast(object value)
@@ -80,53 +46,30 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             return Convert(value);
         }
 
-        private T Create()
+        protected abstract T Create();
+
+        protected abstract T Convert(object value);
+
+        protected virtual T Convert(IDictionary source)
         {
-            return (T)Activator.CreateInstance(instanceType);
-        }
+            var dictionary = (IDictionary)Create();
 
-        private T Convert(object value)
-        {
-            if (value == null || !(value is IEnumerable))
-                return null;
-
-            var dictionary = Create();
-
-            if (value is IDictionary)
+            foreach (DictionaryEntry keyVal in source)
             {
-                if (dicInit != null)
-                {
-                    var argType = iDicType.GetGenericArguments()[0];
-                    var argType2 = iDicType.GetGenericArguments()[1];
-                    var typeMapper = NativeTypeMapper.GetTypeMapper(argType);
-                    var typeMapper2 = NativeTypeMapper.GetTypeMapper(argType2);
-
-                    //foreach (DictionaryEntry keyVal in (IDictionary)value)
-                    //    dicAddCaller(dictionary, typeMapper.Cast(keyVal.Key), typeMapper2.Cast(keyVal.Value));
-
-                }
+                var type = keyVal.Key.GetType();
+                if (keyVal.Value == null)
+                    dictionary.Add(NativeTypeMapper.GetTypeMapper(type).Cast(keyVal.Key), null);
                 else
                 {
-                    var hash = (IDictionary)dictionary;
-                    foreach (DictionaryEntry keyVal in (IDictionary)value)
-                    {
-                        var type = keyVal.Key.GetType();
-                        if (keyVal.Value == null)
-                            hash.Add(NativeTypeMapper.GetTypeMapper(type).Cast(keyVal.Key), null);
-                        else
-                        {
-                            var type2 = keyVal.Value.GetType();
-                            hash.Add(NativeTypeMapper.GetTypeMapper(type).Cast(keyVal.Key), NativeTypeMapper.GetTypeMapper(type2).Cast(keyVal.Value));
-                        }
-                    }
+                    var type2 = keyVal.Value.GetType();
+                    dictionary.Add(NativeTypeMapper.GetTypeMapper(type).Cast(keyVal.Key), NativeTypeMapper.GetTypeMapper(type2).Cast(keyVal.Value));
                 }
-
-                return (T)dictionary;
             }
-            return default(T);
+
+            return (T)dictionary;
         }
 
-        private T Convert<TKey, TValue>(IDictionary source)
+        protected virtual T Convert<TKey, TValue>(IDictionary source)
         {
             var dictionary = (IDictionary<TKey, TValue>)Create();
 
@@ -139,7 +82,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             return (T)dictionary;
         }
 
-        private T Convert<TKey, TValue, TSourceKey, TSourceValue>(IDictionary<TSourceKey, TSourceValue> source)
+        protected virtual T Convert<TKey, TValue, TSourceKey, TSourceValue>(IDictionary<TSourceKey, TSourceValue> source)
         {
             var dictionary = (IDictionary<TKey, TValue>)Create();
 
@@ -152,7 +95,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             return (T)dictionary;
         }
 
-        private T Convert<TSourceKey, TSourceValue>(IDictionary<TSourceKey, TSourceValue> source)
+        protected virtual T Convert<TSourceKey, TSourceValue>(IDictionary<TSourceKey, TSourceValue> source)
         {
             var dictionary = (IDictionary)Create();
 
@@ -166,50 +109,159 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
         }
     }
 
-    public class DictionaryTypeMapper<TKey, TValue> : ITypeMapper<Dictionary<TKey, TValue>>
+    public class DictionaryTypeMapper<TKey, TValue> : DictionaryTypeMapperBase<Dictionary<TKey, TValue>>
     {
-        public Dictionary<TKey, TValue> Cast(object value)
+        protected override Dictionary<TKey, TValue> Create()
         {
-            return Convert(value);
+            return new Dictionary<TKey, TValue>();
         }
 
-        public Type DesctinationType
+        protected override Dictionary<TKey, TValue> Convert(object value)
         {
-            get { return typeof(Dictionary<TKey, TValue>); }
-        }
-
-        object ITypeMapper.Cast(object value)
-        {
-            return Convert(value);
-        }
-
-        private Dictionary<TKey, TValue> Convert(object value)
-        {
-            if (value == null)
+            if (value == null || !(value is IEnumerable))
                 return null;
-
-            var dictionary = new Dictionary<TKey, TValue>();
-
-            var typeMapper = NativeTypeMapper.GetTypeMapper<TKey>();
-            var typeMapper2 = NativeTypeMapper.GetTypeMapper<TValue>();
 
             if (value is IDictionary<TKey, TValue>)
             {
-                foreach (KeyValuePair<TKey, TValue> keyVal in (IDictionary<TKey, TValue>)value)
-                    dictionary.Add(typeMapper.Cast(keyVal.Key), typeMapper2.Cast(keyVal.Value));
-
-                return dictionary;
+                return Convert((IDictionary<TKey, TValue>)value);
             }
 
             if (value is IDictionary)
             {
-                foreach (DictionaryEntry keyVal in (IDictionary)value)
-                    dictionary.Add(typeMapper.Cast(keyVal.Key), typeMapper2.Cast(keyVal.Value));
-
-                return dictionary;
+                return Convert((IDictionary)value);
             }
 
-            return default(Dictionary<TKey, TValue>);
+            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            if (iDicType != null)
+            {
+                var param1 = Expression.Parameter(typeof(object));
+                var args = iDicType.GetGenericArguments();
+                var method = this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args) }).MakeGenericMethod(typeof(TKey), typeof(TValue), args[0], args[1]);
+                var caller = Expression.Call(Expression.Constant(this), method, Expression.Convert(param1, typeof(IDictionary<,>).MakeGenericType(args)));
+                var genericDicConvert = Expression.Lambda<Func<object, Dictionary<TKey, TValue>>>(caller, param1).Compile();
+
+                return genericDicConvert(value);
+            }
+
+            return null;
         }
     }
+
+    public class HashtableTypeMapper : DictionaryTypeMapperBase<Hashtable>
+    {
+        protected override Hashtable Create()
+        {
+            return new Hashtable();
+        }
+
+        protected override Hashtable Convert(object value)
+        {
+            if (value == null || !(value is IEnumerable))
+                return null;
+
+            if (value is IDictionary)
+            {
+                return Convert((IDictionary)value);
+            }
+
+            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            if (iDicType != null)
+            {
+                var param1 = Expression.Parameter(typeof(object));
+                var args = iDicType.GetGenericArguments();
+                var method = this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args) }).MakeGenericMethod(args);
+                var caller = Expression.Call(Expression.Constant(this), method, Expression.Convert(param1, typeof(IDictionary<,>).MakeGenericType(args)));
+                var genericDicConvert = Expression.Lambda<Func<object, Hashtable>>(caller, param1).Compile();
+
+                return genericDicConvert(value);
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 自定义字典的转换
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class CustomDictionaryTypeMapper<T> : DictionaryTypeMapperBase<T>
+    {
+        /// <summary>
+        /// 字典接口信息描述
+        /// </summary>
+        private Type iDicType;
+        /// <summary>
+        /// 适用于泛型的集合的初始化
+        /// </summary>
+        private readonly Func<IDictionary, T> genericDicConvert;
+
+        public CustomDictionaryTypeMapper()
+        {
+            if (!DesctinationType.IsClass)
+            {
+                throw new MapperException(string.Format("类型{0}不是一个有效的实例类型。", DesctinationType.FullName));
+            }
+
+            if (iDicType == null)
+                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+
+            if (iDicType == null)
+                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x == typeof(IDictionary));
+
+            if (iDicType == null)
+                throw new MapperException(string.Format("类型{0}未实现字典接口：IDictionary/IDictionary<TKey,TValue>。", typeof(T).FullName));
+
+            if (iDicType.IsGenericType)
+            {
+                var param1 = Expression.Parameter(typeof(IDictionary));
+                var args = iDicType.GetGenericArguments();
+                var caller = Expression.Call(Expression.Constant(this), this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary) }).MakeGenericMethod(args), param1);
+                genericDicConvert = Expression.Lambda<Func<IDictionary, T>>(caller, param1).Compile();
+            }
+        }
+
+        protected override T Create()
+        {
+            return (T)Activator.CreateInstance(DesctinationType);
+        }
+
+        protected override T Convert(object value)
+        {
+            if (value == null || !(value is IEnumerable))
+                return default(T);
+
+            var sourceDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            if (sourceDicType != null)
+            {
+                var param1 = Expression.Parameter(typeof(object));
+                var args = sourceDicType.GetGenericArguments();
+                System.Reflection.MethodInfo method;
+                if (iDicType.IsGenericType)
+                {
+                    method = this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args) }).MakeGenericMethod(iDicType.GetGenericArguments().Zip(args, (x, y) => y).ToArray());
+                }
+                else
+                {
+                    method = this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args) }).MakeGenericMethod(args);
+                } 
+                
+                var caller = Expression.Call(Expression.Constant(this), method, Expression.Convert(param1, typeof(IDictionary<,>).MakeGenericType(args)));
+                var convert = Expression.Lambda<Func<object, T>>(caller, param1).Compile();
+
+                return convert(value);
+            }
+
+            if (value is IDictionary)
+            {
+                if (genericDicConvert != null)
+                {
+                    return genericDicConvert((IDictionary)value);
+                }
+                return Convert((IDictionary)value);
+            }
+
+            return default(T);
+        }
+    }
+
 }

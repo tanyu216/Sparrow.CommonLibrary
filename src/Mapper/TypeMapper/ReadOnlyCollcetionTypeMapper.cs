@@ -28,7 +28,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
         {
             if (value is IEnumerable)
             {
-                var collection = new ObservableCollection<TElementType>();
+                var collection = new Collection<TElementType>();
                 var typeMapper = NativeTypeMapper.GetTypeMapper<TElementType>();
                 foreach (var obj in (IEnumerable)value)
                     collection.Add(typeMapper.Cast(obj));
