@@ -148,5 +148,6 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             var list = mapper.MapList(dt);
             Assert.IsNotNull(list);
         }
+
     }
 }

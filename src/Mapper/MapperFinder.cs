@@ -125,7 +125,7 @@ namespace Sparrow.CommonLibrary.Mapper
                 var mapper = new DataMapper<T>();
                 mapper.AutoAppendProperty();
                 if (mapper.MetaInfo.PropertyCount == 0)
-                    throw new ArgumentException(string.Format("{0}没有公开任何可读写的成员属性。", typeof(T).FullName));
+                    return null;
                 //
                 return mapper.Complete();
             }

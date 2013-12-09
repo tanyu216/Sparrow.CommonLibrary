@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -9,12 +10,18 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 {
     public class CollectionTypeMaper<T> : ITypeMapper<T> where T : class
     {
-        private Type newType;
-        private Type collectionType;
         /// <summary>
-        /// 适用于泛型的集合
+        /// 创建集合实例的类型描述
         /// </summary>
-        private Action<T, object> collectionAddCaller;
+        private readonly Type instanceType;
+        /// <summary>
+        /// 集合接口类型描述
+        /// </summary>
+        private readonly Type iCollectionType;
+        /// <summary>
+        /// 适用于泛型的集合转换
+        /// </summary>
+        private readonly Func<IEnumerable, T> genericCollectionConvert;
 
         public CollectionTypeMaper()
         {
@@ -24,33 +31,40 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
                     DesctinationType.GetGenericTypeDefinition() == typeof(ICollection<>) ||
                     DesctinationType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 {
-                    newType = typeof(List<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
-                    collectionType = DesctinationType;
+                    instanceType = typeof(List<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
+                    iCollectionType = DesctinationType;
                 }
 
                 if (DesctinationType == typeof(IList) ||
                     DesctinationType == typeof(ICollection) ||
                     DesctinationType == typeof(IEnumerable))
                 {
-                    newType = typeof(ArrayList);
-                    collectionType = DesctinationType;
+                    instanceType = typeof(ArrayList);
+                    iCollectionType = DesctinationType;
                 }
             }
-
-            if (!DesctinationType.IsAbstract)
-                newType = typeof(T);
-
-            if (collectionType == null)
-                collectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-
-            if (collectionType == null)
-                collectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IEnumerable));
-
-            if (collectionType != null && collectionType.IsGenericType)
+            else if (!DesctinationType.IsClass)
             {
-                var param1 = Expression.Parameter(typeof(T));
-                var param2 = Expression.Parameter(typeof(object));
-                collectionAddCaller = Expression.Lambda<Action<T, object>>(Expression.Call(param1, collectionType.GetMethod("Add", new Type[] { collectionType.GetGenericArguments()[0] }), Expression.Convert(param2, collectionType.GetGenericArguments()[0])), param1, param2).Compile();
+                throw new MapperException(string.Format("类型{0}不是一个有效的实例类型", DesctinationType.FullName));
+            }
+
+            if (instanceType == null)
+                instanceType = DesctinationType;
+
+            if (iCollectionType == null)
+                iCollectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(ICollection<>));
+
+            if (iCollectionType == null)
+                iCollectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x == typeof(IList));
+
+            if (iCollectionType == null)
+                throw new MapperException(string.Format("实现类型{0}未实现接口：IList/ICollection<>", DesctinationType.FullName));
+
+            if (iCollectionType.IsGenericType)
+            {
+                var param1 = Expression.Parameter(typeof(IEnumerable));
+                var caller = Expression.Call(Expression.Constant(this), this.GetType().GetMethod("Convert", new Type[] { typeof(IEnumerable) }).MakeGenericMethod(iCollectionType.GetGenericArguments()[0]), param1);
+                genericCollectionConvert = Expression.Lambda<Func<IEnumerable, T>>(caller, param1).Compile();
             }
         }
 
@@ -71,29 +85,20 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         private T Create()
         {
-            if (newType == null)
-                return null;
-            return Activator.CreateInstance(newType) as T;
+            return (T)Activator.CreateInstance(instanceType);
         }
 
         private T Convert(object value)
         {
             if (value is IEnumerable)
             {
-                var collection = Create();
-                if (collection == null)
-                    return default(T);
-
-                if (collectionType.IsGenericType)
+                if (genericCollectionConvert != null)
                 {
-                    var argType = collectionType.GetGenericArguments()[0];
-                    var typeMapper = NativeTypeMapper.GetTypeMapper(argType);
-                    foreach (var obj in (IEnumerable)value)
-                        collectionAddCaller(collection, typeMapper.Cast(obj));
-
+                    return genericCollectionConvert((IEnumerable)value);
                 }
                 else
                 {
+                    var collection = Create();
                     var list = (IList)collection;
                     foreach (var obj in (IEnumerable)value)
                     {
@@ -108,11 +113,22 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
                                 list.Add(NativeTypeMapper.GetTypeMapper(type).Cast(obj));
                         }
                     }
+                    return (T)collection;
                 }
-
-                return (T)collection;
             }
             return default(T);
         }
+
+        private T Convert<TElementType>(IEnumerable source)
+        {
+            ICollection<TElementType> dest = (ICollection<TElementType>)Create();
+            var typeMapper = NativeTypeMapper.GetTypeMapper<TElementType>();
+            foreach (object element in source)
+            {
+                dest.Add(typeMapper.Cast(element));
+            }
+            return (T)dest;
+        }
+
     }
 }

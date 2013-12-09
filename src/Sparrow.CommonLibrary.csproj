@@ -116,6 +116,7 @@
     <Compile Include="Mapper\TypeMapper\BooleanTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\ByteTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\CharTypeMapper.cs" />
+    <Compile Include="Mapper\TypeMapper\CustomDictionaryTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DateTimeTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DecimalTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\DictionaryTypeMapper.cs" />

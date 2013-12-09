@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -7,7 +8,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 {
     public class HashtableTypeMapper : ITypeMapper<Hashtable>
     {
-        public System.Collections.Hashtable Cast(object value)
+        public Hashtable Cast(object value)
         {
             return Convert(value);
         }
@@ -24,10 +25,13 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         private Hashtable Convert(object value)
         {
+            if (value == null || !(value is IEnumerable))
+                return null;
+
+            Hashtable hash = new Hashtable();
+
             if (value is IDictionary)
             {
-                Hashtable hash = new Hashtable();
-
                 foreach (DictionaryEntry keyVal in (IDictionary)value)
                 {
                     var type = keyVal.Key.GetType();
@@ -41,6 +45,13 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
                 }
                 return hash;
             }
+
+            var sourceInterfaces = value.GetType().GetInterfaces();
+            if (sourceInterfaces.Any(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            {
+
+            }
+
             return null;
         }
     }

@@ -77,5 +77,12 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
             }
             return default(T);
         }
+
+        private static void Convert<TElementType>(ISet<TElementType> dest, IEnumerable source)
+        {
+            var typeMapper = NativeTypeMapper.GetTypeMapper<TElementType>();
+            foreach (var element in source)
+                dest.Add(typeMapper.Cast(element));
+        }
     }
 }
