@@ -28,22 +28,15 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         IMetaInfo MetaInfo { get; }
         /// <summary>
+        /// 实例类型
+        /// </summary>
+        Type InstanceType { get; }
+        /// <summary>
         /// 创建一个实体对象
         /// </summary>
         /// <returns></returns>
         object Create();
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dataSource"></param>
-        /// <returns></returns>
-        object MapSingle(object dataSource);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dataSource"></param>
-        /// <returns></returns>
-        IList MapList(object dataSource);
+
     }
 
     /// <summary>
@@ -69,18 +62,6 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <returns></returns>
         new T Create();
-        /// <summary>
-        /// 映射
-        /// </summary>
-        /// <param name="dataSource"></param>
-        /// <returns></returns>
-        new T MapSingle(object dataSource);
-        /// <summary>
-        /// 映射
-        /// </summary>
-        /// <param name="dataSource"></param>
-        /// <returns></returns>
-        new List<T> MapList(object dataSource);
     }
 
 }

@@ -21,20 +21,12 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="mapper"></param>
         /// <typeparam name="T"></typeparam>
-        public static bool Register<T>(IObjectAccessor<T> mapper)
+        public static void Register<T>(IObjectAccessor<T> mapper)
         {
             if (mapper == null)
                 throw new ArgumentNullException("mapper");
 
-            int i = 0;
-            while (i++ < 3)
-            {
-                if (Container.TryAdd(typeof(T), mapper))
-                    return true;
-                if (Container.ContainsKey(typeof(T)))
-                    return false;
-            }
-            return false;
+            Container.AddOrUpdate(typeof(T), mapper, (x, y) => mapper);
         }
 
         /// <summary>

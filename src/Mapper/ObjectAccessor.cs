@@ -19,6 +19,8 @@ namespace Sparrow.CommonLibrary.Mapper
     {
         private readonly IMetaInfo _metaInfo;
 
+        private Type _instanceType;
+
         /// <summary>
         /// 初始化
         /// </summary>
@@ -54,7 +56,7 @@ namespace Sparrow.CommonLibrary.Mapper
             _metaInfo = metaInfo;
         }
 
-        #region IMapper<T>
+        #region IObjectAccessor
 
         private IPropertyAccessor<T>[] _pAccessors;
         private Func<T> _creator;
@@ -102,6 +104,8 @@ namespace Sparrow.CommonLibrary.Mapper
             get { return _metaInfo; }
         }
 
+        public Type InstanceType { get { return _instanceType; } }
+
         object IObjectAccessor.Create()
         {
             return Create();
@@ -112,33 +116,9 @@ namespace Sparrow.CommonLibrary.Mapper
             return _creator();
         }
 
-        public T MapSingle(object dataSource)
-        {
-         //   return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
-            return default(T);
-        }
-
-        public List<T> MapList(object dataSource)
-        {
-            //return DataSourceAdapter.Instance.ReadList(this, dataSource);
-            return default(List<T>);
-        }
-
-        object IObjectAccessor.MapSingle(object dataSource)
-        {
-//            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
-            return null;
-        }
-
-        System.Collections.IList IObjectAccessor.MapList(object dataSource)
-        {
-            //return DataSourceAdapter.Instance.ReadList(this, dataSource);
-            return null;
-        }
-
         #endregion
 
-        #region DataMapper
+        #region ObjectAccessor
 
         /// <summary>
         /// 添加需要映射的属性成员。
@@ -154,7 +134,7 @@ namespace Sparrow.CommonLibrary.Mapper
                 throw new ArgumentNullException("propertyName");
 
             var propertyInfo = PropertyExpression.ExtractMemberExpression(propertyExp);
-            MetaInfo.AddPropertyInfo(new MetaPropertyInfo(MetaInfo,propertyName,(PropertyInfo)propertyInfo.Member));
+            MetaInfo.AddPropertyInfo(new MetaPropertyInfo(MetaInfo, propertyName, (PropertyInfo)propertyInfo.Member));
             return this;
         }
 
@@ -241,7 +221,8 @@ namespace Sparrow.CommonLibrary.Mapper
             if (ctor == null)
                 throw new MapperException(string.Format("类型[{0}]无默认构造函数。", typeof(T).FullName));
 
-            _creator = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+            _instanceType = typeof(T);
+            _creator = Expression.Lambda<Func<T>>(Expression.New(_instanceType)).Compile();
 
             return this;
         }
@@ -251,7 +232,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="builder">自定义类型<typeparamref name="T"/>的实例化。</param>
         /// <returns></returns>
-        public ObjectAccessor<T> Complete(Func<ObjectAccessor<T>, Func<T>> builder)
+        public ObjectAccessor<T> Complete(Func<ObjectAccessor<T>, Type> builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
@@ -261,7 +242,8 @@ namespace Sparrow.CommonLibrary.Mapper
 
             Reorganize();
 
-            _creator = builder(this);
+            _instanceType = builder(this);
+            _creator = Expression.Lambda<Func<T>>(Expression.New(_instanceType)).Compile();
 
             return this;
         }
