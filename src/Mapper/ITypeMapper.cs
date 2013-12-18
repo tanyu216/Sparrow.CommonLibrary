@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper
 {
     public interface ITypeMapper
     {

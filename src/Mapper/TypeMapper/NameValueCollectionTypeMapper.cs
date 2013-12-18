@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public class NameValueCollectionTypeMapper : ITypeMapper<NameValueCollection>
     {

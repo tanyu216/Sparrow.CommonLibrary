@@ -178,9 +178,9 @@ namespace Sparrow.CommonLibrary.Entity
 
         #endregion
 
-        private IMapper _mapper;
+        private IObjectAccessor _mapper;
 
-        public IMapper Mapper { get { return _mapper; } }
+        public IObjectAccessor Mapper { get { return _mapper; } }
 
         public IMetaInfo MetaInfo
         {
@@ -250,9 +250,9 @@ namespace Sparrow.CommonLibrary.Entity
             EntityData = data;
         }
 
-        public new IMapper<T> Mapper
+        public new IObjectAccessor<T> Mapper
         {
-            get { return (IMapper<T>)base.Mapper; }
+            get { return (IObjectAccessor<T>)base.Mapper; }
         }
     }
 }

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
-    public class CollectionTypeMaper<T> : ITypeMapper<T> where T : class
+    public class CollectionTypeMaper<T> : ITypeMapper<T>
     {
         /// <summary>
         /// 创建集合实例的类型描述

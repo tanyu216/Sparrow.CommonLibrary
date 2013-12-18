@@ -11,23 +11,23 @@ namespace Sparrow.CommonLibrary.Entity
     public static class DataMapperExtenssions
     {
         /// <summary>
-        /// 新建一个<see cref="IMapper"/>对象。
+        /// 新建一个<see cref="IObjectAccessor"/>对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static DataMapper<T> Create<T>()
+        public static ObjectAccessor<T> Create<T>()
         {
-            return new DataMapper<T>(new DbMetaInfo(null, typeof(T)));
+            return new ObjectAccessor<T>(new DbMetaInfo(null, typeof(T)));
         }
         /// <summary>
-        /// 新建一个<see cref="IMapper"/>对象。
+        /// 新建一个<see cref="IObjectAccessor"/>对象。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static DataMapper<T> Create<T>(string tableName)
+        public static ObjectAccessor<T> Create<T>(string tableName)
         {
-            return new DataMapper<T>(new DbMetaInfo(tableName, typeof(T)));
+            return new ObjectAccessor<T>(new DbMetaInfo(tableName, typeof(T)));
         }
         /// <summary>
         /// 添加属性与表字段的映射
@@ -38,7 +38,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="propertyName"></param>
         /// <param name="isKey"></param>
         /// <returns></returns>
-        public static DataMapper<T> AppendProperty<T>(this DataMapper<T> dataMapper, Expression<Func<T, object>> propertyExp, string propertyName, bool isKey)
+        public static ObjectAccessor<T> AppendProperty<T>(this ObjectAccessor<T> dataMapper, Expression<Func<T, object>> propertyExp, string propertyName, bool isKey)
         {
             if (propertyExp == null)
                 throw new ArgumentNullException("propertyExp");
@@ -56,7 +56,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <typeparam name="T"></typeparam>
         /// <param name="dataMapper"></param>
         /// <returns></returns>
-        public static DataMapper<T> Increment<T>(this DataMapper<T> dataMapper)
+        public static ObjectAccessor<T> Increment<T>(this ObjectAccessor<T> dataMapper)
         {
             if (dataMapper.MetaInfo.PropertyCount == 0)
                 throw new MapperException("未添加任何可以设置自动增长标识的属性。");
@@ -75,7 +75,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="dataMapper"></param>
         /// <param name="incrementName"></param>
         /// <returns></returns>
-        public static DataMapper<T> Increment<T>(this DataMapper<T> dataMapper, string incrementName)
+        public static ObjectAccessor<T> Increment<T>(this ObjectAccessor<T> dataMapper, string incrementName)
         {
             return dataMapper.Increment<T>(incrementName, 1);
         }
@@ -87,7 +87,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="incrementName"></param>
         /// <param name="startVal"></param>
         /// <returns></returns>
-        public static DataMapper<T> Increment<T>(this DataMapper<T> dataMapper, string incrementName, int startVal)
+        public static ObjectAccessor<T> Increment<T>(this ObjectAccessor<T> dataMapper, string incrementName, int startVal)
         {
             if (dataMapper.MetaInfo.PropertyCount == 0)
                 throw new MapperException("未添加任何可以设置自动增长标识的属性。");
@@ -105,7 +105,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <typeparam name="T"></typeparam>
         /// <param name="dataMapper"></param>
         /// <returns></returns>
-        public static DataMapper<T> ComplieWithEntity<T>(this DataMapper<T> dataMapper)
+        public static ObjectAccessor<T> ComplieWithEntity<T>(this ObjectAccessor<T> dataMapper)
         {
             var subType = EntityBuilder.BuildEntityClass(typeof(T), dataMapper.MetaInfo);
             var func = Expression.Lambda<Func<T>>(Expression.New(subType)).Compile();

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public class HashSetTypeMapper<T> : ITypeMapper<T>
     {

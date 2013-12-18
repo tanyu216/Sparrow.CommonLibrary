@@ -12,17 +12,17 @@ namespace Sparrow.CommonLibrary.Mapper
 {
 
     /// <summary>
-    /// 内部数据映射的实现。
+    /// 对象访问器
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DataMapper<T> : IMapper<T>
+    public class ObjectAccessor<T> : IObjectAccessor<T>
     {
         private readonly IMetaInfo _metaInfo;
 
         /// <summary>
         /// 初始化
         /// </summary>
-        public DataMapper()
+        public ObjectAccessor()
             : this(new MetaInfo(null, typeof(T)))
         {
         }
@@ -30,7 +30,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <summary>
         /// 初始化
         /// </summary>
-        public DataMapper(string name)
+        public ObjectAccessor(string name)
             : this(new MetaInfo(name, typeof(T)))
         {
         }
@@ -39,7 +39,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 初始化
         /// </summary>
         /// <param name="metaInfo">元数据</param>
-        public DataMapper(IMetaInfo metaInfo)
+        public ObjectAccessor(IMetaInfo metaInfo)
         {
             Type type = typeof(T);
             if (type.IsClass == false)
@@ -59,7 +59,7 @@ namespace Sparrow.CommonLibrary.Mapper
         private IPropertyAccessor<T>[] _pAccessors;
         private Func<T> _creator;
 
-        IPropertyAccessor IMapper.this[string propertyName]
+        IPropertyAccessor IObjectAccessor.this[string propertyName]
         {
             get
             {
@@ -68,7 +68,7 @@ namespace Sparrow.CommonLibrary.Mapper
             }
         }
 
-        IPropertyAccessor IMapper.this[int index]
+        IPropertyAccessor IObjectAccessor.this[int index]
         {
             get
             {
@@ -102,7 +102,7 @@ namespace Sparrow.CommonLibrary.Mapper
             get { return _metaInfo; }
         }
 
-        object IMapper.Create()
+        object IObjectAccessor.Create()
         {
             return Create();
         }
@@ -114,22 +114,26 @@ namespace Sparrow.CommonLibrary.Mapper
 
         public T MapSingle(object dataSource)
         {
-            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+         //   return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+            return default(T);
         }
 
         public List<T> MapList(object dataSource)
         {
-            return DataSourceAdapter.Instance.ReadList(this, dataSource);
+            //return DataSourceAdapter.Instance.ReadList(this, dataSource);
+            return default(List<T>);
         }
 
-        object IMapper.MapSingle(object dataSource)
+        object IObjectAccessor.MapSingle(object dataSource)
         {
-            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+//            return DataSourceAdapter.Instance.ReadSingle(this, dataSource);
+            return null;
         }
 
-        System.Collections.IList IMapper.MapList(object dataSource)
+        System.Collections.IList IObjectAccessor.MapList(object dataSource)
         {
-            return DataSourceAdapter.Instance.ReadList(this, dataSource);
+            //return DataSourceAdapter.Instance.ReadList(this, dataSource);
+            return null;
         }
 
         #endregion
@@ -142,7 +146,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="propertyExp"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        public DataMapper<T> AppendProperty(Expression<Func<T, object>> propertyExp, string propertyName)
+        public ObjectAccessor<T> AppendProperty(Expression<Func<T, object>> propertyExp, string propertyName)
         {
             if (propertyExp == null)
                 throw new ArgumentNullException("propertyExp");
@@ -159,7 +163,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="propertyInfo"></param>
         /// <returns></returns>
-        public DataMapper<T> AppendProperty(IMetaPropertyInfo propertyInfo)
+        public ObjectAccessor<T> AppendProperty(IMetaPropertyInfo propertyInfo)
         {
             if (propertyInfo == null)
                 throw new ArgumentNullException("propertyInfo");
@@ -172,7 +176,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 自动映射实体属性
         /// </summary>
         /// <returns></returns>
-        public DataMapper<T> AutoAppendProperty()
+        public ObjectAccessor<T> AutoAppendProperty()
         {
             foreach (var property in typeof(T).GetProperties())
             {
@@ -226,7 +230,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 完成映射（生命周期内只能调用一次）。
         /// </summary>
         /// <returns></returns>
-        public DataMapper<T> Complete()
+        public ObjectAccessor<T> Complete()
         {
             if (MetaInfo.PropertyCount == 0)
                 AutoAppendProperty();
@@ -247,7 +251,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <param name="builder">自定义类型<typeparamref name="T"/>的实例化。</param>
         /// <returns></returns>
-        public DataMapper<T> Complete(Func<DataMapper<T>, Func<T>> builder)
+        public ObjectAccessor<T> Complete(Func<ObjectAccessor<T>, Func<T>> builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");

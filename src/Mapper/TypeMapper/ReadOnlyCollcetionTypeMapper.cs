@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public class ReadOnlyCollcetionTypeMapper<TElementType> : ITypeMapper<ReadOnlyCollection<TElementType>>
     {

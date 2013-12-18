@@ -5,8 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
+    /// <summary>
+    /// 字典转换的基类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class DictionaryTypeMapperBase<T> : ITypeMapper<T>
     {
         public DictionaryTypeMapperBase()
@@ -109,6 +113,11 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
         }
     }
 
+    /// <summary>
+    /// 针对<see cref="Dictionary&lt;TKey,TValue&gt;"/>转换的优化
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public class DictionaryTypeMapper<TKey, TValue> : DictionaryTypeMapperBase<Dictionary<TKey, TValue>>
     {
         protected override Dictionary<TKey, TValue> Create()
@@ -147,6 +156,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
         }
     }
 
+    /// <summary>
+    /// 针对<see cref="Hashtable"/>转换的优化
+    /// </summary>
     public class HashtableTypeMapper : DictionaryTypeMapperBase<Hashtable>
     {
         protected override Hashtable Create()
@@ -181,10 +193,10 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
     }
 
     /// <summary>
-    /// 自定义字典的转换
+    /// 通用字典的转换（包括支持<see cref="HashtableTypeMapper"/>/<see cref="DictionaryTypeMapper&lt;TKey,TValue&gt;"/>所支持的）
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class CustomDictionaryTypeMapper<T> : DictionaryTypeMapperBase<T>
+    public class CommonDictionaryTypeMapper<T> : DictionaryTypeMapperBase<T>
     {
         /// <summary>
         /// 字典接口信息描述
@@ -195,7 +207,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
         /// </summary>
         private readonly Func<IDictionary, T> genericDicConvert;
 
-        public CustomDictionaryTypeMapper()
+        public CommonDictionaryTypeMapper()
         {
             if (!DesctinationType.IsClass)
             {

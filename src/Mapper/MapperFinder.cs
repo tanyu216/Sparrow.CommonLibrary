@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 namespace Sparrow.CommonLibrary.Mapper
 {
     /// <summary>
-    /// <see cref="IMapper"/>映射对象搜索器
+    /// <see cref="IObjectAccessor"/>映射对象搜索器
     /// </summary>
     public abstract class MapperFinder
     {
@@ -58,7 +58,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IMapper<T> GetIMapper<T>()
+        public static IObjectAccessor<T> GetIMapper<T>()
         {
             MapperFinder[] finders = null;
             lock (Finders)
@@ -90,16 +90,16 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="MapperException"></exception>
-        public abstract IMapper<T> FindIMapper<T>();
+        public abstract IObjectAccessor<T> FindIMapper<T>();
 
         private class MappingFinderForNamespace : MapperFinder
         {
-            public override IMapper<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindIMapper<T>()
             {
                 var type = Type.GetType(typeof(T).Namespace + ".Mappers." + typeof(T).Name + "MapperProvider");
                 if (type != null)
                 {
-                    var mapper = (IMapper<T>)type.GetMethod("GetIMapper").Invoke(null, new object[] { });
+                    var mapper = (IObjectAccessor<T>)type.GetMethod("GetIMapper").Invoke(null, new object[] { });
                     return mapper;
                 }
                 return null;
@@ -108,21 +108,21 @@ namespace Sparrow.CommonLibrary.Mapper
 
         private class MappingFinderForClass : MapperFinder
         {
-            public override IMapper<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindIMapper<T>()
             {
                 var method = typeof(T).GetMethod("GetIMapper");
                 if (method == null)
                     return null;
-                var mapper = (IMapper<T>)method.Invoke(null, new object[] { });
+                var mapper = (IObjectAccessor<T>)method.Invoke(null, new object[] { });
                 return mapper;
             }
         }
 
         private class MappingFinderAuto : MapperFinder
         {
-            public override IMapper<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindIMapper<T>()
             {
-                var mapper = new DataMapper<T>();
+                var mapper = new ObjectAccessor<T>();
                 mapper.AutoAppendProperty();
                 if (mapper.MetaInfo.PropertyCount == 0)
                     return null;

@@ -22,7 +22,7 @@ namespace Sparrow.CommonLibrary.Query
     {
         private readonly DatabaseHelper database;
 
-        private readonly IMapper<T> mapper;
+        private readonly IObjectAccessor<T> mapper;
         private readonly IMetaPropertyInfo[] fields;
 
         public Queryable(DatabaseHelper database)

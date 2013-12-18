@@ -27,7 +27,7 @@ namespace Sparrow.CommonLibrary.Repository
 
         protected DatabaseHelper Database { get { return _database; } }
 
-        private readonly IMapper<T> mapper;
+        private readonly IObjectAccessor<T> mapper;
         private readonly IDbMetaInfo metaInfo;
 
         public RepositoryDatabase(Database.DatabaseHelper database)

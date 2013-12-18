@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public class TimestampTypeMapper : ITypeMapper<Timestamp>
     {
@@ -20,6 +20,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         object ITypeMapper.Cast(object value)
         {
+            if (value is Timestamp)
+                return value;
+
             return Convert(value);
         }
 
@@ -50,6 +53,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         object ITypeMapper.Cast(object value)
         {
+            if (value is Timestamp?)
+                return value;
+
             return Convert(value);
         }
 

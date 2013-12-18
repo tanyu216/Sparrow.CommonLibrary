@@ -73,6 +73,7 @@
     <Compile Include="Retrying\FixedIntervalTest.cs" />
     <Compile Include="Retrying\ExponentialBackoffIntervalTest.cs" />
     <Compile Include="Retrying\IncrementalIntervalTest.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="Weblog\ConfigurationTest.cs" />
     <Compile Include="Weblog\WeblogHttpModuleTest.cs" />
     <Compile Include="Web\RecognizeSpiderTest.cs" />

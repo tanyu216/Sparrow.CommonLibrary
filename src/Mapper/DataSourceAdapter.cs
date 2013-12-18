@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Mapper
         private DataSourceAdapter()
         {
             Providers = new List<IDataSourceReaderProvider>();
-            Providers.Add(new DataReaderProvider());
+            Providers.Add(new DataReaderSourceReader());
             Providers.Add(new DataTableProvider());
         }
 
@@ -56,7 +56,7 @@ namespace Sparrow.CommonLibrary.Mapper
             throw new NotSupportedException(string.Format("不受支持的数据源:{0}。", source.GetType().FullName));
         }
 
-        private IPropertyAccessor<T>[] GetPropertyAccessors<T>(IMapper<T> mapper, IDataSourceReader<T> reader, out int[] ordinal)
+        private IPropertyAccessor<T>[] GetPropertyAccessors<T>(IObjectAccessor<T> mapper, IDataSourceReader<T> reader, out int[] ordinal)
         {
             var fields = mapper.MetaInfo.GetPropertyNames();
             var index = reader.Ordinal(fields);
@@ -97,7 +97,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T ReadSingle<T>(IMapper<T> mapper, object dataSource)
+        public T ReadSingle<T>(IObjectAccessor<T> mapper, object dataSource)
         {
             if (mapper == null)
                 throw new ArgumentNullException("mapper");
@@ -120,7 +120,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public List<T> ReadList<T>(IMapper<T> mapper, object dataSource)
+        public List<T> ReadList<T>(IObjectAccessor<T> mapper, object dataSource)
         {
             if (mapper == null)
                 throw new ArgumentNullException("mapper");

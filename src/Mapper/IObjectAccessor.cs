@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace Sparrow.CommonLibrary.Mapper
 {
     /// <summary>
-    /// 对象映射
+    /// 对象访问器
     /// </summary>
-    public interface IMapper
+    public interface IObjectAccessor
     {
         /// <summary>
         /// 获取对象指定成员对象的属性读写器
@@ -47,10 +47,10 @@ namespace Sparrow.CommonLibrary.Mapper
     }
 
     /// <summary>
-    /// 对象映射
+    /// 对象访问器
     /// </summary>
     /// <typeparam name="T">实体类型<see cref="T"/></typeparam>
-    public interface IMapper<T> : IMapper
+    public interface IObjectAccessor<T> : IObjectAccessor
     {
         /// <summary>
         /// 获取对象指定成员对象的值

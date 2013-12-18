@@ -29,5 +29,6 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             var mapper = MapperFinder.GetIMapper<UserProfile3>();
             Assert.IsNotNull(mapper);
         }
+
     }
 }

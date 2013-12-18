@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public class EnumTypeMapper<T> : ITypeMapper<T> where T : struct
     {
@@ -19,6 +19,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         object ITypeMapper.Cast(object value)
         {
+            if (value is T)
+                return value;
+
             return Convert(value);
         }
 
@@ -49,6 +52,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
         object ITypeMapper.Cast(object value)
         {
+            if (value is T?)
+                return value;
+
             return Convert(value);
         }
 

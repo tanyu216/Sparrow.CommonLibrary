@@ -7,48 +7,48 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMapper
+namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
     public static class NativeTypeMapper
     {
         private static readonly ITypeMapper[] _initialMappers = new ITypeMapper[] 
         { 
             new ArrayListTypeMapper(),
-            new BooleanTypeMapper(),
-            new Boolean2TypeMapper(),
-            new ByteTypeMapper(),
-            new Byte2TypeMapper(),
-            new CharTypeMapper(),
-            new Char2TypeMapper(),
-            new DateTimeTypeMapper(),
-            new DateTime2TypeMapper(),
-            new DecimalTypeMapper(),
-            new Decimal2TypeMapper(),
-            new DoubleTypeMapper(),
-            new Double2TypeMapper(),
-            new GuidTypeMapper(),
-            new Guid2TypeMapper(),
-            new Int16TypeMapper(),
-            new Int16_2TypeMapper(),
-            new Int32TypeMapper(),
-            new Int32_2TypeMapper(),
-            new Int64TypeMapper(),
-            new Int64_2TypeMapper(),
-            new SByteTypeMapper(),
-            new SByte2TypeMapper(),
-            new SingleTypeMapper(),
-            new Single2TypeMapper(),
             new StringTypeMapper(),
+            new HashtableTypeMapper(),
+            new NameValueCollectionTypeMapper(),
             new TimestampTypeMapper(),
             new Timestamp2TypeMapper(),
-            new UInt16TypeMapper(),
-            new UInt16_2TypeMapper(),
-            new UInt32TypeMapper(),
-            new UInt32_2TypeMapper(),
-            new UInt64TypeMapper(),
-            new UInt64_2TypeMapper(),
-            new HashtableTypeMapper(),
-            new NameValueCollectionTypeMapper()
+            new ValueTypeTypeMapper<Boolean>(),
+            new ValueTypeTypeMapper<Boolean?>(),
+            new ValueTypeTypeMapper<Byte>(),
+            new ValueTypeTypeMapper<Byte?>(),
+            new ValueTypeTypeMapper<Char>(),
+            new ValueTypeTypeMapper<Char?>(),
+            new ValueTypeTypeMapper<DateTime>(),
+            new ValueTypeTypeMapper<DateTime?>(),
+            new ValueTypeTypeMapper<Decimal>(),
+            new ValueTypeTypeMapper<Decimal?>(),
+            new ValueTypeTypeMapper<Double>(),
+            new ValueTypeTypeMapper<Double?>(),
+            new ValueTypeTypeMapper<Guid>(),
+            new ValueTypeTypeMapper<Guid?>(),
+            new ValueTypeTypeMapper<Int16>(),
+            new ValueTypeTypeMapper<Int16?>(),
+            new ValueTypeTypeMapper<Int32>(),
+            new ValueTypeTypeMapper<Int32>(),
+            new ValueTypeTypeMapper<Int64>(),
+            new ValueTypeTypeMapper<Int64?>(),
+            new ValueTypeTypeMapper<SByte>(),
+            new ValueTypeTypeMapper<SByte?>(),
+            new ValueTypeTypeMapper<Single>(),
+            new ValueTypeTypeMapper<Single?>(),
+            new ValueTypeTypeMapper<UInt16>(),
+            new ValueTypeTypeMapper<UInt16?>(),
+            new ValueTypeTypeMapper<UInt32>(),
+            new ValueTypeTypeMapper<UInt32?>(),
+            new ValueTypeTypeMapper<UInt64>(),
+            new ValueTypeTypeMapper<UInt64?>()
         };
 
         private static readonly ConcurrentDictionary<Type, ITypeMapper> _typeMappers;
@@ -121,7 +121,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
 
             if (interfaces.Any(x => x == typeof(IDictionary) || x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
             {
-                var dictionaryTypeMapperType = typeof(CustomDictionaryTypeMapper<>).MakeGenericType(type);
+                var dictionaryTypeMapperType = typeof(CommonDictionaryTypeMapper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(dictionaryTypeMapperType));
             }
 
@@ -143,9 +143,17 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMapper
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(collectionTypeMapperType));
             }
 
-            // 收尾
-            var objectTypeMapper = typeof(ObjectTypeMapper<>).MakeGenericType(type);
-            return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(objectTypeMapper));
+            if (type.IsClass)
+            {
+                var mapper = typeof(MapperFinder).GetMethod("GetIMapper").MakeGenericMethod(type).Invoke((object)null, new object[0]);
+                if (mapper != null)
+                {
+                    var objectTypeMapper = typeof(ObjectTypeMapper<>).MakeGenericType(type);
+                    return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(objectTypeMapper, mapper));
+                }
+            }
+
+            return null;
         }
 
         public static ITypeMapper<T> GetTypeMapper<T>()
