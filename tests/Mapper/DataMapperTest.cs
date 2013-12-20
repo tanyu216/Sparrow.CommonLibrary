@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Data;
 using Sparrow.CommonLibrary.Entity;
+using Sparrow.CommonLibrary.Mapper;
 
 namespace Sparrow.CommonLibrary.Test.Mapper
 {
@@ -56,14 +57,14 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void CreateDataMapper()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
             Assert.IsNotNull(mapper);
         }
 
         [Test]
         public void CreateInstanceByDataMapper()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
             var user = mapper.Create();
             Assert.IsNotNull(user);
         }
@@ -71,7 +72,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void PropertyTest1()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
             var user = mapper.Create();
 
             Assert.AreEqual(user.Id, 0);
@@ -86,7 +87,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void PropertyTest2()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
             var user = mapper.Create();
 
             Assert.AreEqual(user.Id, 0);
@@ -102,7 +103,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MetaInfoTest1()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
 
             Assert.AreEqual(mapper.MetaInfo[0].PropertyName, "Id");
             Assert.AreEqual(mapper.MetaInfo[1].PropertyName, "Name");
@@ -122,7 +123,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MetaInfoTest2()
         {
-            var mapper = UserProfile.GetIMapper();
+            var mapper = UserProfile.GetObjectAccessor();
             var field1 = (DbMetaPropertyInfo)mapper.MetaInfo.GetProperties()[0];
             
             Assert.AreEqual(field1.PropertyName, "Id");
@@ -134,18 +135,16 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void MapTest1()
         {
-            var mapper = UserProfile.GetIMapper();
             var dt = CreateDataTable();
-            var single = mapper.MapSingle(dt);
+            var single = Map.Single<UserProfile>(dt);
             Assert.IsNotNull(single);
         }
 
         [Test]
         public void MapTest2()
         {
-            var mapper = UserProfile.GetIMapper();
             var dt = CreateDataTable();
-            var list = mapper.MapList(dt);
+            var list = Map.List<UserProfile>(dt);
             Assert.IsNotNull(list);
         }
 

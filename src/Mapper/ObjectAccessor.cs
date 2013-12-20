@@ -21,6 +21,8 @@ namespace Sparrow.CommonLibrary.Mapper
 
         private Type _instanceType;
 
+        private Action<T, object[]> _initDataAction;
+
         /// <summary>
         /// 初始化
         /// </summary>
@@ -212,6 +214,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public ObjectAccessor<T> Complete()
         {
+            if (isReorganize)
+                return this;
+
             if (MetaInfo.PropertyCount == 0)
                 AutoAppendProperty();
 
@@ -234,6 +239,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public ObjectAccessor<T> Complete(Func<ObjectAccessor<T>, Type> builder)
         {
+            if (isReorganize)
+                return this;
+
             if (builder == null)
                 throw new ArgumentNullException("builder");
 

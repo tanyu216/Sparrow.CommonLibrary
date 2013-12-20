@@ -16,7 +16,7 @@ namespace Sparrow.CommonLibrary.Test.Entity
         [Test]
         public void Test1()
         {
-            var mapper = Map.GetIMapper<UserProfile>();
+            var mapper = Map.GetAccessor<UserProfile>();
             var dbMetaInfo = mapper.MetaInfo as IDbMetaInfo;
             var user = mapper.Create();
             user.Id = 1;

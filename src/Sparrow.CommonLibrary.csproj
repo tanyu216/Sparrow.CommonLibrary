@@ -104,11 +104,13 @@
     <Compile Include="Entity\DbIncrementMetaPropertyInfo.cs" />
     <Compile Include="Entity\DbMetaInfo.cs" />
     <Compile Include="Entity\DbMetaPropertyInfo.cs" />
-    <Compile Include="Entity\DataMapperExtenssions.cs" />
+    <Compile Include="Entity\ObjectAccessorExtenssions.cs" />
     <Compile Include="Entity\IDbIncrementMetaPropertyInfo.cs" />
     <Compile Include="Entity\IDbMetaInfo.cs" />
     <Compile Include="Entity\IDbMetaPropertyInfo.cs" />
     <Compile Include="Logging\Configuration\ConfigurationTypeValidator.cs" />
+    <Compile Include="Mapper\DataSource\IDataSourceReaderProvider.cs" />
+    <Compile Include="Mapper\DataSource\NativeDataSourceReader.cs" />
     <Compile Include="Mapper\Metadata\MetaInfo.cs" />
     <Compile Include="Mapper\Metadata\MetaPropertyInfo.cs" />
     <Compile Include="Mapper\TypeMapper\ArrayListTypeMapper.cs" />
@@ -141,8 +143,8 @@
     <Compile Include="Extenssions\CollectionExtenssions.cs" />
     <Compile Include="Extenssions\OtherExtenssions.cs" />
     <Compile Include="Extenssions\ValidationExtenssions.cs" />
-    <Compile Include="Mapper\DataSource\DataReaderSourceReader.cs" />
-    <Compile Include="Mapper\DataSource\DataTableSourceReader.cs" />
+    <Compile Include="Mapper\DataSource\DataReaderSourceProvider.cs" />
+    <Compile Include="Mapper\DataSource\DataTableSourceProvider.cs" />
     <Compile Include="Mapper\DataSource\IDataSourceReader.cs" />
     <Compile Include="Mapper\IMappingTrigger.cs" />
     <Compile Include="Query\DatabaseHelperExtessions.cs" />
@@ -150,7 +152,7 @@
     <Compile Include="Mapper\IObjectAccessor.cs" />
     <Compile Include="Mapper\IPropertyAccessor.cs" />
     <Compile Include="Mapper\MapperException.cs" />
-    <Compile Include="Mapper\MapperFinder.cs" />
+    <Compile Include="Mapper\ObjectAccessorFinder.cs" />
     <Compile Include="Mapper\Map.cs" />
     <Compile Include="Mapper\Metadata\IMetaPropertyInfo.cs" />
     <Compile Include="Mapper\Metadata\IMetaInfo.cs" />

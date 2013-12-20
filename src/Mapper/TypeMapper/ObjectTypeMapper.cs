@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -7,19 +8,22 @@ using Sparrow.CommonLibrary.Mapper.DataSource;
 
 namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 {
-    public class ObjectTypeMapper<T> : ITypeMapper<T> where T : class
+    public class ObjectTypeMapper<T> : ITypeMapper<T>
     {
         private readonly IObjectAccessor<T> objAccessor;
         private ITypeMapper[] typeMappers;
         private string[] propertyNames;
         private IPropertyAccessor<T>[] propertyAccessors;
 
+        public IObjectAccessor<T> ObjAccessor { get { return objAccessor; } }
+
         public ObjectTypeMapper()
         {
-            objAccessor = MapperFinder.GetIMapper<T>();
+            objAccessor = ObjectAccessorFinder.FindObjAccessor<T>();
             if (objAccessor == null)
                 throw new MapperException(string.Format("未能查找到{0}的访问器[{1}]。", typeof(T).FullName, typeof(IObjectAccessor<T>).FullName));
 
+            Init();
         }
 
         public ObjectTypeMapper(IObjectAccessor<T> objAccessor)
@@ -28,17 +32,11 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 throw new ArgumentNullException("objAccessor");
 
             this.objAccessor = objAccessor;
+            Init();
         }
 
         private void Init()
         {
-            var properties = objAccessor.MetaInfo.GetProperties();
-            typeMappers = new ITypeMapper[properties.Length];
-            for (var i = 0; i < properties.Length; i++)
-            {
-                typeMappers[i] = NativeTypeMapper.GetTypeMapper(properties[i].PropertyInfo.PropertyType);
-            }
-
             propertyNames = objAccessor.MetaInfo.GetPropertyNames();
 
             propertyAccessors = propertyNames.Select(x => objAccessor[x]).ToArray();
@@ -61,23 +59,53 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
         protected T Create(object[] initData)
         {
+            T obj = objAccessor.Create();
             for (var i = 0; i < initData.Length; i++)
             {
-
+                propertyAccessors[i].SetValue(obj, initData[i]);
             }
-            return default(T);
+            return obj;
         }
 
         protected virtual T Convert(object value)
         {
-            if (value is Array)
+            if (value == null)
+                return default(T);
+
+            if (value is IDataSourceReader)
+            {
+                var initData = ((IDataSourceReader)value).Read();
+                if (initData == null)
+                    return default(T);
+                return Create(initData);
+            }
+            else if (value is Array)
             {
                 return Create((object[])value);
             }
-            else
+            else if (value is ICollection)
             {
-
+                var initData = new object[((ICollection)value).Count];
+                if (initData.Length < propertyAccessors.Length)
+                    return default(T);
+                ((ICollection)value).CopyTo(initData, 0);
+                return Create(initData);
             }
+
+            var accessor = Map.GetAccessor(value.GetType());
+            if (accessor != null)
+            {
+                var initData = new object[propertyAccessors.Length];
+                for (var i = 0; i < propertyNames.Length; i++)
+                {
+                    var propertyAccessor = accessor[propertyNames[i]];
+                    if (propertyAccessor != null)
+                    {
+                        initData[i] = propertyAccessor.GetValue(value);
+                    }
+                }
+            }
+
             return default(T);
         }
 

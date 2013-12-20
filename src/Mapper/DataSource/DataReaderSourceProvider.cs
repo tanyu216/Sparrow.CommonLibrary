@@ -8,6 +8,19 @@ using System.Threading.Tasks;
 
 namespace Sparrow.CommonLibrary.Mapper.DataSource
 {
+    public class DataReaderSourceProvider : IDataSourceReaderProvider
+    {
+        public bool IsSupported(object dataSource)
+        {
+            return dataSource is IDataReader;
+        }
+
+        public IDataSourceReader CreateReader(object dataSource)
+        {
+            return new DataReaderSourceReader((IDataReader)dataSource);
+        }
+    }
+
     public class DataReaderSourceReader : IDataSourceReader
     {
         private readonly IDataReader _reader;

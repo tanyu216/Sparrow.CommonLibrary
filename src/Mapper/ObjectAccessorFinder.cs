@@ -9,17 +9,17 @@ namespace Sparrow.CommonLibrary.Mapper
     /// <summary>
     /// <see cref="IObjectAccessor"/>映射对象搜索器
     /// </summary>
-    public abstract class MapperFinder
+    public abstract class ObjectAccessorFinder
     {
-        private static readonly List<MapperFinder> Finders;
+        private static readonly List<ObjectAccessorFinder> Finders;
 
-        static MapperFinder()
+        static ObjectAccessorFinder()
         {
-            Finders = new List<MapperFinder>
+            Finders = new List<ObjectAccessorFinder>
                           {
-                              new MappingFinderForClass(),
-                              new MappingFinderForNamespace(),
-                              new MappingFinderAuto()
+                              new ObjectAccessorFinderForClass(),
+                              new ObjectAccessorFinderForNamespace(),
+                              new ObjectAccessorFinderAuto()
                           };
         }
 
@@ -27,7 +27,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 新增一个映射对象搜索器
         /// </summary>
         /// <param name="finder"></param>
-        public static void AddFinder(MapperFinder finder)
+        public static void AddFinder(ObjectAccessorFinder finder)
         {
             if (finder == null) 
                 throw new ArgumentNullException("finder");
@@ -42,7 +42,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// 重置默认的映射对象搜索器
         /// </summary>
         /// <param name="finder"></param>
-        public static void ResetLastFinder(MapperFinder finder)
+        public static void ResetLastFinder(ObjectAccessorFinder finder)
         {
             if (finder == null)
                 throw new ArgumentNullException("finder");
@@ -58,9 +58,9 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IObjectAccessor<T> GetIMapper<T>()
+        public static IObjectAccessor<T> FindObjAccessor<T>()
         {
-            MapperFinder[] finders = null;
+            ObjectAccessorFinder[] finders = null;
             lock (Finders)
             {
                 finders = Finders.ToArray();
@@ -71,7 +71,7 @@ namespace Sparrow.CommonLibrary.Mapper
             {
                 try
                 {
-                    var mapper = mapperFinder.FindIMapper<T>();
+                    var mapper = mapperFinder.FindAccessor<T>();
                     if (mapper != null)
                         return mapper;
                 }
@@ -90,27 +90,27 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="MapperException"></exception>
-        public abstract IObjectAccessor<T> FindIMapper<T>();
+        public abstract IObjectAccessor<T> FindAccessor<T>();
 
-        private class MappingFinderForNamespace : MapperFinder
+        private class ObjectAccessorFinderForNamespace : ObjectAccessorFinder
         {
-            public override IObjectAccessor<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindAccessor<T>()
             {
-                var type = Type.GetType(typeof(T).Namespace + ".Mappers." + typeof(T).Name + "MapperProvider");
+                var type = Type.GetType(typeof(T).Namespace + ".Accessors." + typeof(T).Name + "ObjectAccessorProvider");
                 if (type != null)
                 {
-                    var mapper = (IObjectAccessor<T>)type.GetMethod("GetIMapper").Invoke(null, new object[] { });
+                    var mapper = (IObjectAccessor<T>)type.GetMethod("GetObjectAccessor").Invoke(null, new object[] { });
                     return mapper;
                 }
                 return null;
             }
         }
 
-        private class MappingFinderForClass : MapperFinder
+        private class ObjectAccessorFinderForClass : ObjectAccessorFinder
         {
-            public override IObjectAccessor<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindAccessor<T>()
             {
-                var method = typeof(T).GetMethod("GetIMapper");
+                var method = typeof(T).GetMethod("GetObjectAccessor");
                 if (method == null)
                     return null;
                 var mapper = (IObjectAccessor<T>)method.Invoke(null, new object[] { });
@@ -118,9 +118,9 @@ namespace Sparrow.CommonLibrary.Mapper
             }
         }
 
-        private class MappingFinderAuto : MapperFinder
+        private class ObjectAccessorFinderAuto : ObjectAccessorFinder
         {
-            public override IObjectAccessor<T> FindIMapper<T>()
+            public override IObjectAccessor<T> FindAccessor<T>()
             {
                 var mapper = new ObjectAccessor<T>();
                 mapper.AutoAppendProperty();

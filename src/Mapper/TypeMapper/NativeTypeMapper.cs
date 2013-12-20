@@ -61,7 +61,12 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
         public static void Register<T>(ITypeMapper<T> typeMapper)
         {
+            if (typeMapper == null)
+                throw new ArgumentNullException("typeMapper");
+
             _typeMappers.AddOrUpdate(typeof(T), typeMapper, (x, y) => typeMapper);
+            if (typeMapper is ObjectTypeMapper<T>)
+                _typeMappers.AddOrUpdate(((ObjectTypeMapper<T>)typeMapper).ObjAccessor.InstanceType, typeMapper, (x, y) => typeMapper);
         }
 
         public static void Reset()
@@ -78,6 +83,9 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
         public static ITypeMapper GetTypeMapper(Type type)
         {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
             ITypeMapper typeMapper;
             if (_typeMappers.TryGetValue(type, out typeMapper))
                 return typeMapper;
@@ -145,11 +153,13 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
             if (type.IsClass)
             {
-                var mapper = typeof(MapperFinder).GetMethod("GetIMapper").MakeGenericMethod(type).Invoke((object)null, new object[0]);
-                if (mapper != null)
+                var accessor = (IObjectAccessor)typeof(ObjectAccessorFinder).GetMethod("GetObjectAccessor").MakeGenericMethod(type).Invoke((object)null, new object[0]);
+                if (accessor != null)
                 {
                     var objectTypeMapper = typeof(ObjectTypeMapper<>).MakeGenericType(type);
-                    return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(objectTypeMapper, mapper));
+                    typeMapper = _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(objectTypeMapper, accessor));
+                    _typeMappers.GetOrAdd(accessor.InstanceType, typeMapper);
+                    return typeMapper;
                 }
             }
 

@@ -63,7 +63,7 @@ namespace Sparrow.CommonLibrary.Mapper.Metadata
         /// <param name="metaPropertyInfo"></param>
         void RemovePropertyInfo(IMetaPropertyInfo metaPropertyInfo);
         /// <summary>
-        /// 标记为只读的元数据
+        /// 元数据标记为只读
         /// </summary>
         void MakeReadonly();
     }

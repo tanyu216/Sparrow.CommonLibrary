@@ -5,6 +5,8 @@ using System.Reflection;
 using Sparrow.CommonLibrary.Mapper.Metadata;
 using Sparrow.CommonLibrary.Database;
 using System.Collections.Generic;
+using Sparrow.CommonLibrary.Mapper.TypeMappers;
+using Sparrow.CommonLibrary.Mapper.DataSource;
 
 namespace Sparrow.CommonLibrary.Mapper
 {
@@ -13,38 +15,14 @@ namespace Sparrow.CommonLibrary.Mapper
     /// </summary>
     public static class Map
     {
-        private static readonly ConcurrentDictionary<Type, IObjectAccessor> Container =
-            new ConcurrentDictionary<Type, IObjectAccessor>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mapper"></param>
-        /// <typeparam name="T"></typeparam>
-        public static void Register<T>(IObjectAccessor<T> mapper)
-        {
-            if (mapper == null)
-                throw new ArgumentNullException("mapper");
-
-            Container.AddOrUpdate(typeof(T), mapper, (x, y) => mapper);
-        }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="entityType"></param>
         /// <returns></returns>
-        public static IObjectAccessor GetIMapper(Type entityType)
+        public static IObjectAccessor GetAccessor(Type entityType)
         {
-            IObjectAccessor output;
-            if (Container.TryGetValue(entityType, out output))
-                return output;
-
-            var mapper = typeof(Map).GetMethod("GetIMapper", new Type[0]).MakeGenericMethod(entityType).Invoke(null, new object[] { });
-            if (mapper != null)
-                return (IObjectAccessor)mapper;
-            //
-            throw new MapperException(string.Format("无法获取到实体对象的映射信息，请确认[{0}]的架构信息和实体的约定。", entityType.FullName));
+            return (IObjectAccessor)typeof(Map).GetMethod("GetAccessor", new Type[0]).MakeGenericMethod(entityType).Invoke(null, new object[] { });
         }
 
         /// <summary>
@@ -52,27 +30,13 @@ namespace Sparrow.CommonLibrary.Mapper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IObjectAccessor<T> GetIMapper<T>()
+        public static IObjectAccessor<T> GetAccessor<T>()
         {
-            IObjectAccessor output;
-            int i = 0;
-        begin:
-            if (Container.TryGetValue(typeof(T), out output))
-                return (IObjectAccessor<T>)output;
+            var typeMapper = NativeTypeMapper.GetTypeMapper<T>() as ObjectTypeMapper<T>;
+            if (typeMapper != null)
+                return typeMapper.ObjAccessor;
 
-            var mapper = MapperFinder.GetIMapper<T>();
-            if (mapper != null)
-            {
-                if (Register<T>(mapper))
-                    return mapper;
-
-                i++;
-                if (i < 3)
-                    goto begin;
-            }
-
-            //
-            throw new MapperException(string.Format("无法获取到实体对象的映射信息，请确认[{0}]的架构信息和实体的约定。", typeof(T).FullName));
+            return default(IObjectAccessor<T>);
         }
 
         /// <summary>
@@ -82,7 +46,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <returns></returns>
         public static T Create<T>()
         {
-            return GetIMapper<T>().Create();
+            return GetAccessor<T>().Create();
         }
 
         /// <summary>
@@ -96,7 +60,7 @@ namespace Sparrow.CommonLibrary.Mapper
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            var mapper = GetIMapper<T>();
+            var mapper = GetAccessor<T>();
             var dest = mapper.Create();
 
             if (dest is IMappingTrigger)
@@ -120,9 +84,21 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static TDestination Single<TDestination, TSource>(TSource source)
+        public static TDestination Single<TDestination>(object source)
         {
-            return GetIMapper<TDestination>().MapSingle(source);
+            var accessor = GetAccessor<TDestination>();
+            if (accessor == null)
+                throw new MapperException(string.Format("未找到适用{0}的对象访问器。", typeof(TDestination).FullName));
+
+            var dataSourceReader = NativeDataSourceReader.GetReader(source);
+            var fields = accessor.MetaInfo.GetPropertyNames();
+            dataSourceReader.Ordinal(fields);
+
+            var initData = dataSourceReader.Read();
+            if (initData != null)
+                return NativeTypeMapper.GetTypeMapper<TDestination>().Cast(initData);
+
+            return default(TDestination);
         }
 
         /// <summary>
@@ -131,9 +107,28 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static List<TDestination> List<TDestination, TSource>(TSource source)
+        public static List<TDestination> List<TDestination>(object source)
         {
-            return GetIMapper<TDestination>().MapList(source);
+            var accessor = GetAccessor<TDestination>();
+            if (accessor == null)
+                throw new MapperException(string.Format("未找到适用{0}的对象访问器。", typeof(TDestination).FullName));
+
+            var typeMapper = NativeTypeMapper.GetTypeMapper<TDestination>();
+
+            var dataSourceReader = NativeDataSourceReader.GetReader(source);
+            var fields = accessor.MetaInfo.GetPropertyNames();
+            dataSourceReader.Ordinal(fields);
+
+            var list = new List<TDestination>(dataSourceReader.Count > 0 ? dataSourceReader.Count : 8);
+
+            object[] initData;
+            while (null != (initData = dataSourceReader.Read()))
+            {
+                TDestination destObj = typeMapper.Cast(initData);
+                if (destObj != null)
+                    list.Add(destObj);
+            }
+            return list;
         }
 
     }

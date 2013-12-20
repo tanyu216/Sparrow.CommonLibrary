@@ -210,11 +210,11 @@ namespace Sparrow.CommonLibrary.Entity
             {
                 if (data is IEntity)
                 {
-                    _mapper = Map.GetIMapper(((IEntity)data).EntityType);
+                    _mapper = Map.GetAccessor(((IEntity)data).EntityType);
                 }
                 else
                 {
-                    _mapper = Map.GetIMapper(data.GetType());
+                    _mapper = Map.GetAccessor(data.GetType());
                 }
             }
             EntityData = data;

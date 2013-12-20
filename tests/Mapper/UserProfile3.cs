@@ -18,9 +18,9 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public virtual string Email { get; set; }
         public virtual string FixPhone { get; set; }
 
-        public static IObjectAccessor<UserProfile3> GetIMapper()
+        public static IObjectAccessor<UserProfile3> GetObjectAccessor()
         {
-            return DataMapperExtenssions.Create<UserProfile3>()
+            return ObjectAccessorExtenssions.Create<UserProfile3>()
                 .AppendProperty(x => x.Id, "Id")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")

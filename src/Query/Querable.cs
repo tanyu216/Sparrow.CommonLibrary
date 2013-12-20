@@ -31,7 +31,7 @@ namespace Sparrow.CommonLibrary.Query
                 throw new ArgumentNullException("database");
 
             this.database = database;
-            mapper = Map.GetIMapper<T>();
+            mapper = Map.GetAccessor<T>();
             fields = mapper.MetaInfo.GetProperties();
             Options = SqlOptions.NoLock;
         }
@@ -438,7 +438,7 @@ namespace Sparrow.CommonLibrary.Query
         private string GetFieldName(Expression<Func<T, object>> field)
         {
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            var fieldInfo = Map.GetIMapper<T>().MetaInfo[propertyInfo];
+            var fieldInfo = Map.GetAccessor<T>().MetaInfo[propertyInfo];
             if (fieldInfo != null)
                 return fieldInfo.PropertyName;
             throw new ArgumentException("无法获取该属性所映射的成员字段。");

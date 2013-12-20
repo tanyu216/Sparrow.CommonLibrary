@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, (ParameterCollection)null))
             {
-                return Map.Single<T, IDataReader>(reader);
+                return Map.Single<T>(reader);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return Map.Single<T, IDataReader>(reader);
+                return Map.Single<T>(reader);
             }
         }
 
@@ -55,7 +55,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return Map.Single<T, IDataReader>(reader);
+                return Map.Single<T>(reader);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return Map.Single<T, IDataReader>(reader);
+                return Map.Single<T>(reader);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return Map.Single<T, IDataReader>(reader);
+                return Map.Single<T>(reader);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, (ParameterCollection)null))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -135,7 +135,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -185,7 +185,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, (ParameterCollection)null))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -200,7 +200,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 
@@ -216,7 +216,7 @@ namespace Sparrow.CommonLibrary.Database
         {
             using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters, transaction))
             {
-                return Map.List<T, IDataReader>(reader);
+                return Map.List<T>(reader);
             }
         }
 

@@ -97,7 +97,7 @@ namespace Sparrow.CommonLibrary.Query
                     if (((MemberExpression)expression).Expression.NodeType == LqExpressionType.Parameter)
                     {
                         var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(expression).Member;
-                        var fieldInfo = Map.GetIMapper(propertyInfo.ReflectedType).MetaInfo[propertyInfo];
+                        var fieldInfo = Map.GetAccessor(propertyInfo.ReflectedType).MetaInfo[propertyInfo];
                         if (fieldInfo != null)
                             return Field(fieldInfo.PropertyName);
 

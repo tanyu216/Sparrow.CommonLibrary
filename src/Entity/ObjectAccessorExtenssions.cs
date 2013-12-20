@@ -8,7 +8,7 @@ using Sparrow.CommonLibrary.Mapper;
 
 namespace Sparrow.CommonLibrary.Entity
 {
-    public static class DataMapperExtenssions
+    public static class ObjectAccessorExtenssions
     {
         /// <summary>
         /// 新建一个<see cref="IObjectAccessor"/>对象。
@@ -105,11 +105,10 @@ namespace Sparrow.CommonLibrary.Entity
         /// <typeparam name="T"></typeparam>
         /// <param name="dataMapper"></param>
         /// <returns></returns>
-        public static ObjectAccessor<T> ComplieWithEntity<T>(this ObjectAccessor<T> dataMapper)
+        public static ObjectAccessor<T> CompleteWithEntity<T>(this ObjectAccessor<T> dataMapper)
         {
             var subType = EntityBuilder.BuildEntityClass(typeof(T), dataMapper.MetaInfo);
-            var func = Expression.Lambda<Func<T>>(Expression.New(subType)).Compile();
-            return dataMapper.Complete(x => func);
+            return dataMapper.Complete(x => subType);
         }
     }
 }

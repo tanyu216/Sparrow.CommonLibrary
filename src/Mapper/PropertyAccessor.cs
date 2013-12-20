@@ -4,6 +4,7 @@ using System.Reflection;
 using Sparrow.CommonLibrary.Database;
 using Sparrow.CommonLibrary.Entity;
 using Sparrow.CommonLibrary.Mapper.Metadata;
+using Sparrow.CommonLibrary.Mapper.TypeMappers;
 
 namespace Sparrow.CommonLibrary.Mapper
 {
@@ -17,6 +18,7 @@ namespace Sparrow.CommonLibrary.Mapper
     {
         readonly Func<T, object> _getter;
         readonly Action<T, object> _setter;
+        readonly ITypeMapper _typeMapper;
 
         /// <summary>
         /// 
@@ -24,6 +26,8 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="field"></param>
         public PropertyAccessor(PropertyInfo propertyInfo)
         {
+            _typeMapper = NativeTypeMapper.GetTypeMapper(propertyInfo.PropertyType);
+
             var param1 = Expression.Parameter(typeof(T), "handler");
             var param2 = Expression.Parameter(typeof(object), "value");
             // 获取属性的值的方法
@@ -32,7 +36,7 @@ namespace Sparrow.CommonLibrary.Mapper
             // 向属性赋值的方法
             var assignExp = Expression.Assign(
                     Expression.Property(param1, propertyInfo),
-                    Expression.Call(Expression.Constant(this), "To", new Type[] { propertyInfo.PropertyType }, new ParameterExpression[] { param2 })
+                    Expression.Call(Expression.Convert(Expression.Constant(_typeMapper), typeof(ITypeMapper).MakeGenericType(propertyInfo.PropertyType)), "Cast", new Type[0], new ParameterExpression[] { param2 })
                 );
             _setter = Expression.Lambda<Action<T, object>>(assignExp, param1, param2).Compile();
         }
@@ -55,11 +59,6 @@ namespace Sparrow.CommonLibrary.Mapper
         public object GetValue(T handler)
         {
             return _getter(handler);
-        }
-
-        public virtual TPropertyType To<TPropertyType>(object value)
-        {
-            return Sparrow.CommonLibrary.Common.DbValueCast.Cast<TPropertyType>(value);
         }
     }
 

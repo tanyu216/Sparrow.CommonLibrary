@@ -27,16 +27,17 @@ namespace Sparrow.CommonLibrary.Repository
 
         protected DatabaseHelper Database { get { return _database; } }
 
-        private readonly IObjectAccessor<T> mapper;
-        private readonly IDbMetaInfo metaInfo;
+        private readonly IDbMetaInfo dbMetaInfo;
+        private readonly IMetaInfo metaInfo;
 
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
             if (typeof(T) == typeof(DynamicEntity))
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
             _database = database;
-            mapper = Mapper.Map.GetIMapper<T>();
-            metaInfo = mapper.MetaInfo as IDbMetaInfo;
+            var accessor = Mapper.Map.GetAccessor<T>();
+            dbMetaInfo = accessor.MetaInfo as IDbMetaInfo;
+            metaInfo = accessor.MetaInfo;
         }
 
         protected ISqlBuilder SqlBuilder { get { return _database.Builder; } }
@@ -51,7 +52,7 @@ namespace Sparrow.CommonLibrary.Repository
         protected string FieldName(Expression<Func<T, object>> field)
         {
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            var fieldMap = mapper.MetaInfo[propertyInfo];
+            var fieldMap = metaInfo[propertyInfo];
             if (fieldMap != null)
                 return fieldMap.PropertyName;
 
@@ -299,7 +300,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("logical");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, LogicalBinaryExpression.Expression(logical).OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(metaInfo.Name, LogicalBinaryExpression.Expression(logical).OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
@@ -310,7 +311,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("logical");
             //
             var parameters = CreateParamterCollection();
-            var sql = SqlBuilder.DeleteFormat(mapper.MetaInfo.Name, logical.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
+            var sql = SqlBuilder.DeleteFormat(metaInfo.Name, logical.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
             return DoExecute(sql, parameters, null);
         }
@@ -362,7 +363,7 @@ namespace Sparrow.CommonLibrary.Repository
 
             using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
             {
-                return mapper.MapSingle(read);
+                return Map.Single<T>(read);
             }
         }
 
@@ -371,17 +372,17 @@ namespace Sparrow.CommonLibrary.Repository
             if (id == null)
                 throw new ArgumentNullException("id");
 
-            if (metaInfo == null)
+            if (dbMetaInfo == null)
                 throw new MapperException(string.Format("实体{0}缺少数据库映射信息", typeof(T).FullName));
-            if (metaInfo.KeyCount < 1)
+            if (dbMetaInfo.KeyCount < 1)
                 throw new MapperException("缺少主键信息");
-            if (metaInfo.KeyCount != 1)
+            if (dbMetaInfo.KeyCount != 1)
                 throw new MapperException("复合主键的实体对象，无法使用该方法。");
 
-            var condition = SqlExpression.Equal(metaInfo.GetKeys()[0], id);
+            var condition = SqlExpression.Equal(dbMetaInfo.GetKeys()[0], id);
             using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
             {
-                return mapper.MapSingle(read);
+                return Map.Single<T>(read);
             }
         }
 
@@ -392,7 +393,7 @@ namespace Sparrow.CommonLibrary.Repository
 
             using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
             {
-                return mapper.MapSingle(read);
+                return Map.Single<T>(read);
             }
         }
 

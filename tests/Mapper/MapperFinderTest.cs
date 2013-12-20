@@ -14,19 +14,19 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         [Test]
         public void Test1()
         {
-            var mapper = MapperFinder.GetIMapper<UserProfile>();
+            var mapper = ObjectAccessorFinder.FindObjAccessor<UserProfile>();
             Assert.IsNotNull(mapper);
         }
         [Test]
         public void Test2()
         {
-            var mapper = MapperFinder.GetIMapper<UserProfile2>();
+            var mapper = ObjectAccessorFinder.FindObjAccessor<UserProfile2>();
             Assert.IsNotNull(mapper);
         }
         [Test]
         public void Test3()
         {
-            var mapper = MapperFinder.GetIMapper<UserProfile3>();
+            var mapper = ObjectAccessorFinder.FindObjAccessor<UserProfile3>();
             Assert.IsNotNull(mapper);
         }
 

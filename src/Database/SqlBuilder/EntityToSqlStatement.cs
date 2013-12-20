@@ -163,7 +163,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (id == null)
                 throw new ArgumentException("参数id不能为空。");
 
-            var mapper = Map.GetIMapper<T>();
+            var mapper = Map.GetAccessor<T>();
             if (!(mapper.MetaInfo is IDbMetaInfo))
                 throw new MapperException("实体未实现数据库表的元数据。");
 

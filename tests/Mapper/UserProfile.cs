@@ -18,15 +18,15 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public virtual string Email { get; set; }
         public virtual string FixPhone { get; set; }
 
-        public static IObjectAccessor<UserProfile> GetIMapper()
+        public static IObjectAccessor<UserProfile> GetObjectAccessor()
         {
-            return DataMapperExtenssions.Create<UserProfile>("UserProfile")
+            return ObjectAccessorExtenssions.Create<UserProfile>("UserProfile")
                 .AppendProperty(x => x.Id, "Id", true).Increment("UserProfileId")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")
                 .AppendProperty(x => x.Email, "Email")
                 .AppendProperty(x => x.FixPhone, "FixPhone")
-                .ComplieWithEntity();
+                .CompleteWithEntity();
 
         }
     }
