@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Sparrow.CommonLibrary.Mapper
@@ -154,7 +155,7 @@ namespace Sparrow.CommonLibrary.Mapper
 
             if (type.IsClass)
             {
-                var accessor = Map.GetAccessor(type);
+                var accessor = Expression.Lambda<Func<IObjectAccessor>>(Expression.Call(typeof(ObjectAccessorFinder), "FindObjAccessor", new Type[] { type })).Compile()();
                 if (accessor != null)
                 {
                     var objectTypeMapper = typeof(ObjectTypeMapper<>).MakeGenericType(type);
