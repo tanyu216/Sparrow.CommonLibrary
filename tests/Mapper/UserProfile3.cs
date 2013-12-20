@@ -20,7 +20,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
 
         public static IObjectAccessor<UserProfile3> GetObjectAccessor()
         {
-            return ObjectAccessorExtenssions.Create<UserProfile3>()
+            return new ObjectAccessor<UserProfile3>()
                 .AppendProperty(x => x.Id, "Id")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")

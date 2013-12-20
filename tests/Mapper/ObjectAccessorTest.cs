@@ -148,5 +148,21 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             Assert.IsNotNull(list);
         }
 
+        [Test]
+        public void MapTest3()
+        {
+            var dt = CreateDataTable();
+            var list = Map.List<UserProfile2>(dt);
+            Assert.IsNotNull(list);
+        }
+
+        [Test]
+        public void MapTest4()
+        {
+            var dt = CreateDataTable();
+            var list = Map.List<UserProfile3>(dt);
+            Assert.IsNotNull(list);
+        }
+
     }
 }
