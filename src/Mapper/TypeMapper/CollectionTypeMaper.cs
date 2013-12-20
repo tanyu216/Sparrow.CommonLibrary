@@ -27,20 +27,25 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
         {
             if (DesctinationType.IsInterface)
             {
-                if (DesctinationType.GetGenericTypeDefinition() == typeof(IList<>) ||
-                    DesctinationType.GetGenericTypeDefinition() == typeof(ICollection<>) ||
-                    DesctinationType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                if (DesctinationType.IsGenericType)
                 {
-                    instanceType = typeof(List<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
-                    iCollectionType = DesctinationType;
+                    if (DesctinationType.GetGenericTypeDefinition() == typeof(IList<>) ||
+                        DesctinationType.GetGenericTypeDefinition() == typeof(ICollection<>) ||
+                        DesctinationType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    {
+                        instanceType = typeof(List<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
+                        iCollectionType = DesctinationType;
+                    }
                 }
-
-                if (DesctinationType == typeof(IList) ||
-                    DesctinationType == typeof(ICollection) ||
-                    DesctinationType == typeof(IEnumerable))
+                else
                 {
-                    instanceType = typeof(ArrayList);
-                    iCollectionType = DesctinationType;
+                    if (DesctinationType == typeof(IList) ||
+                        DesctinationType == typeof(ICollection) ||
+                        DesctinationType == typeof(IEnumerable))
+                    {
+                        instanceType = typeof(ArrayList);
+                        iCollectionType = DesctinationType;
+                    }
                 }
             }
             else if (!DesctinationType.IsClass)
@@ -52,7 +57,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 instanceType = DesctinationType;
 
             if (iCollectionType == null)
-                iCollectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(ICollection<>));
+                iCollectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>));
 
             if (iCollectionType == null)
                 iCollectionType = DesctinationType.GetInterfaces().FirstOrDefault(x => x == typeof(IList));

@@ -35,7 +35,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (typeof(T) == typeof(DynamicEntity))
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
             _database = database;
-            var accessor = Mapper.Map.GetAccessor<T>();
+            var accessor = Map.GetCheckedAccessor<T>();
             dbMetaInfo = accessor.MetaInfo as IDbMetaInfo;
             metaInfo = accessor.MetaInfo;
         }

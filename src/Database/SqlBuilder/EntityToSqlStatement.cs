@@ -163,15 +163,16 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
             if (id == null)
                 throw new ArgumentException("参数id不能为空。");
 
-            var mapper = Map.GetAccessor<T>();
-            if (!(mapper.MetaInfo is IDbMetaInfo))
+            var accessor = Map.GetCheckedAccessor<T>();
+
+            if (!(accessor.MetaInfo is IDbMetaInfo))
                 throw new MapperException("实体未实现数据库表的元数据。");
 
-            var keys = ((IDbMetaInfo)mapper.MetaInfo).GetKeys();
+            var keys = ((IDbMetaInfo)accessor.MetaInfo).GetKeys();
             if (keys.Length != 1)
                 throw new MapperException(keys.Length > 0 ? "主键不能为复合主键。" : "该对象没有设置主键，无法执行删除命令。");
 
-            return _stmBuilder.DeleteFormat(mapper.MetaInfo.Name, _stmBuilder.Where(new[] { new ItemValue(keys[0], id), }, output, SqlOptions.None), SqlOptions.None);
+            return _stmBuilder.DeleteFormat(accessor.MetaInfo.Name, _stmBuilder.Where(new[] { new ItemValue(keys[0], id), }, output, SqlOptions.None), SqlOptions.None);
         }
 
 

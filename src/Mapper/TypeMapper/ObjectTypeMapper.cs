@@ -11,7 +11,6 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
     public class ObjectTypeMapper<T> : ITypeMapper<T>
     {
         private readonly IObjectAccessor<T> objAccessor;
-        private ITypeMapper[] typeMappers;
         private string[] propertyNames;
         private IPropertyAccessor<T>[] propertyAccessors;
 
@@ -92,16 +91,16 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 return Create(initData);
             }
 
-            var accessor = Map.GetAccessor(value.GetType());
-            if (accessor != null)
+            var sourceAccessor = Map.GetAccessor(value.GetType());
+            if (sourceAccessor != null)
             {
                 var initData = new object[propertyAccessors.Length];
                 for (var i = 0; i < propertyNames.Length; i++)
                 {
-                    var propertyAccessor = accessor[propertyNames[i]];
-                    if (propertyAccessor != null)
+                    var getter = sourceAccessor[propertyNames[i]];
+                    if (getter != null)
                     {
-                        initData[i] = propertyAccessor.GetValue(value);
+                        initData[i] = getter.GetValue(value);
                     }
                 }
             }

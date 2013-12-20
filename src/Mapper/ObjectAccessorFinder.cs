@@ -29,7 +29,7 @@ namespace Sparrow.CommonLibrary.Mapper
         /// <param name="finder"></param>
         public static void AddFinder(ObjectAccessorFinder finder)
         {
-            if (finder == null) 
+            if (finder == null)
                 throw new ArgumentNullException("finder");
 
             lock (Finders)
@@ -71,16 +71,19 @@ namespace Sparrow.CommonLibrary.Mapper
             {
                 try
                 {
-                    var mapper = mapperFinder.FindAccessor<T>();
-                    if (mapper != null)
-                        return mapper;
+                    var accessor = mapperFinder.FindAccessor<T>();
+                    if (accessor != null)
+                        return accessor;
                 }
                 catch (Exception ex)
                 {
                     lastException = ex;
                 }
             }
-            if (lastException != null) throw lastException;
+
+            if (lastException != null)
+                throw lastException;
+
             return null;
         }
 
@@ -99,8 +102,8 @@ namespace Sparrow.CommonLibrary.Mapper
                 var type = Type.GetType(typeof(T).Namespace + ".Accessors." + typeof(T).Name + "ObjectAccessorProvider");
                 if (type != null)
                 {
-                    var mapper = (IObjectAccessor<T>)type.GetMethod("GetObjectAccessor").Invoke(null, new object[] { });
-                    return mapper;
+                    var accessor = (IObjectAccessor<T>)type.GetMethod("GetObjectAccessor").Invoke(null, new object[] { });
+                    return accessor;
                 }
                 return null;
             }
@@ -113,8 +116,8 @@ namespace Sparrow.CommonLibrary.Mapper
                 var method = typeof(T).GetMethod("GetObjectAccessor");
                 if (method == null)
                     return null;
-                var mapper = (IObjectAccessor<T>)method.Invoke(null, new object[] { });
-                return mapper;
+                var accessor = (IObjectAccessor<T>)method.Invoke(null, new object[] { });
+                return accessor;
             }
         }
 
@@ -122,12 +125,12 @@ namespace Sparrow.CommonLibrary.Mapper
         {
             public override IObjectAccessor<T> FindAccessor<T>()
             {
-                var mapper = new ObjectAccessor<T>();
-                mapper.AutoAppendProperty();
-                if (mapper.MetaInfo.PropertyCount == 0)
+                var accessor = new ObjectAccessor<T>();
+                accessor.AutoAppendProperty();
+                if (accessor.MetaInfo.PropertyCount == 0)
                     return null;
                 //
-                return mapper.Complete();
+                return accessor.Complete();
             }
         }
     }

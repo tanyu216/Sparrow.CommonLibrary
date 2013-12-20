@@ -84,14 +84,14 @@ namespace Sparrow.CommonLibrary.Entity
         {
             get
             {
-                var property = _mapper[field];
+                var property = _accessor[field];
                 if (property == null)
                     return null;
                 return property.GetValue(EntityData);
             }
             set
             {
-                var property = _mapper[field];
+                var property = _accessor[field];
                 if (property == null)
                     return;
                 property.SetValue(EntityData, value);
@@ -102,12 +102,12 @@ namespace Sparrow.CommonLibrary.Entity
         {
             var entity = EntityData as IEntity;
             if (entity == null)
-                return _mapper.MetaInfo.GetPropertyNames();
+                return _accessor.MetaInfo.GetPropertyNames();
             //
             var list = new List<string>();
-            for (var i = 0; i < _mapper.MetaInfo.PropertyCount; i++)
+            for (var i = 0; i < _accessor.MetaInfo.PropertyCount; i++)
                 if (entity.IsSetted(i))
-                    list.Add(_mapper.MetaInfo[i].PropertyName);
+                    list.Add(_accessor.MetaInfo[i].PropertyName);
             return list;
         }
 
@@ -122,14 +122,14 @@ namespace Sparrow.CommonLibrary.Entity
 
         public string TableName
         {
-            get { return _mapper.MetaInfo.Name; }
+            get { return _accessor.MetaInfo.Name; }
         }
 
         public IDbIncrementMetaPropertyInfo Increment
         {
             get
             {
-                var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
+                var dbMeta = _accessor.MetaInfo as IDbMetaInfo;
                 if (dbMeta != null)
                     return dbMeta.Increment;
                 return null;
@@ -140,18 +140,18 @@ namespace Sparrow.CommonLibrary.Entity
         {
             get
             {
-                var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
+                var dbMeta = _accessor.MetaInfo as IDbMetaInfo;
                 if (dbMeta != null)
                     return dbMeta.KeyCount;
                 return 0;
             }
         }
 
-        public int ColumnCount { get { return _mapper.MetaInfo.PropertyCount; } }
+        public int ColumnCount { get { return _accessor.MetaInfo.PropertyCount; } }
 
         public bool IsKey(string columnName)
         {
-            var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
+            var dbMeta = _accessor.MetaInfo as IDbMetaInfo;
             if (dbMeta != null)
                 return dbMeta.IsKey(columnName);
             return false;
@@ -159,7 +159,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public string[] GetKeys()
         {
-            var dbMeta = _mapper.MetaInfo as IDbMetaInfo;
+            var dbMeta = _accessor.MetaInfo as IDbMetaInfo;
             if (dbMeta != null)
                 return dbMeta.GetKeys();
             return new string[0];
@@ -167,7 +167,7 @@ namespace Sparrow.CommonLibrary.Entity
 
         public string[] GetColumnNames()
         {
-            return _mapper.MetaInfo.GetPropertyNames();
+            return _accessor.MetaInfo.GetPropertyNames();
         }
 
         #endregion
@@ -178,13 +178,13 @@ namespace Sparrow.CommonLibrary.Entity
 
         #endregion
 
-        private IObjectAccessor _mapper;
+        private IObjectAccessor _accessor;
 
-        public IObjectAccessor Mapper { get { return _mapper; } }
+        public IObjectAccessor Mapper { get { return _accessor; } }
 
         public IMetaInfo MetaInfo
         {
-            get { return _mapper.MetaInfo; }
+            get { return _accessor.MetaInfo; }
         }
 
         /// <summary>
@@ -208,14 +208,17 @@ namespace Sparrow.CommonLibrary.Entity
                 throw new ArgumentException(string.Format("类型[{0}]已经继承[{1}].", data.GetType().FullName, typeof(IEntityExplain).FullName));
             if (EntityData == null || data.GetType() != EntityData.GetType())
             {
+                Type sourceType;
                 if (data is IEntity)
                 {
-                    _mapper = Map.GetAccessor(((IEntity)data).EntityType);
+                    sourceType = ((IEntity)data).EntityType;
                 }
                 else
                 {
-                    _mapper = Map.GetAccessor(data.GetType());
+                    sourceType = data.GetType();
                 }
+
+                _accessor = Map.GetCheckedAccessor(sourceType);
             }
             EntityData = data;
         }

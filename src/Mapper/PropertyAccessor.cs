@@ -36,7 +36,7 @@ namespace Sparrow.CommonLibrary.Mapper
             // 向属性赋值的方法
             var assignExp = Expression.Assign(
                     Expression.Property(param1, propertyInfo),
-                    Expression.Call(Expression.Convert(Expression.Constant(_typeMapper), typeof(ITypeMapper).MakeGenericType(propertyInfo.PropertyType)), "Cast", new Type[0], new ParameterExpression[] { param2 })
+                    Expression.Call(Expression.Convert(Expression.Constant(_typeMapper), typeof(ITypeMapper<>).MakeGenericType(propertyInfo.PropertyType)), "Cast", new Type[0], new ParameterExpression[] { param2 })
                 );
             _setter = Expression.Lambda<Action<T, object>>(assignExp, param1, param2).Compile();
         }

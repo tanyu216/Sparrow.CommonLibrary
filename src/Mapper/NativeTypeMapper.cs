@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sparrow.CommonLibrary.Mapper.TypeMappers;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-namespace Sparrow.CommonLibrary.Mapper.TypeMappers
+namespace Sparrow.CommonLibrary.Mapper
 {
     public static class NativeTypeMapper
     {
@@ -96,7 +97,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(enumTypeMapperType));
             }
 
-            if (type.GetGenericTypeDefinition() == typeof(Nullable<>) && type.GetGenericArguments()[0].IsEnum)
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && type.GetGenericArguments()[0].IsEnum)
             {
                 var enumTypeMapperType = typeof(Enum2TypeMapper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(enumTypeMapperType));
@@ -127,19 +128,19 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
             // 接口转换
             var interfaces = type.GetInterfaces();
 
-            if (interfaces.Any(x => x == typeof(IDictionary) || x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            if (interfaces.Any(x => x == typeof(IDictionary) || (x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>))))
             {
                 var dictionaryTypeMapperType = typeof(CommonDictionaryTypeMapper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(dictionaryTypeMapperType));
             }
 
-            if (interfaces.Any(x => x.GetGenericTypeDefinition() == typeof(ISet<>)))
+            if (interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISet<>)))
             {
                 var hashSetTypeMapperType = typeof(HashSetTypeMapper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(hashSetTypeMapperType));
             }
 
-            if (interfaces.Any(x => x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            if (interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
             {
                 var collectionTypeMapperType = typeof(CollectionTypeMaper<>).MakeGenericType(type);
                 return _typeMappers.GetOrAdd(type, x => (ITypeMapper)Activator.CreateInstance(collectionTypeMapperType));
@@ -153,7 +154,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
             if (type.IsClass)
             {
-                var accessor = (IObjectAccessor)typeof(ObjectAccessorFinder).GetMethod("GetObjectAccessor").MakeGenericMethod(type).Invoke((object)null, new object[0]);
+                var accessor = Map.GetAccessor(type);
                 if (accessor != null)
                 {
                     var objectTypeMapper = typeof(ObjectTypeMapper<>).MakeGenericType(type);

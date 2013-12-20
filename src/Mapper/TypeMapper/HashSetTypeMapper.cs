@@ -17,7 +17,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
         {
             if (DesctinationType.IsInterface)
             {
-                if (DesctinationType.GetGenericTypeDefinition() == typeof(ISet<>))
+                if (DesctinationType.IsGenericType && DesctinationType.GetGenericTypeDefinition() == typeof(ISet<>))
                 {
                     instanceType = typeof(HashSet<>).MakeGenericType(DesctinationType.GetGenericArguments()[0]);
                     hashSetType = DesctinationType;
@@ -32,7 +32,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 instanceType = DesctinationType;
 
             if (hashSetType == null)
-                hashSetType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(ISet<>));
+                hashSetType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISet<>));
 
             if (hashSetType == null)
             {

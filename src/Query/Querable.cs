@@ -22,7 +22,7 @@ namespace Sparrow.CommonLibrary.Query
     {
         private readonly DatabaseHelper database;
 
-        private readonly IObjectAccessor<T> mapper;
+        private readonly IObjectAccessor<T> accessor;
         private readonly IMetaPropertyInfo[] fields;
 
         public Queryable(DatabaseHelper database)
@@ -31,8 +31,8 @@ namespace Sparrow.CommonLibrary.Query
                 throw new ArgumentNullException("database");
 
             this.database = database;
-            mapper = Map.GetAccessor<T>();
-            fields = mapper.MetaInfo.GetProperties();
+            accessor = Map.GetCheckedAccessor<T>();
+            fields = accessor.MetaInfo.GetProperties();
             Options = SqlOptions.NoLock;
         }
 
@@ -345,11 +345,11 @@ namespace Sparrow.CommonLibrary.Query
         public override string OutputSqlString(ISqlBuilder builder, ParameterCollection output)
         {
             if (_fields == null || _fields.Count == 0)
-                Fields.AddRang(mapper.MetaInfo.GetPropertyNames().Select(x => SqlExpression.Field(x)));
+                Fields.AddRang(accessor.MetaInfo.GetPropertyNames().Select(x => SqlExpression.Field(x)));
 
             var topExpressions = top > 0 ? builder.Constant(top) : string.Empty;
             var fieldExpressions = Fields.OutputSqlString(builder, output);
-            var tableExpression = builder.BuildTableName(mapper.MetaInfo.Name);
+            var tableExpression = builder.BuildTableName(accessor.MetaInfo.Name);
             var conditionExpressions = _where != null ? _where.OutputSqlString(builder, output) : string.Empty;
             var groupbyExpression = _groups != null && _groups.Count > 0 ? _groups.OutputSqlString(builder, output) : string.Empty;
             var havingExpression = _groups != null && _groups.Count > 0 && _having != null ? _having.OutputSqlString(builder, output) : string.Empty;
@@ -438,7 +438,7 @@ namespace Sparrow.CommonLibrary.Query
         private string GetFieldName(Expression<Func<T, object>> field)
         {
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
-            var fieldInfo = Map.GetAccessor<T>().MetaInfo[propertyInfo];
+            var fieldInfo = Map.GetCheckedAccessor<T>().MetaInfo[propertyInfo];
             if (fieldInfo != null)
                 return fieldInfo.PropertyName;
             throw new ArgumentException("无法获取该属性所映射的成员字段。");

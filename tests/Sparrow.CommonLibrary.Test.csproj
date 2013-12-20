@@ -60,8 +60,8 @@
     <Compile Include="Extenssions\ValidationExtenssionsTest.cs" />
     <Compile Include="Logging\ConfigurationTest.cs" />
     <Compile Include="Logging\LogTest.cs" />
-    <Compile Include="Mapper\DataMapperTest.cs" />
-    <Compile Include="Mapper\MapperFinderTest.cs" />
+    <Compile Include="Mapper\ObjectAccessorTest.cs" />
+    <Compile Include="Mapper\ObjectAccessorFinderTest.cs" />
     <Compile Include="Mapper\UserProfile.cs" />
     <Compile Include="Mapper\UserProfile2.cs" />
     <Compile Include="Mapper\UserProfile3.cs" />

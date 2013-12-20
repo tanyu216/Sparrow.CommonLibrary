@@ -17,7 +17,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
         {
             bool validated = false;
 
-            if (DesctinationType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            if (DesctinationType.IsGenericType && DesctinationType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
             {
                 validated = true;
             }
@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
             {
                 validated = true;
             }
-            else if (DesctinationType.GetInterfaces().Any(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>) || x == typeof(IDictionary)))
+            else if (DesctinationType.GetInterfaces().Any(x => (x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>)) || x == typeof(IDictionary)))
             {
                 validated = true;
             }
@@ -140,7 +140,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 return Convert((IDictionary)value);
             }
 
-            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
             if (iDicType != null)
             {
                 var param1 = Expression.Parameter(typeof(object));
@@ -176,7 +176,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 return Convert((IDictionary)value);
             }
 
-            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            var iDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
             if (iDicType != null)
             {
                 var param1 = Expression.Parameter(typeof(object));
@@ -215,7 +215,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
             }
 
             if (iDicType == null)
-                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+                iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
 
             if (iDicType == null)
                 iDicType = DesctinationType.GetInterfaces().FirstOrDefault(x => x == typeof(IDictionary));
@@ -242,7 +242,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
             if (value == null || !(value is IEnumerable))
                 return default(T);
 
-            var sourceDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+            var sourceDicType = value.GetType().GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
             if (sourceDicType != null)
             {
                 var param1 = Expression.Parameter(typeof(object));
@@ -255,8 +255,8 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                 else
                 {
                     method = this.GetType().GetMethod("Convert", new Type[] { typeof(IDictionary<,>).MakeGenericType(args) }).MakeGenericMethod(args);
-                } 
-                
+                }
+
                 var caller = Expression.Call(Expression.Constant(this), method, Expression.Convert(param1, typeof(IDictionary<,>).MakeGenericType(args)));
                 var convert = Expression.Lambda<Func<object, T>>(caller, param1).Compile();
 

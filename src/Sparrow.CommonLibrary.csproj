@@ -121,7 +121,7 @@
     <Compile Include="Mapper\ITypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\CollectionTypeMaper.cs" />
     <Compile Include="Mapper\TypeMapper\NameValueCollectionTypeMapper.cs" />
-    <Compile Include="Mapper\TypeMapper\NativeTypeMapper.cs" />
+    <Compile Include="Mapper\NativeTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\ObjectTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\ReadOnlyCollcetionTypeMapper.cs" />
     <Compile Include="Mapper\TypeMapper\StringTypeMapper.cs" />

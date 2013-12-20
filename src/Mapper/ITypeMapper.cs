@@ -13,6 +13,6 @@ namespace Sparrow.CommonLibrary.Mapper
 
     public interface ITypeMapper<TDestination> : ITypeMapper
     {
-        TDestination Cast(object value);
+        new TDestination Cast(object value);
     }
 }

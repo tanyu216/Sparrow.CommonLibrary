@@ -39,6 +39,24 @@ namespace Sparrow.CommonLibrary.Mapper
             return default(IObjectAccessor<T>);
         }
 
+        internal static IObjectAccessor GetCheckedAccessor(Type entityType)
+        {
+            var accessor = GetAccessor(entityType);
+            if (accessor == null)
+                throw new MapperException(string.Format("未找到适用{0}的对象访问器。", entityType.FullName));
+
+            return accessor;
+        }
+
+        internal static IObjectAccessor<T> GetCheckedAccessor<T>()
+        {
+            var accessor = GetAccessor<T>();
+            if (accessor == null)
+                throw new MapperException(string.Format("未找到适用{0}的对象访问器。", typeof(T).FullName));
+
+            return accessor;
+        }
+
         /// <summary>
         /// 创建类型<paramref name="T"/>的实例。
         /// </summary>
@@ -60,15 +78,15 @@ namespace Sparrow.CommonLibrary.Mapper
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            var mapper = GetAccessor<T>();
-            var dest = mapper.Create();
+            var accessor = GetAccessor<T>();
+            var dest = accessor.Create();
 
             if (dest is IMappingTrigger)
                 ((IMappingTrigger)dest).Begin();
 
-            for (var i = mapper.MetaInfo.PropertyCount - 1; i > -1; i--)
+            for (var i = accessor.MetaInfo.PropertyCount - 1; i > -1; i--)
             {
-                var property = mapper[i];
+                var property = accessor[i];
                 property.SetValue(dest, property.GetValue(source));
             }
 

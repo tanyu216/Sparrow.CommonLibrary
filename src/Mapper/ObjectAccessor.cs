@@ -21,8 +21,6 @@ namespace Sparrow.CommonLibrary.Mapper
 
         private Type _instanceType;
 
-        private Action<T, object[]> _initDataAction;
-
         /// <summary>
         /// 初始化
         /// </summary>
