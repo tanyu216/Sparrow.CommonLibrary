@@ -120,7 +120,7 @@ namespace Sparrow.CommonLibrary.Test.Query
             var database = DatabaseHelper.GetHelper("test");
 
             var list = database.CreateQueryable<UserProfile>()
-                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+                .Where(x => new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.Contains(x.Id))
                 .RowLimit(0, 10)
                 .ExecuteList();
 
@@ -138,6 +138,10 @@ namespace Sparrow.CommonLibrary.Test.Query
             var logicalExp3 = SqlExpression.Expression<UserProfile>(x => x.Id > 10 || x.Id < 2);
             var logicalExp4 = SqlExpression.Expression<UserProfile>(x => x.Id >= 10 || x.Id <= 2);
 
+            var array = new object[] { "test0", "test1", i };
+            var list = new List<object> { "test0", "test1", i };
+            var logicalExp5 = SqlExpression.Expression<UserProfile>(x => array.Contains(x.Name));
+            var logicalExp6 = SqlExpression.Expression<UserProfile>(x => list.Contains(x.Name));
         }
 
         private void TestExpression<T>(Expression<Func<T, bool>> expression)

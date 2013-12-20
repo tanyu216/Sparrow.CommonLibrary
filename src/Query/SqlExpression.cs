@@ -42,6 +42,30 @@ namespace Sparrow.CommonLibrary.Query
                 case LqExpressionType.AndAlso:
                     return AndAlso(Expression(((Binary)expression).Left), Expression(((Binary)expression).Right));
 
+                case LqExpressionType.Call:
+                    var methodCall = ((MethodCallExpression)expression);
+                    if (methodCall.Method.Name == "Contains" && methodCall.Method.ReturnType == typeof(bool))
+                    {
+                        //System.Linq.Enumerable的Contants方法。注：这是一个扩展方法
+                        if (methodCall.Method.ReflectedType == typeof(System.Linq.Enumerable))
+                        {
+                            if (methodCall.Arguments[1] is MemberExpression && ((MemberExpression)methodCall.Arguments[1]).Expression.NodeType == LqExpressionType.Parameter)
+                            {
+                                return In(Expression(methodCall.Arguments[1]), (CollectionExpression)Expression(methodCall.Arguments[0]));
+                            }
+                        }
+                        //IList<>/IList的Contants方法
+                        if (methodCall.Method.ReflectedType.GetInterfaces().Any(x => x == typeof(IList) || x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>)))
+                        {
+                            if (methodCall.Arguments[0] is MemberExpression && ((MemberExpression)methodCall.Arguments[0]).Expression.NodeType == LqExpressionType.Parameter)
+                            {
+                                return In(Expression(methodCall.Arguments[0]), (CollectionExpression)Expression(methodCall.Object));
+                            }
+                        }
+
+                    }
+                    break;
+
                 case LqExpressionType.Equal:
                     var left = Expression(((Binary)expression).Left);
                     var right = Expression(((Binary)expression).Right);
@@ -104,7 +128,20 @@ namespace Sparrow.CommonLibrary.Query
                         throw new NotSupportedException("实体属性未映射到字段。");
                     }
 
-                    return Constant(LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(System.Linq.Expressions.ExpressionType.Convert, expression, typeof(object))).Compile()());
+                    var value = LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(System.Linq.Expressions.ExpressionType.Convert, expression, typeof(object))).Compile()();
+                    if (value is ICollection || (!(value is string) && value is IEnumerable))
+                    {
+                        var exps = new CollectionExpression();
+                        foreach (object item in (IEnumerable)value)
+                        {
+                            exps.Add(Constant(item));
+                        }
+                        return exps;
+                    }
+                    else
+                    {
+                        return Constant(value);
+                    }
 
                 case LqExpressionType.NewArrayInit:
                     var array = (Array)LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(System.Linq.Expressions.ExpressionType.Convert, expression, typeof(object))).Compile()();
@@ -120,9 +157,9 @@ namespace Sparrow.CommonLibrary.Query
                         listcollection.Add(Constant(item));
                     return listcollection;
 
-                default:
-                    throw new NotSupportedException(string.Format("不受支持的Lambda表达式类型：{0}", expression.NodeType));
             }
+
+            throw new NotSupportedException(string.Format("不受支持的Lambda表达式类型：{0}", expression.NodeType));
         }
 
         public static LogicalBinaryExpression Expression<T>(System.Linq.Expressions.Expression<Func<T, bool>> logical)
@@ -130,14 +167,19 @@ namespace Sparrow.CommonLibrary.Query
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            if (!(logical.Body is System.Linq.Expressions.BinaryExpression))
-                throw new ArgumentException("logical不是二元表达式。");
+            if (!(logical.Body is System.Linq.Expressions.BinaryExpression) && !(logical.Body is System.Linq.Expressions.MethodCallExpression))
+                throw new ArgumentException("logical不是一个有效的逻辑表达式。");
 
-            var expression = (System.Linq.Expressions.BinaryExpression)logical.Body;
+            Expression expression = logical.Body as System.Linq.Expressions.BinaryExpression;
+            if (expression == null)
+                expression = logical.Body as System.Linq.Expressions.MethodCallExpression;
+            if(expression==null)
+                throw new ArgumentException("logical不是一个有效的逻辑表达式。");
+
             var logicalExp = Expression(expression) as LogicalBinaryExpression;
 
             if (logicalExp == null)
-                throw new ArgumentException("该表达式不是一个有效的逻辑表达式。");
+                throw new ArgumentException("logical不是一个有效的逻辑表达式。");
 
             return logicalExp;
         }
