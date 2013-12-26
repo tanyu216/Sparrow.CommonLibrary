@@ -243,9 +243,7 @@
     <Compile Include="Web\HttpClient.cs" />
     <Compile Include="Web\RecognizeSpider.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Validation\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>

@@ -110,7 +110,7 @@ namespace Sparrow.CommonLibrary.Web
         public HttpClient(string url)
         {
             var uri = new Uri(url);
-            Url = string.Concat(uri.Scheme, "://", uri.Host, uri.IsDefaultPort ? "" : uri.Port.ToString(), uri.AbsolutePath);
+            Url = string.Concat(uri.Scheme, "://", uri.Host, (uri.IsDefaultPort ? "" : ":" + uri.Port.ToString()), uri.AbsolutePath);
             if (!string.IsNullOrEmpty(uri.Query))
                 _queryString = HttpUtility.ParseQueryString(uri.Query);
             Timeout = 10 * 1000;
@@ -143,8 +143,7 @@ namespace Sparrow.CommonLibrary.Web
             if (_queryString != null)
             {
                 var queryString = NameValueSerialize(_queryString);
-                var joinCharset = Url.IndexOf('?') > 0 ? "&" : "?";
-                url = string.IsNullOrEmpty(queryString) == false ? string.Concat(Url, joinCharset, queryString) : Url;
+                url = string.Concat(Url, "?", queryString);
             }
             else
             {
@@ -283,10 +282,10 @@ namespace Sparrow.CommonLibrary.Web
         /// 转换Cookies
         /// </summary>
         /// <param name="source">cookies的源</param>
-        /// <param name="target">cookies转换至target中</param>
+        /// <param name="dest">cookies转换至target中</param>
         /// <param name="keys">转换至target的cookies依据</param>
         /// <param name="domain">当参数source中的cookie缺少domain值时，使用指定domain，加入target中。</param>
-        public static void LoadCookies(System.Web.HttpCookieCollection source, System.Net.CookieCollection target, string[] keys, string domain = null)
+        public static void LoadCookies(System.Web.HttpCookieCollection source, System.Net.CookieCollection dest, string[] keys, string domain = null)
         {
             if (source == null || keys == null || keys.Length == 0)
                 return;
@@ -306,7 +305,7 @@ namespace Sparrow.CommonLibrary.Web
                     Secure = cookie.Secure,
                     Path = cookie.Path
                 };
-                target.Add(ncookie);
+                dest.Add(ncookie);
             }
         }
 
@@ -314,10 +313,10 @@ namespace Sparrow.CommonLibrary.Web
         /// 转换Cookies
         /// </summary>
         /// <param name="source">cookies的源</param>
-        /// <param name="target">cookies转换至target中</param>
+        /// <param name="dest">cookies转换至target中</param>
         /// <param name="keys">转换至target的cookies依据</param>
         /// <param name="domain">当参数source中的cookie缺少domain值时，使用指定domain，加入target中。</param>
-        public static void LoadCookies(System.Net.CookieCollection source, System.Web.HttpCookieCollection target, string[] keys, string domain = null)
+        public static void LoadCookies(System.Net.CookieCollection source, System.Web.HttpCookieCollection dest, string[] keys, string domain = null)
         {
             if (source == null || keys == null || keys.Length == 0)
                 return;
@@ -336,7 +335,7 @@ namespace Sparrow.CommonLibrary.Web
                     Secure = cookie.Secure,
                     HttpOnly = cookie.HttpOnly
                 };
-                target.Add(hcookie);
+                dest.Add(hcookie);
             }
         }
     }
@@ -355,24 +354,16 @@ namespace Sparrow.CommonLibrary.Web
 
         public virtual string GetOutputString()
         {
-            using (var responseStream = Response.GetResponseStream())
+            using (var rs = new StreamReader(GetOutputStream()))
             {
-                using (var sm = Decompress(responseStream, Regex.Match(Response.ContentEncoding, "gzip|deflate").Groups[0].Value))
-                {
-                    using (var rs = new StreamReader(sm))
-                    {
-                        return rs.ReadToEnd();
-                    }
-                }
+                return rs.ReadToEnd();
             }
         }
 
         public virtual Stream GetOutputStream()
         {
-            using (var responseStream = Response.GetResponseStream())
-            {
-                return Decompress(responseStream, Regex.Match(Response.ContentEncoding, "gzip|deflate").Groups[0].Value);
-            }
+            var responseStream = Response.GetResponseStream();
+            return Decompress(responseStream, Regex.Match(Response.ContentEncoding, "gzip|deflate", RegexOptions.IgnoreCase).Groups[0].Value);
         }
 
         public ResponseResult(HttpWebResponse response)
@@ -391,7 +382,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <returns></returns>
         protected virtual Stream Decompress(Stream stream, string type)
         {
-            switch (type)
+            switch ((type ?? string.Empty).ToLower())
             {
                 case "gzip":
                     return new GZipStream(stream, CompressionMode.Decompress);
