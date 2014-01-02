@@ -8,5 +8,6 @@ namespace Sparrow.CommonLibrary.Web
     public class HttpClientAttribute : Attribute
     {
         public string Url { get; set; }
+
     }
 }
