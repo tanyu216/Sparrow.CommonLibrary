@@ -356,7 +356,8 @@ namespace Sparrow.CommonLibrary.Web
         public virtual Stream GetOutputStream()
         {
             var responseStream = Response.GetResponseStream();
-            return Decompress(responseStream, Regex.Match(Response.ContentEncoding, "gzip|deflate", RegexOptions.IgnoreCase).Groups[0].Value);
+            var match = Regex.Match(Response.ContentEncoding, "gzip|deflate", RegexOptions.IgnoreCase);
+            return Decompress(responseStream, match.Groups[0].Value);
         }
 
         public ResponseResult(HttpWebResponse response)
