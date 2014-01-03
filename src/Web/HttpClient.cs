@@ -162,7 +162,7 @@ namespace Sparrow.CommonLibrary.Web
             request.ContentType = "application/x-www-form-urlencoded";
             request.Headers.Add("Accept-Charset", Encoding.WebName);
             request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据
-            
+
             if (request.RequestUri.AbsoluteUri.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((a, b, c, d) => true);
@@ -347,7 +347,7 @@ namespace Sparrow.CommonLibrary.Web
 
         public virtual string GetOutputString()
         {
-            using (var rs = new StreamReader(GetOutputStream()))
+            using (var rs = new StreamReader(GetOutputStream(), Encoding))
             {
                 return rs.ReadToEnd();
             }
