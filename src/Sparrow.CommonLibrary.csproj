@@ -240,9 +240,7 @@
     <Compile Include="Weblog\Writer\WeblogWriterBase.cs" />
     <Compile Include="Weblog\Writer\MSMQWeblogWriter.cs" />
     <Compile Include="Extenssions\WebExtenssions.cs" />
-    <Compile Include="Web\ActionAttribute.cs" />
     <Compile Include="Web\HttpClient.cs" />
-    <Compile Include="Web\HttpClientAttribute.cs" />
     <Compile Include="Web\RecognizeSpider.cs" />
   </ItemGroup>
   <ItemGroup />

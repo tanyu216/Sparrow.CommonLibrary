@@ -74,7 +74,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// HttpClient默认的浏览器
         /// </summary>
-        private static readonly string HTTPCLIENT_USERAGENT = "Mozilla/5.0 (SparrowHttpClient; ) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.60 Safari/537.1";
+        private static readonly string HTTPCLIENT_USERAGENT = "SparrowHttpClient";
         private static string _userAgent;
         /// <summary>
         /// 浏览器信息
@@ -162,7 +162,7 @@ namespace Sparrow.CommonLibrary.Web
             request.ContentType = "application/x-www-form-urlencoded";
             request.Headers.Add("Accept-Charset", Encoding.WebName);
             request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据
-
+            
             if (request.RequestUri.AbsoluteUri.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((a, b, c, d) => true);
@@ -185,22 +185,17 @@ namespace Sparrow.CommonLibrary.Web
                 return;
 
             var forms = NameValueSerialize(Form);
-            if (string.IsNullOrEmpty(forms) == false)
+            using (var reqStream = request.GetRequestStream())
             {
-                using (var reqStream = request.GetRequestStream())
+                if (CompressData)
                 {
-                    if (CompressData)
-                    {
-                        request.Headers.Add("Content-Encoding", "gzip");
-                        CompressByGZip(forms, reqStream);
-                    }
-                    else
-                    {
-                        using (var sw = new StreamWriter(reqStream, Encoding))
-                        {
-                            sw.Write(forms);
-                        }
-                    }
+                    request.Headers.Add("Content-Encoding", "gzip");
+                    CompressByGZip(forms, reqStream);
+                }
+                else
+                {
+                    var data = Encoding.GetBytes(forms);
+                    reqStream.Write(data, 0, data.Length);
                 }
             }
         }
@@ -235,10 +230,8 @@ namespace Sparrow.CommonLibrary.Web
         {
             using (var gs = new GZipStream(output, CompressionMode.Compress))
             {
-                using (var sw = new StreamWriter(gs, Encoding))
-                {
-                    sw.Write(text);
-                }
+                var data = Encoding.GetBytes(text);
+                gs.Write(data, 0, data.Length);
             }
         }
 
