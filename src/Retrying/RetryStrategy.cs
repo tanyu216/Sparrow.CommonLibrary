@@ -67,11 +67,22 @@ namespace Sparrow.CommonLibrary.Retrying
         /// </summary>
         public event EventHandler<RetryingEventArgs> OnRetrying;
 
+        /// <summary>
+        /// 重试初始化
+        /// </summary>
+        /// <param name="name">重试策略名称</param>
+        /// <param name="firstFastRetry">第一次是否重试</param>
         protected RetryStrategy(string name, bool firstFastRetry)
             : this(name, firstFastRetry, DefaultMaxRetryCount)
         {
         }
 
+        /// <summary>
+        /// 重试初始化
+        /// </summary>
+        /// <param name="name">重试策略名称</param>
+        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="maxRetryCount">重试最大次数</param>
         protected RetryStrategy(string name, bool firstFastRetry, int maxRetryCount)
         {
             this.Name = name;
@@ -79,11 +90,21 @@ namespace Sparrow.CommonLibrary.Retrying
             this.MaxRetryCount = maxRetryCount;
         }
 
+        /// <summary>
+        /// 执行无返回值的方法
+        /// </summary>
+        /// <param name="action"></param>
         public void DoExecute(Action action)
         {
             DoExecute(() => { action(); return default(object); });
         }
 
+        /// <summary>
+        /// 执行有返回值的方法
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public TResult DoExecute<TResult>(Func<TResult> action)
         {
             if (action == null)
@@ -120,7 +141,7 @@ namespace Sparrow.CommonLibrary.Retrying
         }
 
         /// <summary>
-        /// 
+        /// 检测是否应该继续执行重试策略，以及返回重试间隔时间。
         /// </summary>
         /// <param name="retryCount">重试次数</param>
         /// <param name="lastException">最后一次抛出的异常</param>
