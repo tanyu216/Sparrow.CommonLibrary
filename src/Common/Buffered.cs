@@ -42,10 +42,13 @@ namespace Sparrow.CommonLibrary.Common
         public int MaxBufer { get; set; }
 
         /// <summary>
-        /// 缓冲区临界值，当该临界值时强制触发Flush事件（默认值：2048），小于 1 则不会触发Flush事件。
+        /// 缓冲区临界值，当该临界值时强制触发Flush事件（默认值：65535），小于 1 则不会触发Flush事件。
         /// </summary>
         public int Threshold { get; set; }
 
+        /// <summary>
+        /// 指示当前实例是否正在执行Flush事件。
+        /// </summary>
         public bool Flushing { get; private set; }
 
         private object SyncFlushing = new object();
@@ -74,6 +77,11 @@ namespace Sparrow.CommonLibrary.Common
             _timer.Start();
         }
 
+        /// <summary>
+        /// 定时Flush事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (_queue.Count > 0)
@@ -121,6 +129,10 @@ namespace Sparrow.CommonLibrary.Common
             Flushing = false;
         }
 
+        /// <summary>
+        /// 向缓冲区写入一个对象。
+        /// </summary>
+        /// <param name="item"></param>
         public void Write(T item)
         {
             TestDisposed();
@@ -131,6 +143,10 @@ namespace Sparrow.CommonLibrary.Common
                 Flush();
         }
 
+        /// <summary>
+        /// 向缓冲区写入一组对象集合。
+        /// </summary>
+        /// <param name="items"></param>
         public void Write(ICollection<T> items)
         {
             TestDisposed();
@@ -146,6 +162,7 @@ namespace Sparrow.CommonLibrary.Common
                 Flush();
         }
 
+        #region IDispose
         private bool _disposed;
         private void TestDisposed()
         {
@@ -163,6 +180,7 @@ namespace Sparrow.CommonLibrary.Common
                 _disposed = true;
             }
         }
+        #endregion
     }
 
     public class BufferedFlushEventArgs<T> : EventArgs
