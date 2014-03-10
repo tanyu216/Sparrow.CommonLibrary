@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Retrying
 {
+    /// <summary>
+    /// 无重试规则
+    /// </summary>
     public class NonRetryInterval : RetryStrategy
     {
         public NonRetryInterval()
