@@ -7,7 +7,7 @@ using System.Timers;
 namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
-    /// 多线程安全的缓冲区，用于网络传输或文件操作的中间衔接，以提高数据输入输出的效率。
+    /// 多线程安全的缓冲区，通过定时或定量触发操作，以节省CPU和网络资源，降低主业务线程时间。主要适用于可延迟的操作。
     /// </summary>
     public class Buffered<T> : IDisposable
     {
@@ -37,9 +37,9 @@ namespace Sparrow.CommonLibrary.Common
         }
 
         /// <summary>
-        /// 缓冲区最大值，超出该值时，将会引发缓冲区溢出异常（默认值：131072）。
+        /// 缓冲区最大值，超出该值时，将会引发缓冲区溢出异常。
         /// </summary>
-        public int MaxBufer { get; set; }
+        public int MaxBuferSize { get; set; }
 
         /// <summary>
         /// 缓冲区临界值，当该临界值时强制触发Flush事件（默认值：65535），小于 1 则不会触发Flush事件。
@@ -68,7 +68,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <param name="interval">当缓冲区设置自动Flush后，每一次自动Flush的时间间隔</param>
         public Buffered(double interval)
         {
-            MaxBufer = 131072;
+            MaxBuferSize = 16777215;
             Threshold = 65535;
             _queue = new ConcurrentQueue<T>();
             _timer = new Timer(interval);
@@ -85,7 +85,9 @@ namespace Sparrow.CommonLibrary.Common
         void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (_queue.Count > 0)
+            {
                 Flush();
+            }
         }
 
         /// <summary>
@@ -97,14 +99,20 @@ namespace Sparrow.CommonLibrary.Common
 
             int max = _queue.Count;
             if (max < 1)
+            {
                 return;
+            }
 
             if (Flushing)
+            {
                 return;
+            }
             lock (SyncFlushing)
             {
                 if (Flushing)
+                {
                     return;
+                }
                 Flushing = true;
             }
 
@@ -124,7 +132,13 @@ namespace Sparrow.CommonLibrary.Common
 
             // 触发Flush事件
             if (list.Count > 0 && OnFlush != null)
-                OnFlush(this, new BufferedFlushEventArgs<T>(list));
+            {
+                try
+                {
+                    OnFlush(this, new BufferedFlushEventArgs<T>(list));
+                }
+                catch { }
+            }
 
             Flushing = false;
         }
@@ -136,11 +150,15 @@ namespace Sparrow.CommonLibrary.Common
         public void Write(T item)
         {
             TestDisposed();
-            if (_queue.Count > MaxBufer)
-                throw new OutOfMemoryException(string.Format("缓冲区溢出，超出最大值{0}。", MaxBufer));
+            if (_queue.Count > MaxBuferSize)
+            {
+                throw new OutOfMemoryException(string.Format("缓冲区溢出，超出最大值{0}。", MaxBuferSize));
+            }
             _queue.Enqueue(item);
             if (_queue.Count >= Threshold)
+            {
                 Flush();
+            }
         }
 
         /// <summary>
@@ -151,15 +169,23 @@ namespace Sparrow.CommonLibrary.Common
         {
             TestDisposed();
             if (items == null)
+            {
                 throw new ArgumentNullException("items");
-            if (_queue.Count + items.Count > MaxBufer)
-                throw new OutOfMemoryException(string.Format("缓冲区溢出，超出最大值{0}。", MaxBufer));
+            }
+            if (_queue.Count + items.Count > MaxBuferSize)
+            {
+                throw new OutOfMemoryException(string.Format("缓冲区溢出，超出最大值{0}。", MaxBuferSize));
+            }
+
             foreach (var item in items)
             {
                 _queue.Enqueue(item);
             }
+
             if (_queue.Count >= Threshold)
+            {
                 Flush();
+            }
         }
 
         #region IDispose
@@ -167,7 +193,9 @@ namespace Sparrow.CommonLibrary.Common
         private void TestDisposed()
         {
             if (_disposed)
+            {
                 throw new ObjectDisposedException(GetType().FullName, "缓冲区已经释放所有资源。");
+            }
         }
 
         public void Dispose()
@@ -183,6 +211,10 @@ namespace Sparrow.CommonLibrary.Common
         #endregion
     }
 
+    /// <summary>
+    /// Flush事件参数
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class BufferedFlushEventArgs<T> : EventArgs
     {
         public IList<T> List { get; private set; }
