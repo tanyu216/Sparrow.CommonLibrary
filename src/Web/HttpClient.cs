@@ -14,13 +14,11 @@ using Sparrow.CommonLibrary.Retrying;
 
 namespace Sparrow.CommonLibrary.Web
 {
+    /// <summary>
+    /// HttpClient，创建一个Http请求，获取请求地址返回的数据。
+    /// </summary>
     public class HttpClient
     {
-        /// <summary>
-        /// 编码类型，默认为utf-8。
-        /// </summary>
-        public Encoding Encoding { get; set; }
-
         private NameValueCollection _queryString;
         /// <summary>
         /// 提交至目标服务器的url字符参数
@@ -30,7 +28,9 @@ namespace Sparrow.CommonLibrary.Web
             get
             {
                 if (_queryString == null)
+                {
                     _queryString = new NameValueCollection();
+                }
                 return _queryString;
             }
             set { _queryString = value; }
@@ -45,7 +45,9 @@ namespace Sparrow.CommonLibrary.Web
             get
             {
                 if (_form == null)
+                {
                     _form = new NameValueCollection();
+                }
                 return _form;
             }
             set { _form = value; }
@@ -60,7 +62,9 @@ namespace Sparrow.CommonLibrary.Web
             get
             {
                 if (_headers == null)
+                {
                     _headers = new NameValueCollection();
+                }
                 return _headers;
             }
             set { _headers = value; }
@@ -74,7 +78,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// HttpClient默认的浏览器
         /// </summary>
-        private static readonly string HTTPCLIENT_USERAGENT = "SparrowHttpClient";
+        private static readonly string HTTPCLIENT_USERAGENT = "Autohome.HttpClient";
         private static string _userAgent;
         /// <summary>
         /// 浏览器信息
@@ -86,12 +90,7 @@ namespace Sparrow.CommonLibrary.Web
         }
 
         /// <summary>
-        /// Cookies
-        /// </summary>
-        public System.Net.CookieContainer Cookies { get; set; }
-
-        /// <summary>
-        /// 支持GZip打包数据后再发送至服务
+        /// 支持上传压缩后的表单数据
         /// </summary>
         public bool CompressData { get; set; }
 
@@ -105,6 +104,9 @@ namespace Sparrow.CommonLibrary.Web
             set { _retry = value; }
         }
 
+        /// <summary>
+        /// http url
+        /// </summary>
         protected readonly string Url;
 
         public HttpClient(string url)
@@ -112,12 +114,18 @@ namespace Sparrow.CommonLibrary.Web
             var uri = new Uri(url);
             Url = string.Concat(uri.Scheme, "://", uri.Host, (uri.IsDefaultPort ? "" : ":" + uri.Port.ToString()), uri.AbsolutePath);
             if (!string.IsNullOrEmpty(uri.Query))
+            {
                 _queryString = HttpUtility.ParseQueryString(uri.Query);
-            Timeout = 10 * 1000;
-            Encoding = Encoding.UTF8;
-            CompressData = true;
+            }
+
+            Timeout = 8 * 1000;
         }
 
+        /// <summary>
+        /// 将集合序列化成Web编码后的字符串格式
+        /// </summary>
+        /// <param name="values">参数集合</param>
+        /// <returns></returns>
         protected virtual string NameValueSerialize(NameValueCollection values)
         {
             if (values != null)
@@ -131,12 +139,19 @@ namespace Sparrow.CommonLibrary.Web
                         .Append('&');
                 }
                 if (builder[builder.Length - 1] == '&')
+                {
                     builder.Remove(builder.Length - 1, 1);
+                }
                 return builder.ToString();
             }
             return string.Empty;
         }
 
+        /// <summary>
+        /// 创建一个HttpWebRequest对象
+        /// </summary>
+        /// <param name="method">HttpWebRequest实例对象</param>
+        /// <returns>HttpWebRequest实例对象</returns>
         private HttpWebRequest CreateRequest(string method)
         {
             string url;
@@ -156,12 +171,17 @@ namespace Sparrow.CommonLibrary.Web
             return request;
         }
 
+        /// <summary>
+        /// 初始化HttpWebRequest请求
+        /// </summary>
+        /// <param name="request">HttpWebRequest实例对象</param>
         protected virtual void InitRequest(HttpWebRequest request)
         {
             request.Timeout = Timeout;
             request.ContentType = "application/x-www-form-urlencoded";
-            request.Headers.Add("Accept-Charset", Encoding.WebName);
-            request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据
+            request.Headers.Add("Accept-Charset", Encoding.UTF8.WebName);
+            request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据 
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
             if (request.RequestUri.AbsoluteUri.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
@@ -172,17 +192,19 @@ namespace Sparrow.CommonLibrary.Web
             {
                 request.Headers.Add(_headers);
             }
-            if (Cookies != null)
-            {
-                request.CookieContainer = Cookies;
-            }
             request.UserAgent = UserAgent;
         }
 
+        /// <summary>
+        /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
+        /// </summary>
+        /// <param name="request">HttpWebRequest实例对象</param>
         protected virtual void LoadFormData(HttpWebRequest request)
         {
             if (_form == null)
+            {
                 return;
+            }
 
             var forms = NameValueSerialize(Form);
             using (var reqStream = request.GetRequestStream())
@@ -194,12 +216,17 @@ namespace Sparrow.CommonLibrary.Web
                 }
                 else
                 {
-                    var data = Encoding.GetBytes(forms);
+                    var data = Encoding.Default.GetBytes(forms);
                     reqStream.Write(data, 0, data.Length);
                 }
             }
         }
 
+        /// <summary>
+        /// 提交一个Web请求
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
         protected virtual ResponseResult SubmitRequest(string method)
         {
             var request = CreateRequest(method);
@@ -212,10 +239,19 @@ namespace Sparrow.CommonLibrary.Web
             }
             catch (WebException ex)
             {
+                if ((HttpWebResponse)ex.Response == null)
+                {
+                    throw ex;
+                }
                 return CreateReponseResult((HttpWebResponse)ex.Response);
             }
         }
 
+        /// <summary>
+        /// 包装一个HttpWebResponse
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
         protected virtual ResponseResult CreateReponseResult(HttpWebResponse response)
         {
             return new ResponseResult(response);
@@ -224,13 +260,13 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 压缩数据，数据压缩格式为GZip
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="output"></param>
-        protected virtual void CompressByGZip(string text, Stream output)
+        /// <param name="encodedText">url编码后的表单数据</param>
+        /// <param name="output">输出流</param>
+        protected virtual void CompressByGZip(string encodedText, Stream output)
         {
             using (var gs = new GZipStream(output, CompressionMode.Compress))
             {
-                var data = Encoding.GetBytes(text);
+                var data = Encoding.Default.GetBytes(encodedText);
                 gs.Write(data, 0, data.Length);
             }
         }
@@ -252,7 +288,7 @@ namespace Sparrow.CommonLibrary.Web
         {
             return SubmitRequest("POST");
         }
-
+        
         /// <summary>
         /// 以PUT的方式向目标服务器发出Http请求。
         /// </summary>
@@ -270,81 +306,42 @@ namespace Sparrow.CommonLibrary.Web
         {
             return SubmitRequest("DELETE");
         }
-
-        /// <summary>
-        /// 转换Cookies
-        /// </summary>
-        /// <param name="source">cookies的源</param>
-        /// <param name="dest">cookies转换至target中</param>
-        /// <param name="keys">转换至target的cookies依据</param>
-        /// <param name="domain">当参数source中的cookie缺少domain值时，使用指定domain，加入target中。</param>
-        public static void LoadCookies(System.Web.HttpCookieCollection source, System.Net.CookieCollection dest, string[] keys, string domain = null)
-        {
-            if (source == null || keys == null || keys.Length == 0)
-                return;
-
-            for (int i = 0; i < source.Count; i++)
-            {
-                if (keys.FirstOrDefault(x => x != null && x.ToLower() == source[i].Name.ToLower()) == null)
-                    continue;
-                var cookie = source[i];
-                if (cookie == null || String.IsNullOrEmpty(cookie.Value)) continue;
-
-                var ncookie = new Cookie(cookie.Name, cookie.Value)
-                {
-                    Expires = cookie.Expires,
-                    Domain = string.IsNullOrEmpty(cookie.Domain) ? domain : cookie.Domain,
-                    HttpOnly = cookie.HttpOnly,
-                    Secure = cookie.Secure,
-                    Path = cookie.Path
-                };
-                dest.Add(ncookie);
-            }
-        }
-
-        /// <summary>
-        /// 转换Cookies
-        /// </summary>
-        /// <param name="source">cookies的源</param>
-        /// <param name="dest">cookies转换至target中</param>
-        /// <param name="keys">转换至target的cookies依据</param>
-        /// <param name="domain">当参数source中的cookie缺少domain值时，使用指定domain，加入target中。</param>
-        public static void LoadCookies(System.Net.CookieCollection source, System.Web.HttpCookieCollection dest, string[] keys, string domain = null)
-        {
-            if (source == null || keys == null || keys.Length == 0)
-                return;
-
-            for (int i = 0; i < source.Count; i++)
-            {
-                if (keys.FirstOrDefault(x => x != null && x.ToLower() == source[i].Name.ToLower()) == null)
-                    continue;
-                var cookie = source[i];
-
-                var hcookie = new System.Web.HttpCookie(cookie.Name, cookie.Value)
-                {
-                    Path = cookie.Path,
-                    Domain = string.IsNullOrEmpty(cookie.Domain) ? domain : cookie.Domain,
-                    Expires = cookie.Expires,
-                    Secure = cookie.Secure,
-                    HttpOnly = cookie.HttpOnly
-                };
-                dest.Add(hcookie);
-            }
-        }
     }
 
+    /// <summary>
+    /// HttpWebResponse对象封装
+    /// </summary>
     public class ResponseResult : IDisposable
     {
+        /// <summary>
+        /// HttpWebResponse对象
+        /// </summary>
         public HttpWebResponse Response { get; private set; }
 
+        /// <summary>
+        /// http响应状态码
+        /// </summary>
         public HttpStatusCode StatusCode { get { return Response.StatusCode; } }
 
+        /// <summary>
+        /// http响应状态码描述
+        /// </summary>
         public string Status { get { return Response.StatusDescription; } }
 
+        /// <summary>
+        /// http响应内容编码方式
+        /// </summary>
         public Encoding Encoding { get { return Encoding.GetEncoding(Response.CharacterSet); } }
 
+        /// <summary>
+        /// 响应的内容类型，text/html、application/json
+        /// </summary>
         public string ContentType { get { return Response.ContentType; } }
 
+        /// <summary>
+        /// 获取响应内容的字符串形式
+        /// </summary>
+        /// <returns></returns>
         public virtual string GetOutputString()
         {
             using (var rs = new StreamReader(GetOutputStream(), Encoding))
@@ -353,38 +350,27 @@ namespace Sparrow.CommonLibrary.Web
             }
         }
 
+        /// <summary>
+        /// 获取响应内容的数据流
+        /// </summary>
+        /// <returns></returns>
         public virtual Stream GetOutputStream()
         {
-            var responseStream = Response.GetResponseStream();
-            var match = Regex.Match(Response.ContentEncoding, "gzip|deflate", RegexOptions.IgnoreCase);
-            return Decompress(responseStream, match.Groups[0].Value);
-        }
-
-        public ResponseResult(HttpWebResponse response)
-        {
-            if (response == null)
-                throw new ArgumentNullException("response");
-
-            Response = response;
+            return Response.GetResponseStream();
         }
 
         /// <summary>
-        /// 解压数据（不支持的压缩格式，直接返回源数据）
+        /// ctor
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="type">gzip/deflate</param>
-        /// <returns></returns>
-        protected virtual Stream Decompress(Stream stream, string type)
+        /// <param name="response"></param>
+        public ResponseResult(HttpWebResponse response)
         {
-            switch ((type ?? string.Empty).ToLower())
+            if (response == null)
             {
-                case "gzip":
-                    return new GZipStream(stream, CompressionMode.Decompress);
-                case "deflate":
-                    return new DeflateStream(stream, CompressionMode.Decompress);
-                default:
-                    return stream;
+                throw new ArgumentNullException("response");
             }
+
+            Response = response;
         }
 
         #region IDisposable
