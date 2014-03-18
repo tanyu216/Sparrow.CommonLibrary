@@ -19,23 +19,6 @@ namespace Sparrow.CommonLibrary.Web
     /// </summary>
     public class HttpClient
     {
-        private NameValueCollection _queryString;
-        /// <summary>
-        /// 提交至目标服务器的url字符参数
-        /// </summary>
-        public NameValueCollection QueryString
-        {
-            get
-            {
-                if (_queryString == null)
-                {
-                    _queryString = new NameValueCollection();
-                }
-                return _queryString;
-            }
-            set { _queryString = value; }
-        }
-
         private NameValueCollection _form;
         /// <summary>
         /// 提交至目标服务的表单数据
@@ -78,7 +61,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// HttpClient默认的浏览器
         /// </summary>
-        private static readonly string HTTPCLIENT_USERAGENT = "Sparrow.CommonLibrary.HttpClient";
+        private static readonly string HTTPCLIENT_USERAGENT = "Autohome.HttpClient";
         private static string _userAgent;
         /// <summary>
         /// 浏览器信息
@@ -111,14 +94,13 @@ namespace Sparrow.CommonLibrary.Web
 
         public HttpClient(string url)
         {
-            var uri = new Uri(url);
-            Url = string.Concat(uri.Scheme, "://", uri.Host, (uri.IsDefaultPort ? "" : ":" + uri.Port.ToString()), uri.AbsolutePath);
-            if (!string.IsNullOrEmpty(uri.Query))
+            if (string.IsNullOrEmpty(url) || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
             {
-                _queryString = HttpUtility.ParseQueryString(uri.Query);
+                throw new ArgumentException("参数url不合法。");
             }
 
-            Timeout = 8 * 1000;
+            Url = url;
+            Timeout = 6 * 1000;
         }
 
         /// <summary>
@@ -154,18 +136,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <returns>HttpWebRequest实例对象</returns>
         private HttpWebRequest CreateRequest(string method)
         {
-            string url;
-            if (_queryString != null)
-            {
-                var queryString = NameValueSerialize(_queryString);
-                url = string.Concat(Url, "?", queryString);
-            }
-            else
-            {
-                url = Url;
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var request = (HttpWebRequest)WebRequest.Create(Url);
             request.Method = method;
             request.AllowAutoRedirect = false;
             return request;
@@ -281,16 +252,7 @@ namespace Sparrow.CommonLibrary.Web
         }
 
         /// <summary>
-        /// 以POST的方式向目标服务器发出Http请求。
-        /// </summary>
-        /// <returns></returns>
-        public ResponseResult Post()
-        {
-            return SubmitRequest("POST");
-        }
-        
-        /// <summary>
-        /// 以PUT的方式向目标服务器发出Http请求。
+        /// 以PUT传值方式向目标服务器发出Http请求。
         /// </summary>
         /// <returns></returns>
         public ResponseResult Put()
@@ -299,13 +261,23 @@ namespace Sparrow.CommonLibrary.Web
         }
 
         /// <summary>
-        /// 以DELETE的方式向目标服务器发出Http请求。
+        /// 以DELETE传值方式向目标服务器发出Http请求。
         /// </summary>
         /// <returns></returns>
         public ResponseResult Delete()
         {
             return SubmitRequest("DELETE");
         }
+
+        /// <summary>
+        /// 以POST的方式向目标服务器发出Http请求。
+        /// </summary>
+        /// <returns></returns>
+        public ResponseResult Post()
+        {
+            return SubmitRequest("POST");
+        }
+
     }
 
     /// <summary>
