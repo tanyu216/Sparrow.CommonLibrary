@@ -61,7 +61,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// HttpClient默认的浏览器
         /// </summary>
-        private static readonly string HTTPCLIENT_USERAGENT = "Autohome.HttpClient";
+        private static readonly string HTTPCLIENT_USERAGENT = "Sparrow.HttpClient";
         private static string _userAgent;
         /// <summary>
         /// 浏览器信息
