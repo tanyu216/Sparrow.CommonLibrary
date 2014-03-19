@@ -19,23 +19,6 @@ namespace Sparrow.CommonLibrary.Web
     /// </summary>
     public class HttpClient
     {
-        private NameValueCollection _form;
-        /// <summary>
-        /// 提交至目标服务的表单数据
-        /// </summary>
-        public NameValueCollection Form
-        {
-            get
-            {
-                if (_form == null)
-                {
-                    _form = new NameValueCollection();
-                }
-                return _form;
-            }
-            set { _form = value; }
-        }
-
         private NameValueCollection _headers;
         /// <summary>
         /// 自定义Http请求的头
@@ -92,6 +75,10 @@ namespace Sparrow.CommonLibrary.Web
         /// </summary>
         protected readonly string Url;
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="url">Web请求的Url</param>
         public HttpClient(string url)
         {
             if (string.IsNullOrEmpty(url) || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -107,7 +94,7 @@ namespace Sparrow.CommonLibrary.Web
         /// 将集合序列化成Web编码后的字符串格式
         /// </summary>
         /// <param name="values">参数集合</param>
-        /// <returns></returns>
+        /// <returns>编码后的字符串</returns>
         protected virtual string NameValueSerialize(NameValueCollection values)
         {
             if (values != null)
@@ -170,14 +157,14 @@ namespace Sparrow.CommonLibrary.Web
         /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
         /// </summary>
         /// <param name="request">HttpWebRequest实例对象</param>
-        protected virtual void LoadFormData(HttpWebRequest request)
+        protected virtual void LoadFormData(HttpWebRequest request, NameValueCollection data)
         {
-            if (_form == null)
+            if (data == null)
             {
                 return;
             }
 
-            var forms = NameValueSerialize(Form);
+            var forms = NameValueSerialize(data);
             using (var reqStream = request.GetRequestStream())
             {
                 if (CompressData)
@@ -187,8 +174,8 @@ namespace Sparrow.CommonLibrary.Web
                 }
                 else
                 {
-                    var data = Encoding.Default.GetBytes(forms);
-                    reqStream.Write(data, 0, data.Length);
+                    var content = Encoding.Default.GetBytes(forms);
+                    reqStream.Write(content, 0, content.Length);
                 }
             }
         }
@@ -196,13 +183,23 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 提交一个Web请求
         /// </summary>
-        /// <param name="method"></param>
-        /// <returns></returns>
+        /// <param name="method">Web请求方式</param>
+        /// <returns>Web请求返回结果</returns>
         protected virtual ResponseResult SubmitRequest(string method)
+        {
+            return SubmitRequest(method, null);
+        }
+
+        /// <summary>
+        /// 提交一个Web请求
+        /// </summary>
+        /// <param name="method">Web请求方式</param>
+        /// <returns>Web请求返回结果</returns>
+        protected virtual ResponseResult SubmitRequest(string method, NameValueCollection data)
         {
             var request = CreateRequest(method);
             InitRequest(request);
-            LoadFormData(request);
+            LoadFormData(request, data);
 
             try
             {
@@ -221,8 +218,8 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 包装一个HttpWebResponse
         /// </summary>
-        /// <param name="response"></param>
-        /// <returns></returns>
+        /// <param name="response">Web请求返回结果</param>
+        /// <returns>封装后的Web请求返回结果</returns>
         protected virtual ResponseResult CreateReponseResult(HttpWebResponse response)
         {
             return new ResponseResult(response);
@@ -245,7 +242,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 以GET传值方式向目标服务器发出Http请求。
         /// </summary>
-        /// <returns></returns>
+        /// <returns>封装后的Web请求返回结果</returns>
         public ResponseResult Get()
         {
             return SubmitRequest("GET");
@@ -254,16 +251,17 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 以PUT传值方式向目标服务器发出Http请求。
         /// </summary>
-        /// <returns></returns>
-        public ResponseResult Put()
+        /// <param name="data">向目标服务发送的数据</param>
+        /// <returns>封装后的Web请求返回结果</returns>
+        public ResponseResult Put(NameValueCollection data)
         {
-            return SubmitRequest("PUT");
+            return SubmitRequest("PUT", data);
         }
 
         /// <summary>
         /// 以DELETE传值方式向目标服务器发出Http请求。
         /// </summary>
-        /// <returns></returns>
+        /// <returns>封装后的Web请求返回结果</returns>
         public ResponseResult Delete()
         {
             return SubmitRequest("DELETE");
@@ -272,10 +270,11 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 以POST的方式向目标服务器发出Http请求。
         /// </summary>
-        /// <returns></returns>
-        public ResponseResult Post()
+        /// <param name="data">向目标服务发送的数据</param>
+        /// <returns>封装后的Web请求返回结果</returns>
+        public ResponseResult Post(NameValueCollection data)
         {
-            return SubmitRequest("POST");
+            return SubmitRequest("POST", data);
         }
 
     }
@@ -313,7 +312,7 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 获取响应内容的字符串形式
         /// </summary>
-        /// <returns></returns>
+        /// <returns>响应内容的字符串形式</returns>
         public virtual string GetOutputString()
         {
             using (var rs = new StreamReader(GetOutputStream(), Encoding))
@@ -325,16 +324,16 @@ namespace Sparrow.CommonLibrary.Web
         /// <summary>
         /// 获取响应内容的数据流
         /// </summary>
-        /// <returns></returns>
+        /// <returns>响应内容的数据流</returns>
         public virtual Stream GetOutputStream()
         {
             return Response.GetResponseStream();
         }
 
         /// <summary>
-        /// ctor
+        /// 初始化
         /// </summary>
-        /// <param name="response"></param>
+        /// <param name="response">Web请求的返回结果对象</param>
         public ResponseResult(HttpWebResponse response)
         {
             if (response == null)
@@ -349,6 +348,9 @@ namespace Sparrow.CommonLibrary.Web
 
         private bool _dispose;
 
+        /// <summary>
+        /// 资源释放
+        /// </summary>
         public void Dispose()
         {
             Dispose(_dispose);
