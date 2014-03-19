@@ -42,7 +42,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// <summary>
         /// 重试初始化
         /// </summary>
-        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="firstFastRetry">第一次异常时立即重试</param>
         public IncrementalInterval(bool firstFastRetry)
             : this(DefaultMaxRetryCount, DefaultRetryIncrementalInterval, firstFastRetry)
         {
@@ -63,7 +63,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// </summary>
         /// <param name="retryCount">最大重试次数</param>
         /// <param name="interval">重试时间间隔</param>
-        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="firstFastRetry">第一次异常时立即重试</param>
         public IncrementalInterval(int retryCount, TimeSpan interval, bool firstFastRetry)
             : this(retryCount, interval, firstFastRetry, null)
         {
@@ -74,7 +74,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// </summary>
         /// <param name="retryCount">最大重试次数</param>
         /// <param name="interval">重试时间间隔</param>
-        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="firstFastRetry">第一次异常时立即重试</param>
         /// <param name="name">重试策略名称</param>
         public IncrementalInterval(int retryCount, TimeSpan interval, bool firstFastRetry, string name)
             : base(name, firstFastRetry, retryCount)
@@ -85,10 +85,10 @@ namespace Sparrow.CommonLibrary.Retrying
         /// <summary>
         /// 检测是否应该继续执行重试策略，以及返回重试间隔时间。
         /// </summary>
-        /// <param name="retryCount"></param>
-        /// <param name="lastException"></param>
-        /// <param name="delay"></param>
-        /// <returns></returns>
+        /// <param name="retryCount">重试次数</param>
+        /// <param name="lastException">引发重试的异常</param>
+        /// <param name="delay">重试时的延迟</param>
+        /// <returns>返回true表示继续重试，否则表示停止重试结束操作。</returns>
         protected override bool ShouldRetry(int retryCount, Exception lastException, out TimeSpan delay)
         {
             if (retryCount < MaxRetryCount)
