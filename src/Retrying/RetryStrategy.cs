@@ -28,21 +28,6 @@ namespace Sparrow.CommonLibrary.Retrying
         public static readonly TimeSpan DefaultRetryIncrementalInterval = TimeSpan.FromSeconds(1);
 
         /// <summary>
-        /// <see cref="ExponentialBackoffInterval"/>默认重试时间间隔最小指数。
-        /// </summary>
-        public static readonly TimeSpan DefaultRetryMinBackoff = TimeSpan.FromSeconds(1);
-
-        /// <summary>
-        /// <see cref="ExponentialBackoffInterval"/>默认重试时间间隔最大指数。
-        /// </summary>
-        public static readonly TimeSpan DefaultRetryMaxBackoff = TimeSpan.FromSeconds(30);
-
-        /// <summary>
-        /// <see cref="ExponentialBackoffInterval"/>默认计算指数延迟指数的三角。
-        /// </summary>
-        public static readonly TimeSpan DefaultDeltaBackoff = TimeSpan.FromSeconds(10);
-
-        /// <summary>
         /// 默认第一次异常时立即重试。
         /// </summary>
         public static readonly bool DefaultFirstFastRetry = true;
@@ -71,7 +56,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// 重试初始化
         /// </summary>
         /// <param name="name">重试策略名称</param>
-        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="firstFastRetry">第一次异常时立即重试</param>
         protected RetryStrategy(string name, bool firstFastRetry)
             : this(name, firstFastRetry, DefaultMaxRetryCount)
         {
@@ -81,7 +66,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// 重试初始化
         /// </summary>
         /// <param name="name">重试策略名称</param>
-        /// <param name="firstFastRetry">第一次是否重试</param>
+        /// <param name="firstFastRetry">第一次异常时立即重试</param>
         /// <param name="maxRetryCount">重试最大次数</param>
         protected RetryStrategy(string name, bool firstFastRetry, int maxRetryCount)
         {
@@ -93,7 +78,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// <summary>
         /// 执行无返回值的方法
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="action">重试委托</param>
         public void DoExecute(Action action)
         {
             DoExecute(() => { action(); return default(object); });
@@ -102,13 +87,15 @@ namespace Sparrow.CommonLibrary.Retrying
         /// <summary>
         /// 执行有返回值的方法
         /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <typeparam name="TResult">返回值类型</typeparam>
+        /// <param name="action">重试委托</param>
+        /// <returns>返回结果</returns>
         public TResult DoExecute<TResult>(Func<TResult> action)
         {
             if (action == null)
+            {
                 throw new ArgumentNullException("func");
+            }
             //
             int retryCount = 0;
             TimeSpan delay = TimeSpan.Zero;
@@ -125,17 +112,25 @@ namespace Sparrow.CommonLibrary.Retrying
                     lastException = exception;
                     //
                     if (!ShouldRetry(retryCount++, lastException, out delay))
+                    {
                         throw;
+                    }
                 }
 
                 if (delay.TotalMilliseconds < 0)
+                {
                     delay = TimeSpan.Zero;
+                }
 
                 if (!this.Retrying(retryCount, lastException, delay))
+                {
                     throw lastException;
+                }
 
                 if (retryCount > 1 || !this.FirstFastRetry)
+                {
                     Thread.Sleep(delay);
+                }
 
             } while (true);
         }
@@ -144,7 +139,7 @@ namespace Sparrow.CommonLibrary.Retrying
         /// 检测是否应该继续执行重试策略，以及返回重试间隔时间。
         /// </summary>
         /// <param name="retryCount">重试次数</param>
-        /// <param name="lastException">最后一次抛出的异常</param>
+        /// <param name="lastException">引发重试的异常</param>
         /// <param name="delay">重试时的延迟</param>
         /// <returns>返回true表示继续重试，否则表示停止重试结束操作。</returns>
         protected abstract bool ShouldRetry(int retryCount, Exception lastException, out TimeSpan delay);
@@ -152,9 +147,9 @@ namespace Sparrow.CommonLibrary.Retrying
         /// <summary>
         /// 触发OnRetrying事件。
         /// </summary>
-        /// <param name="retryCount"></param>
-        /// <param name="lastException"></param>
-        /// <param name="delay"></param>
+        /// <param name="retryCount">重试次数</param>
+        /// <param name="lastException">引发重试的异常</param>
+        /// <param name="delay">重试时的延迟</param>
         /// <returns>指示是否继续执行</returns>
         protected virtual bool Retrying(int retryCount, Exception lastException, TimeSpan delay)
         {
