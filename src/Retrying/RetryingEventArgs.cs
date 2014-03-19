@@ -26,7 +26,12 @@ namespace Sparrow.CommonLibrary.Retrying
         /// 指示继续重试，默认为true，如果设置为false，表示立即停止重试。
         /// </summary>
         public bool Retrying { get; set; }
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="retryCount">重试次数</param>
+        /// <param name="lastException">引发重试的异常</param>
+        /// <param name="delay">重试时间间隔</param>
         public RetryingEventArgs(int retryCount, Exception lastException, TimeSpan delay)
         {
             this.CurrentRetryCount = retryCount;
