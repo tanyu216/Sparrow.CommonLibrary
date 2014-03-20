@@ -8,43 +8,59 @@ using System.Text.RegularExpressions;
 
 namespace Sparrow.CommonLibrary.Extenssions
 {
+    /// <summary>
+    /// 类型转换扩展类
+    /// </summary>
     public static class ConvertExtenssions
     {
+        /// <summary>
+        /// 将字符串编码utf-8格式
+        /// </summary>
+        /// <param name="value">字符串</param>
+        /// <returns>utf-8编码数据</returns>
         public static byte[] ToUtf8Bytes(this string value)
         {
             return Encoding.UTF8.GetBytes(value);
         }
-
+        /// <summary>
+        /// 编码兼容uri规范的base64字符串
+        /// </summary>
+        /// <param name="base64String">编码前的base64字符串</param>
+        /// <returns>编码后的base64字符串</returns>
         public static string Base64StringEncode(this string base64String)
         {
             return Regex.Replace(base64String, "\\+|=|/", x =>
-                                                          {
-                                                              switch (x.Value)
-                                                              {
-                                                                  case "+":
-                                                                      return "_";
-                                                                  case "=":
-                                                                      return "`";
-                                                                  default:
-                                                                      return "-";
-                                                              }
-                                                          });
+            {
+                switch (x.Value)
+                {
+                    case "+":
+                        return "_";
+                    case "=":
+                        return "`";
+                    default:
+                        return "-";
+                }
+            });
         }
-
+        /// <summary>
+        /// 解码兼容uri规范的base64字符串
+        /// </summary>
+        /// <param name="base64String">编码后的base64字符串</param>
+        /// <returns>解码后的base64字符串</returns>
         public static string Base64StringDecode(this string base64String)
         {
             return Regex.Replace(base64String, "_|\\-|`", x =>
-                                                          {
-                                                              switch (x.Value)
-                                                              {
-                                                                  case "_":
-                                                                      return "+";
-                                                                  case "`":
-                                                                      return "=";
-                                                                  default:
-                                                                      return "/";
-                                                              }
-                                                          });
+            {
+                switch (x.Value)
+                {
+                    case "_":
+                        return "+";
+                    case "`":
+                        return "=";
+                    default:
+                        return "/";
+                }
+            });
         }
 
         #region Cast T
