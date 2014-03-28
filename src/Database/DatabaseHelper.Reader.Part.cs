@@ -75,7 +75,7 @@ namespace Sparrow.CommonLibrary.Database
         public IDataReader ExecuteReader(SqlBatch batch)
         {
             var command = BuildDbCommand(batch);
-            return Executer.ExecuteReader(command);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Sparrow.CommonLibrary.Database
         public IDataReader ExecuteReader(SqlBatch batch, DbTransaction transaction)
         {
             var command = BuildDbCommand(batch);
-            return Executer.ExecuteReader(command, transaction);
+            return ExecuteReader(command, transaction);
         }
 
 

@@ -35,13 +35,12 @@ namespace Sparrow.CommonLibrary.Database.Configuration
 
         public DatabaseSettings()
         {
-            _executerTypes = new ConcurrentDictionary<string, Type>();
-            _importerTypes = new ConcurrentDictionary<string, Type>();
+            _databaseTypes = new ConcurrentDictionary<string, Type>();
             _sqlbuilderInstances = new ConcurrentDictionary<string, ISqlBuilder>();
         }
 
         public DatabaseSettings(DatabaseConfigurationSection configuration)
-            :this()
+            : this()
         {
             LoadConfig(configuration);
         }
@@ -53,9 +52,9 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             {
                 configuration = new DatabaseConfigurationSection();
                 configuration.Providers = new ProviderElementCollection();
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.SqlClient", Executer = new ExecuterElement() { Type = typeof(DbCommon.CommonExecuter) }, Builder = new BuilderElement() { Type = typeof(SqlBuilder.SqlServerStatementBuilder) }, Importer = new ImporterElement() { Type = typeof(ImporterForSqlServer) } });
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.MySqlClient", Executer = new ExecuterElement() { Type = typeof(DbCommon.CommonExecuter) }, Builder = new BuilderElement() { Type = typeof(SqlBuilder.MySqlStatementBuilder) } });
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.OracleClient", Executer = new ExecuterElement() { Type = typeof(DbCommon.CommonExecuter) }, Builder = new BuilderElement() { Type = typeof(SqlBuilder.OracleStatementBuilder) } });
+                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.SqlClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.SqlServerStatementBuilder) } });
+                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.MySqlClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.MySqlStatementBuilder) } });
+                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.OracleClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.OracleStatementBuilder) } });
             }
 
             LoadConfig(configuration);
@@ -71,11 +70,9 @@ namespace Sparrow.CommonLibrary.Database.Configuration
                 if (element.Builder != null)
                     _sqlbuilderInstances[element.Name] = (ISqlBuilder)Activator.CreateInstance(element.Builder.Type);
 
-                if (element.Importer != null)
-                    _importerTypes[element.Name] = element.Importer.Type;
+                if (element.Database != null)
+                    _databaseTypes[element.Name] = element.Database.Type;
 
-                if (element.Executer != null)
-                    _executerTypes[element.Name] = element.Executer.Type;
             }
         }
 
@@ -99,44 +96,24 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             return null;
         }
 
-        private ConcurrentDictionary<string, Type> _importerTypes;
+        private ConcurrentDictionary<string, Type> _databaseTypes;
 
-        public void SetImporterType(string name, Type importer)
+        public void SetDatabaseHelperType(string name, Type databaseType)
         {
-            if (importer == null)
-                throw new ArgumentNullException("importer");
+            if (databaseType == null)
+                throw new ArgumentNullException("databaseType");
 
-            _importerTypes[name] = importer;
+            _databaseTypes[name] = databaseType;
         }
 
-        public Type GetImporterType(string name)
+        public Type GetDatabaseHelperType(string name)
         {
-            Type importer;
+            Type databaseType;
 
-            if (_importerTypes.TryGetValue(name, out importer))
-                return importer;
+            if (_databaseTypes.TryGetValue(name, out databaseType))
+                return databaseType;
 
             return null;
-        }
-
-        private ConcurrentDictionary<string, Type> _executerTypes;
-
-        public void SetICommonExecuterType(string name, Type executer)
-        {
-            if (executer == null)
-                throw new ArgumentNullException("executer");
-
-            _executerTypes[name] = executer;
-        }
-
-        public Type GetICommonExecuterType(string name)
-        {
-            Type executer;
-
-            if (_executerTypes.TryGetValue(name, out executer))
-                return executer;
-
-            return typeof(DbCommon.CommonExecuter);
         }
 
         public static void ResetSettings(DatabaseSettings settings)

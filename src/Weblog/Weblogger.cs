@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
-using Sparrow.CommonLibrary.Logging;
 using Sparrow.CommonLibrary.Common;
 using Sparrow.CommonLibrary.Weblog.Collect;
 using Sparrow.CommonLibrary.Weblog.Writer;
@@ -37,8 +36,6 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly IWeblogWriter Writer;
 
-        private Logging.Log Log { get { return Logging.Log.GetLog(Configuration.WeblogSettings.Settings.LogCategory); } }
-
         public Weblogger(string version, IEnumerable<ICollecter> collecters, IWeblogWriter writer)
         {
             if (string.IsNullOrEmpty(version))
@@ -69,9 +66,8 @@ namespace Sparrow.CommonLibrary.Weblog
                     if (collect != null)
                         collect.Begin(context);
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    Log.Warning("带有上下文的采集器错误，Begin", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
                 }
             }
         }
@@ -86,9 +82,8 @@ namespace Sparrow.CommonLibrary.Weblog
                     if (collect != null)
                         collect.End(context);
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    Log.Warning("带有上下文的采集器错误，End", ex, new { Name = collect.Name, Type = collect.GetType().FullName });
                 }
             }
         }
@@ -107,9 +102,8 @@ namespace Sparrow.CommonLibrary.Weblog
                         data[i] = Collecters[i].GetValue(context);
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Log.Warning("采集器错误，GetValue", ex, new { Name = Collecters[i].Name, Type = Collecters[i].GetType().FullName });
                 }
             }
             //
@@ -117,9 +111,8 @@ namespace Sparrow.CommonLibrary.Weblog
             {
                 buffer.Write(new WeblogEntry(data));
             }
-            catch (Exception ex)
+            catch
             {
-                Log.Error("采集器采集的数据输出至缓冲区异常。", ex);
             }
         }
 
@@ -130,9 +123,8 @@ namespace Sparrow.CommonLibrary.Weblog
                 var weblogs = new WeblogEntryCollection(Version, CollecterNames, e.List);
                 Writer.Write(weblogs);
             }
-            catch (Exception ex)
+            catch
             {
-                Log.Error("weblog写日志错误。", ex);
             }
         }
 

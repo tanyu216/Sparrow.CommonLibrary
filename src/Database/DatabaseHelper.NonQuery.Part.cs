@@ -74,7 +74,7 @@ namespace Sparrow.CommonLibrary.Database
         public int ExecuteNonQuery(SqlBatch batch)
         {
             var command = BuildDbCommand(batch);
-            return Executer.ExecuteNonQuery(command);
+            return ExecuteNonQuery(command);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Sparrow.CommonLibrary.Database
         public int ExecuteNonQuery(SqlBatch batch, DbTransaction transaction)
         {
             var command = BuildDbCommand(batch);
-            return Executer.ExecuteNonQuery(command, transaction);
+            return ExecuteNonQuery(command, transaction);
         }
 
 

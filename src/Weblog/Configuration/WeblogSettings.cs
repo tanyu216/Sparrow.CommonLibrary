@@ -68,16 +68,8 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             protected set { _writerParameters = value; }
         }
 
-        /// <summary>
-        /// 用于记录日志的Category
-        /// </summary>
-        internal protected string LogCategory { get; protected set; }
-
-        protected Logging.Log Log { get { return Logging.Log.GetLog(LogCategory); } }
-
         public WeblogSettings()
         {
-            LogCategory = "sprweblog";
         }
 
         public void LoadConfig()
@@ -101,35 +93,27 @@ namespace Sparrow.CommonLibrary.Weblog.Configuration
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            try
+            Version = configuration.Version;
+            _collecters = configuration.Collect.Value.Split(',').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            if (_collecters.Length == 0)
+                throw new System.Configuration.ConfigurationErrorsException(string.Format("Weblog没有配置任何一个可用的采集选项({0})。", typeof(ICollecter).FullName));
+
+            var ignoreList = new List<string>();
+            if (configuration.Ignores != null)
             {
-                Version = configuration.Version;
-                _collecters = configuration.Collect.Value.Split(',').Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                if (_collecters.Length == 0)
-                    throw new System.Configuration.ConfigurationErrorsException(string.Format("Weblog没有配置任何一个可用的采集选项({0})。", typeof(ICollecter).FullName));
-
-                var ignoreList = new List<string>();
-                if (configuration.Ignores != null)
-                {
-                    foreach (IgnoreElement ignore in configuration.Ignores)
-                        if (!string.IsNullOrWhiteSpace(ignore.Match))
-                            ignoreList.Add(ignore.Match);
-                }
-                _ignores = ignoreList.ToArray();
-
-                Writer = configuration.Writer.Type;
-
-                WriterParameters = new Dictionary<string, string>();
-                if (configuration.Writer.Params != null)
-                {
-                    foreach (Sparrow.CommonLibrary.Weblog.Configuration.ParamElement param in configuration.Writer.Params)
-                        WriterParameters[param.Name] = param.Value;
-                }
+                foreach (IgnoreElement ignore in configuration.Ignores)
+                    if (!string.IsNullOrWhiteSpace(ignore.Match))
+                        ignoreList.Add(ignore.Match);
             }
-            catch (Exception ex)
+            _ignores = ignoreList.ToArray();
+
+            Writer = configuration.Writer.Type;
+
+            WriterParameters = new Dictionary<string, string>();
+            if (configuration.Writer.Params != null)
             {
-                Log.Error("加载Weblog配置失败。", ex);
-                throw ex;
+                foreach (Sparrow.CommonLibrary.Weblog.Configuration.ParamElement param in configuration.Writer.Params)
+                    WriterParameters[param.Name] = param.Value;
             }
         }
     }

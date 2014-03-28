@@ -28,6 +28,21 @@ namespace Sparrow.CommonLibrary.Retrying
         public static readonly TimeSpan DefaultRetryIncrementalInterval = TimeSpan.FromSeconds(1);
 
         /// <summary>
+        /// <see cref="ExponentialBackoffInterval"/>默认重试时间间隔最小指数。
+        /// </summary>
+        public static readonly TimeSpan DefaultRetryMinBackoff = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// <see cref="ExponentialBackoffInterval"/>默认重试时间间隔最大指数。
+        /// </summary>
+        public static readonly TimeSpan DefaultRetryMaxBackoff = TimeSpan.FromSeconds(30);
+
+        /// <summary>
+        /// <see cref="ExponentialBackoffInterval"/>默认计算指数延迟指数的三角。
+        /// </summary>
+        public static readonly TimeSpan DefaultDeltaBackoff = TimeSpan.FromSeconds(10);
+
+        /// <summary>
         /// 默认第一次异常时立即重试。
         /// </summary>
         public static readonly bool DefaultFirstFastRetry = true;

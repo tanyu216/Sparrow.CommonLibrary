@@ -10,17 +10,14 @@ namespace Sparrow.CommonLibrary.Database.Configuration
     public class ProviderElement : ConfigurationElement
     {
         private readonly ConfigurationProperty _builderProperty;
-        private readonly ConfigurationProperty _executerProperty;
-        private readonly ConfigurationProperty _importerProperty;
+        private readonly ConfigurationProperty _dbProperty;
 
         public ProviderElement()
         {
             _builderProperty = new ConfigurationProperty("builder", typeof(BuilderElement), null);
-            _executerProperty = new ConfigurationProperty("executer", typeof(ExecuterElement), null);
-            _importerProperty = new ConfigurationProperty("importer", typeof(ImporterElement), null);
+            _dbProperty = new ConfigurationProperty("database", typeof(DatabaseElement), null);
             Properties.Add(_builderProperty);
-            Properties.Add(_executerProperty);
-            Properties.Add(_importerProperty);
+            Properties.Add(_dbProperty);
         }
 
         [ConfigurationProperty("name", IsRequired = true)]
@@ -36,16 +33,10 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             set { this[_builderProperty] = value; }
         }
 
-        public ExecuterElement Executer
+        public DatabaseElement Database
         {
-            get { return (ExecuterElement)this[_executerProperty]; }
-            set { this[_executerProperty] = value; }
-        }
-
-        public ImporterElement Importer
-        {
-            get { return (ImporterElement)this[_importerProperty]; }
-            set { this[_importerProperty] = value; }
+            get { return (DatabaseElement)this[_dbProperty]; }
+            set { this[_dbProperty] = value; }
         }
     }
 }

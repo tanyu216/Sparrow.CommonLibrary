@@ -1,10 +1,8 @@
-﻿using Sparrow.CommonLibrary.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
-using Sparrow.CommonLibrary.Logging.Configuration;
 
 namespace Sparrow.CommonLibrary.Weblog.Configuration
 {

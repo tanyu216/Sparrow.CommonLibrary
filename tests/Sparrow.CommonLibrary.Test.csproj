@@ -58,8 +58,6 @@
     <Compile Include="Extenssions\ConvertExtenssionsTest.cs" />
     <Compile Include="Extenssions\DataExtenssionsTest.cs" />
     <Compile Include="Extenssions\ValidationExtenssionsTest.cs" />
-    <Compile Include="Logging\ConfigurationTest.cs" />
-    <Compile Include="Logging\LogTest.cs" />
     <Compile Include="Mapper\ObjectAccessorTest.cs" />
     <Compile Include="Mapper\ObjectAccessorFinderTest.cs" />
     <Compile Include="Mapper\UserProfile.cs" />

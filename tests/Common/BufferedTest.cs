@@ -16,7 +16,7 @@ namespace Sparrow.CommonLibrary.Test.Common
         public void Init()
         {
             buffered = new Buffered<int>(500);
-            buffered.MaxBufer = 100000;
+            buffered.MaxBuferSize = 100000;
             buffered.OnFlush += buffered_OnFlush;
         }
 

@@ -25,8 +25,6 @@ namespace Sparrow.CommonLibrary.Weblog
         /// </summary>
         private readonly Weblogger weblogger;
 
-        protected Logging.Log Log { get { return Logging.Log.GetLog(WeblogSettings.Settings.LogCategory); } }
-
         public WeblogHttpModule()
         {
             try
@@ -39,9 +37,8 @@ namespace Sparrow.CommonLibrary.Weblog
                     {
                         ignoreList.Add(new Regex(ignore, RegexOptions.Compiled | RegexOptions.IgnoreCase));
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Log.Warning("weblog跟踪初始化Ignores", ex, new { Regex = ignore });
                     }
                 }
                 Ignores = ignoreList.ToArray();
@@ -68,10 +65,9 @@ namespace Sparrow.CommonLibrary.Weblog
                 //weblogger
                 weblogger = new Weblogger(WeblogSettings.Settings.Version, collecters, writer);
             }
-            catch (Exception ex)
+            catch
             {
                 Skip = true;
-                Log.Error("WeblogHttpModule初始化失败。", ex);
             }
         }
 

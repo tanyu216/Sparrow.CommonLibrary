@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Sparrow.CommonLibrary.Database.Configuration
 {
-    public class ImporterElement : ConfigurationElement
+    public class DatabaseElement : ConfigurationElement
     {
         [ConfigurationProperty("type", IsRequired = true)]
         [TypeConverter(typeof(TypeNameConverter))]
-        [ConfigurationValidator(typeof(ConfigurationImporterTypeValidator))]
+        [ConfigurationValidator(typeof(ConfigurationDatabaseHelperTypeValidator))]
         public Type Type
         {
             get { return (Type)this["type"]; }

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
 using Sparrow.CommonLibrary.Common;
+using System.Configuration;
 
 namespace Sparrow.CommonLibrary.Database
 {
@@ -24,10 +25,8 @@ namespace Sparrow.CommonLibrary.Database
     {
         #region Properties
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ICommandExecuter Executer { get; private set; }
+        private string _connectionString;
+        public DbProvider DbProvider { get; private set; }
 
         /// <summary>
         /// 
@@ -50,7 +49,7 @@ namespace Sparrow.CommonLibrary.Database
 
         #endregion
 
-        #region ctor
+        #region ctor/init
 
         static DatabaseHelper()
         {
@@ -58,23 +57,32 @@ namespace Sparrow.CommonLibrary.Database
         }
 
         /// <summary>
-        /// 
+        /// 初始化
         /// </summary>
-        /// <param name="commandExecuter"></param>
-        /// <param name="entityToSql"> </param>
-        protected DatabaseHelper(ICommandExecuter commandExecuter, ISqlBuilder builder)
+        /// <param name="connectionString">连接字符串</param>
+        /// <param name="dbProvider">数据库操作对象提供器</param>
+        /// <param name="builder">sql语句生成</param>
+        protected DatabaseHelper()
         {
-            if (commandExecuter == null)
-                throw new ArgumentNullException("commandExecuter");
+        }
+
+        private void Init(string connectionString, DbProvider dbProvider, ISqlBuilder builder)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentNullException("connectionString");
+            if (dbProvider == null)
+                throw new ArgumentNullException("dbProvider");
             if (builder == null)
                 throw new ArgumentNullException("builder");
-            Executer = commandExecuter;
+
+            _connectionString = connectionString;
+            DbProvider = dbProvider;
             Builder = builder;
         }
 
         #endregion
 
-        #region Build
+        #region Build/Create
 
         /// <summary>
         /// 生成command对象
@@ -86,7 +94,7 @@ namespace Sparrow.CommonLibrary.Database
         internal protected DbCommand BuildDbCommand(CommandType commandType, string commandText, ParameterCollection parameterCollection)
         {
             if (commandText == null) throw new ArgumentNullException("commandText");
-            var command = Executer.DbProvider.CreateDbCommand(commandType, commandText);
+            var command = DbProvider.CreateDbCommand(commandType, commandText);
 
             //
             if (parameterCollection != null)
@@ -164,17 +172,13 @@ namespace Sparrow.CommonLibrary.Database
             return BuildDbCommand(CommandType.Text, sql.ToString(), paramters);
         }
 
-        #endregion
-
-        #region basic
-
         /// <summary>
         /// 创建一个参数集合的实例对象
         /// </summary>
         /// <returns></returns>
         public virtual ParameterCollection CreateParamterCollection()
         {
-            return new ParameterCollection(Builder, Executer.DbProvider);
+            return new ParameterCollection(Builder, DbProvider);
         }
 
         /// <summary>
@@ -184,8 +188,26 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns></returns>
         public virtual ParameterCollection CreateParamterCollection(int capacity)
         {
-            return new ParameterCollection(Builder, Executer.DbProvider, capacity);
+            return new ParameterCollection(Builder, DbProvider, capacity);
         }
+
+        #endregion
+
+        #region Connection
+
+        public ConnectionWrapper GetWrapperedConnection()
+        {
+            return DbProvider.GetWrapperedConnection(_connectionString);
+        }
+
+        public DbConnection GetNotWrapperedConnection()
+        {
+            return DbProvider.GetNotWrapperedConnection(_connectionString);
+        }
+
+        #endregion
+
+        #region Execute
 
         /// <summary>
         /// 
@@ -200,9 +222,9 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameterCollection);
             if (dbTransaction == null)
-                return Executer.ExecuteReader(command);
+                return ExecuteReader(command);
             //
-            return Executer.ExecuteReader(command, dbTransaction);
+            return ExecuteReader(command, dbTransaction);
         }
 
         /// <summary>
@@ -218,9 +240,9 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameters);
             if (dbTransaction == null)
-                return Executer.ExecuteReader(command);
+                return ExecuteReader(command);
             //
-            return Executer.ExecuteReader(command, dbTransaction);
+            return ExecuteReader(command, dbTransaction);
         }
 
         /// <summary>
@@ -236,9 +258,9 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameterCollection);
             if (dbTransaction == null)
-                return DbValueCast.Cast<T>(Executer.ExecuteScalar(command));
+                return DbValueCast.Cast<T>(ExecuteScalar(command));
             //
-            return DbValueCast.Cast<T>(Executer.ExecuteScalar(command, dbTransaction));
+            return DbValueCast.Cast<T>(ExecuteScalar(command, dbTransaction));
         }
 
         /// <summary>
@@ -254,9 +276,9 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameters);
             if (dbTransaction == null)
-                return DbValueCast.Cast<T>(Executer.ExecuteScalar(command));
+                return DbValueCast.Cast<T>(ExecuteScalar(command));
             //
-            return DbValueCast.Cast<T>(Executer.ExecuteScalar(command, dbTransaction));
+            return DbValueCast.Cast<T>(ExecuteScalar(command, dbTransaction));
         }
 
         /// <summary>
@@ -272,9 +294,9 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameterCollection);
             if (dbTransaction == null)
-                return Executer.ExecuteNonQuery(command);
+                return ExecuteNonQuery(command);
             //
-            return Executer.ExecuteNonQuery(command, dbTransaction);
+            return ExecuteNonQuery(command, dbTransaction);
         }
 
         /// <summary>
@@ -290,9 +312,122 @@ namespace Sparrow.CommonLibrary.Database
         {
             var command = BuildDbCommand(commandType, commandText, parameters);
             if (dbTransaction == null)
-                return Executer.ExecuteNonQuery(command);
+                return ExecuteNonQuery(command);
             //
-            return Executer.ExecuteNonQuery(command, dbTransaction);
+            return ExecuteNonQuery(command, dbTransaction);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual System.Data.IDataReader ExecuteReader(System.Data.Common.DbCommand command)
+        {
+            using (var conn = GetWrapperedConnection())
+            {
+                PrepareCommand(command, conn);
+                return new DataReaderWrapper(conn, command.ExecuteReader());
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual System.Data.DataSet ExecuteDataSet(System.Data.Common.DbCommand command)
+        {
+            using (var da = DbProvider.DbProviderFactory.CreateDataAdapter())
+            {
+                using (var conn = GetWrapperedConnection())
+                {
+                    PrepareCommand(command, conn);
+                    da.SelectCommand = command;
+                    var ds = new DataSet();
+                    da.Fill(ds);
+                    return ds;
+                }
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual object ExecuteScalar(System.Data.Common.DbCommand command)
+        {
+            using (var conn = GetWrapperedConnection())
+            {
+                PrepareCommand(command, conn);
+                return command.ExecuteScalar();
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual int ExecuteNonQuery(System.Data.Common.DbCommand command)
+        {
+            using (var conn = GetWrapperedConnection())
+            {
+                PrepareCommand(command, conn);
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual System.Data.IDataReader ExecuteReader(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
+        {
+            PrepareCommand(command, dbTransaction);
+            return command.ExecuteReader();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual System.Data.DataSet ExecuteDataSet(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
+        {
+            PrepareCommand(command, dbTransaction);
+            var da = DbProvider.DbProviderFactory.CreateDataAdapter();
+            da.SelectCommand = command;
+            var ds = new DataSet();
+            da.Fill(ds);
+            return ds;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual object ExecuteScalar(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
+        {
+            PrepareCommand(command, dbTransaction);
+            return command.ExecuteScalar();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual int ExecuteNonQuery(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
+        {
+            PrepareCommand(command, dbTransaction);
+            return command.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region PrepareCommand
+
+        internal protected static void PrepareCommand(DbCommand command, ConnectionWrapper connection)
+        {
+            if (command == null)
+                throw new ArgumentNullException("command");
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+            //
+            command.Connection = connection.Connection;
+        }
+
+        internal protected static void PrepareCommand(DbCommand command, DbTransaction dbTransaction)
+        {
+            if (command == null)
+                throw new ArgumentNullException("command");
+            if (dbTransaction == null)
+                throw new ArgumentNullException("dbTransaction");
+            //
+            command.Connection = dbTransaction.Connection;
+            command.Transaction = dbTransaction;
+        }
+
+        internal protected static void PrepareCommand(DbCommand command, DbConnection connection)
+        {
+            if (command == null)
+                throw new ArgumentNullException("command");
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+            //
+            command.Connection = connection;
         }
 
         #endregion
@@ -330,7 +465,34 @@ namespace Sparrow.CommonLibrary.Database
 
         #endregion
 
-        #region CachedDatabaseHelper
+        #region Decrypt
+
+        private static Func<string, string> decrypter;
+
+        /// <summary>
+        /// 自定义链接字符串解密方法
+        /// </summary>
+        /// <param name="decrypter">解密方法</param>
+        public static void SetDecrypter(Func<string, string> decrypter)
+        {
+            DatabaseHelper.decrypter = decrypter;
+        }
+
+        /// <summary>
+        /// 链接字符串解密
+        /// </summary>
+        /// <param name="connectionString">密文</param>
+        /// <returns>解密成功后的明文</returns>
+        private static string Decrypt(string connectionString)
+        {
+            if (decrypter != null)
+                return decrypter(connectionString);
+            return connectionString;
+        }
+
+        #endregion
+
+        #region GetDatabaseHelper
 
         private static readonly ConcurrentDictionary<string, DatabaseHelper> _databaseHelpers;
 
@@ -351,13 +513,46 @@ namespace Sparrow.CommonLibrary.Database
             throw new System.Configuration.ConfigurationErrorsException(string.Format("未配置{0}/{1}对应的{2}实例。", connName, providerName, typeof(ISqlBuilder)));
         }
 
+        private static DatabaseHelper CreateDatabaseHelper(string connName, string connString, string providerName)
+        {
+            var dbProvider = DbProvider.GetDbProvider(providerName);
+            DatabaseHelper db = null;
+            Type dbType = null;
+            if (!string.IsNullOrEmpty(connName))
+            {
+                dbType = Configuration.DatabaseSettings.Settings.GetDatabaseHelperType(connName);
+            }
+            if (dbType == null && !string.IsNullOrEmpty(providerName))
+            {
+                dbType = Configuration.DatabaseSettings.Settings.GetDatabaseHelperType(providerName);
+            }
+            if (dbType != null)
+            {
+                db = (DatabaseHelper)Activator.CreateInstance(dbType);
+            }
+
+            if (db == null)
+            {
+                db = new DatabaseHelper();
+            }
+            db.Init(Decrypt(connString), dbProvider, GetISqlBuilder(connName, dbProvider.ProviderName));
+            return db;
+        }
+
         public static DatabaseHelper GetHelper(string connectionName)
         {
             return _databaseHelpers.GetOrAdd(connectionName, x =>
             {
-                var cmdExecuter = ExecuterManager.Create(connectionName);
-                var database = new DatabaseHelper(cmdExecuter, GetISqlBuilder(connectionName, cmdExecuter.DbProvider.ProviderName));
-                return database;
+                var connString = ConfigurationManager.ConnectionStrings[connectionName];
+
+                if (connString == null)
+                    throw new ConfigurationErrorsException(string.Format("未找到{0}连接字符串配置。", connectionName));
+                if (string.IsNullOrEmpty(connString.ConnectionString))
+                    throw new ConfigurationErrorsException(string.Format("{0}未配置连接字符串。", connectionName));
+                if (string.IsNullOrEmpty(connString.ProviderName))
+                    throw new ConfigurationErrorsException("连接字符串未配置providerName。");
+
+                return CreateDatabaseHelper(connectionName, connString.ConnectionString, connString.ProviderName);
             });
         }
 
@@ -365,9 +560,12 @@ namespace Sparrow.CommonLibrary.Database
         {
             return _databaseHelpers.GetOrAdd(connectionString, x =>
             {
-                var cmdExecuter = ExecuterManager.Create(connectionString, providerName);
-                var database = new DatabaseHelper(cmdExecuter, GetISqlBuilder(null, cmdExecuter.DbProvider.ProviderName));
-                return database;
+                if (string.IsNullOrEmpty(connectionString))
+                    throw new ArgumentNullException("connectionString");
+                if (string.IsNullOrEmpty(providerName))
+                    throw new ArgumentNullException("providerName");
+
+                return CreateDatabaseHelper(null, connectionString, providerName);
             });
         }
 
