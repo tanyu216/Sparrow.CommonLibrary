@@ -103,6 +103,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
                         initData[i] = getter.GetValue(value);
                     }
                 }
+                return Create(initData);
             }
 
             return default(T);

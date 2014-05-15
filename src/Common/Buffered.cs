@@ -78,10 +78,10 @@ namespace Sparrow.CommonLibrary.Common
         }
 
         /// <summary>
-        /// 定时Flush事件
+        /// Flush事件
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">触发Flush事件的对象实例</param>
+        /// <param name="e">Flush事件参数</param>
         void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (_queue.Count > 0)
@@ -146,7 +146,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <summary>
         /// 向缓冲区写入一个对象。
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">写入缓冲区的对象</param>
         public void Write(T item)
         {
             TestDisposed();
@@ -164,7 +164,7 @@ namespace Sparrow.CommonLibrary.Common
         /// <summary>
         /// 向缓冲区写入一组对象集合。
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="items">写入缓冲区的一组对象</param>
         public void Write(ICollection<T> items)
         {
             TestDisposed();
@@ -214,11 +214,18 @@ namespace Sparrow.CommonLibrary.Common
     /// <summary>
     /// Flush事件参数
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">缓冲区对象泛型</typeparam>
     public class BufferedFlushEventArgs<T> : EventArgs
     {
+        /// <summary>
+        /// 缓存区的元素集合
+        /// </summary>
         public IList<T> List { get; private set; }
 
+        /// <summary>
+        /// 初始线
+        /// </summary>
+        /// <param name="list">缓存区的元素集合</param>
         public BufferedFlushEventArgs(IList<T> list)
         {
             this.List = list;

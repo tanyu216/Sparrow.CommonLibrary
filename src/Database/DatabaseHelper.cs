@@ -33,19 +33,10 @@ namespace Sparrow.CommonLibrary.Database
         /// </summary>
         public ISqlBuilder Builder { get; private set; }
 
-        private EntityToSqlStatement _entityToSql;
         /// <summary>
         /// 
         /// </summary>
-        public EntityToSqlStatement EntityToSql
-        {
-            get
-            {
-                if (_entityToSql == null)
-                    _entityToSql = EntityToSqlStatement.Create(Builder);
-                return _entityToSql;
-            }
-        }
+        public EntityToSqlStatement EntityToSql { get; private set; }
 
         #endregion
 
@@ -78,6 +69,7 @@ namespace Sparrow.CommonLibrary.Database
             _connectionString = connectionString;
             DbProvider = dbProvider;
             Builder = builder;
+            EntityToSql = EntityToSqlStatement.Create(Builder);
         }
 
         #endregion
