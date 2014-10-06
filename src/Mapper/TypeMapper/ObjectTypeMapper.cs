@@ -71,14 +71,7 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
             if (value == null)
                 return default(T);
 
-            if (value is IDataSourceReader)
-            {
-                var initData = ((IDataSourceReader)value).Read();
-                if (initData == null)
-                    return default(T);
-                return Create(initData);
-            }
-            else if (value is Array)
+            if (value is Array)
             {
                 return Create((object[])value);
             }

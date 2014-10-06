@@ -38,7 +38,7 @@ namespace Sparrow.CommonLibrary.Mapper
             new ValueTypeTypeMapper<Int16>(),
             new ValueTypeTypeMapper<Int16?>(),
             new ValueTypeTypeMapper<Int32>(),
-            new ValueTypeTypeMapper<Int32>(),
+            new ValueTypeTypeMapper<Int32?>(),
             new ValueTypeTypeMapper<Int64>(),
             new ValueTypeTypeMapper<Int64?>(),
             new ValueTypeTypeMapper<SByte>(),

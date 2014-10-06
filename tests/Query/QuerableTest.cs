@@ -75,9 +75,7 @@ namespace Sparrow.CommonLibrary.Test.Query
         {
             var database = DatabaseHelper.GetHelper("test");
 
-            var list = database.CreateQueryable<UserProfile>()
-                .Select(x => x.Id, x => x.Name)
-                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+            var list = database.CreateQueryable<UserProfile3>()
                 .ExecuteList();
 
             Assert.IsNotNull(list);

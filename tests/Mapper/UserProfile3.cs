@@ -14,13 +14,13 @@ namespace Sparrow.CommonLibrary.Test.Mapper
     {
         public virtual int Id { get; set; }
         public virtual string Name { get; set; }
-        public virtual short Sex { get; set; }
+        public virtual int? Sex { get; set; }
         public virtual string Email { get; set; }
         public virtual string FixPhone { get; set; }
 
         public static IObjectAccessor<UserProfile3> GetObjectAccessor()
         {
-            return new ObjectAccessor<UserProfile3>()
+            return new ObjectAccessor<UserProfile3>("UserProfile")
                 .AppendProperty(x => x.Id, "Id")
                 .AppendProperty(x => x.Name, "Name")
                 .AppendProperty(x => x.Sex, "Sex")
