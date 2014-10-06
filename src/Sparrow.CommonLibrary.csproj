@@ -185,32 +185,9 @@
     <Compile Include="Common\DynamicKeyValueContainer.cs" />
     <Compile Include="Common\PathBuilder.cs" />
     <Compile Include="Common\Timestamp.cs" />
-    <Compile Include="Weblog\Collect\CollecterTypeContainer.cs" />
-    <Compile Include="Weblog\Collect\Collecters.cs" />
-    <Compile Include="Weblog\Collect\ICollecter.cs" />
-    <Compile Include="Weblog\Configuration\CollectElement.cs" />
-    <Compile Include="Weblog\Configuration\ConfigurationTypeValidator.cs" />
-    <Compile Include="Weblog\Configuration\IgnoreElementCollection.cs" />
-    <Compile Include="Weblog\Configuration\IgnoreElement.cs" />
-    <Compile Include="Weblog\Configuration\ParamElementCollection.cs" />
-    <Compile Include="Weblog\Configuration\ParamElement.cs" />
-    <Compile Include="Weblog\Configuration\WeblogConfigurationSection.cs" />
-    <Compile Include="Weblog\Configuration\WriterElement.cs" />
-    <Compile Include="Weblog\Configuration\CustomCollectElement.cs" />
-    <Compile Include="Weblog\Configuration\CustomCollectElementCollection.cs" />
-    <Compile Include="Weblog\WeblogEntry.cs" />
-    <Compile Include="Weblog\WeblogEntryCollection.cs" />
-    <Compile Include="Weblog\Weblogger.cs" />
-    <Compile Include="Weblog\WeblogHttpModule.cs" />
-    <Compile Include="Weblog\Configuration\WeblogSettings.cs" />
-    <Compile Include="Weblog\Writer\DbWeblogWriter.cs" />
-    <Compile Include="Weblog\Writer\IWeblogWriter.cs" />
-    <Compile Include="Weblog\Writer\TextWeblogWriter.cs" />
-    <Compile Include="Weblog\Writer\WeblogWriterBase.cs" />
-    <Compile Include="Weblog\Writer\MSMQWeblogWriter.cs" />
     <Compile Include="Extenssions\WebExtenssions.cs" />
-    <Compile Include="Web\HttpClient.cs" />
-    <Compile Include="Web\RecognizeSpider.cs" />
+    <Compile Include="Net\HttpClient.cs" />
+    <Compile Include="Net\RecognizeSpider.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

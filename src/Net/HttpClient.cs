@@ -11,7 +11,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Sparrow.CommonLibrary.Retrying;
 
-namespace Sparrow.CommonLibrary.Web
+namespace Sparrow.CommonLibrary.Net
 {
     /// <summary>
     /// HttpClient，创建一个Http请求，获取请求地址返回的数据。

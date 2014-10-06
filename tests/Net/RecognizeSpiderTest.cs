@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Sparrow.CommonLibrary.Web;
+using Sparrow.CommonLibrary.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
