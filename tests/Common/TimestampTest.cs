@@ -28,8 +28,12 @@ namespace Sparrow.CommonLibrary.Test.Common
         [Test]
         public void Test2()
         {
+
             var timestamp = Timestamp.Now;
             var datetime = (DateTime)timestamp;
+            //转换为本地时区的时间
+            var local = datetime.ToLocalTime();
+
             var longVal = (long)timestamp;
             Assert.AreEqual(timestamp, longVal);
         }
@@ -62,6 +66,15 @@ namespace Sparrow.CommonLibrary.Test.Common
             var val = 100000;
             var timestamp = val.Cast<Timestamp>();
         }
+
+        [Test]
+        public void Test5()
+        {
+
+            Timestamp tt = (Timestamp)DateTime.Now;
+
+        }
+
 
     }
 }

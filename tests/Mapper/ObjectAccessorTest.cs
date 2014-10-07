@@ -137,6 +137,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         {
             var dt = CreateDataTable();
             var single = Map.Single<UserProfile>(dt);
+
             Assert.IsNotNull(single);
         }
 
@@ -145,6 +146,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         {
             var dt = CreateDataTable();
             var list = Map.List<UserProfile>(dt);
+
             Assert.IsNotNull(list);
         }
 
@@ -164,5 +166,15 @@ namespace Sparrow.CommonLibrary.Test.Mapper
             Assert.IsNotNull(list);
         }
 
+        [Test]
+        public void MapTest5()
+        {
+
+            var user = Map.Create<UserProfile>();
+            user.Id = 1;
+            user.Email = "newemail@126.com";
+
+
+        }
     }
 }

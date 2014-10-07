@@ -46,6 +46,8 @@ namespace Sparrow.CommonLibrary.Query
                     return new AndAlsoExpression() { Left = left, Right = right };
                 case ExpressionType.OrElse:
                     return new OrElseExpression() { Left = left, Right = right };
+                case ExpressionType.Like:
+                    return new LikeExpression() { Left = left, Right = right };
                 default:
                     throw new NotSupportedException(string.Format("不受支持的{0}", nodeType.ToString()));
             }

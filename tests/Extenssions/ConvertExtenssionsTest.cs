@@ -38,9 +38,12 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         [Test]
         public void CastTest3()
         {
-            string obj = "1";
-            int val = obj.ToInt();
-            decimal val2 = obj.ToDecimal();
+
+            int val = "1".ToInt();
+            decimal val2 = "1.2".ToDecimal();
+            DateTime date = "2014-1-1".ToDateTime();
+            bool b = "true".ToBoolean();
+
         }
 
         [Test]
@@ -61,12 +64,14 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         public void CastTest5()
         {
             decimal? val1 = "".ToNullableDecimal();
-            Assert.AreEqual(val1, null);
 
             decimal? val2 = "2".ToNullableDecimal();
-            Assert.AreEqual(val2, 2);
 
             decimal? val3 = ",".ToNullableDecimal();
+
+
+            Assert.AreEqual(val2, 2);
+            Assert.AreEqual(val1, null);
             Assert.AreEqual(val3, null);
 
         }
@@ -99,6 +104,17 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
 
             bool val5 = "TRUE".ToBoolean();
             Assert.AreEqual(val5, true);
+        }
+
+        [Test]
+        public void CastTest8()
+        {
+            decimal? val1 = "2".ToNullableDecimal();//2
+            decimal? val2 = "2，".ToNullableDecimal();//转换失败返回：null
+            int? val3 = "2".ToNullableInt();//2
+            int? val4 = "2，".ToNullableInt();//转换失败返回：null
+            string safestring = ((string)null).ToSafeString();//可以必免发生空引用异常
+            string safestring2 = "123".ToSafeString();
         }
     }
 }

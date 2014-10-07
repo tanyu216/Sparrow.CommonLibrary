@@ -41,5 +41,14 @@ namespace Sparrow.CommonLibrary.Test.Common
                     System.Threading.Thread.Sleep(5);
             }
         }
+
+        [Test]
+        public void Test2()
+        {
+            int obj = 1;
+
+            buffered.Write(obj);
+
+        }
     }
 }

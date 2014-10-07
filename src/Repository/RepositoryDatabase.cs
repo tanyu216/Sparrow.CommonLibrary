@@ -176,9 +176,9 @@ namespace Sparrow.CommonLibrary.Repository
                 return 0;
             if (incrementEntity == null || incrementEntity.Count == 0)
             {
-                return _database.ExecuteNonQuery(CommandType.Text, sql, parameterCollection);
+                return _database.ExecuteNonQuery(sql, parameterCollection);
             }
-            using (var reader = _database.ExecuteReader(CommandType.Text, sql, parameterCollection))
+            using (var reader = _database.ExecuteReader(sql, parameterCollection))
             {
                 ReceiveIncrement(incrementEntity, reader);
                 return reader.RecordsAffected;

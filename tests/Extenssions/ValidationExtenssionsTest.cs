@@ -34,7 +34,7 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         [Test]
         public void IsEmailTest()
         {
-            Assert.IsTrue("tanyu216@hotmail.com".IsEmail());
+            Assert.IsTrue("test@hotmail.com".IsEmail());
             Assert.IsTrue("tanyu216@126.com".IsEmail());
             Assert.IsTrue("tanyu_216@126.com".IsEmail());
             Assert.IsTrue("tanyu-216@126.com".IsEmail());
@@ -118,6 +118,30 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         {
             //Assert.IsTrue("430211***".IsIDCardCHN());
             Assert.IsFalse("430211191202161811".IsIDCardCHN());
+        }
+
+        [Test]
+        public void Test1()
+        {
+            "1234".IsDigits();//整数
+            "1234.1".IsNumber();//数字（整数、小数）
+            "test@hotmail.com".IsEmail();//邮箱
+            "59356309".IsFixPhoneCHN();//固定电话
+            "8659356309".IsFixPhoneCHN();
+            "+8659356309".IsFixPhoneCHN();
+            "01059356309".IsFixPhoneCHN();
+            "8601059356309".IsFixPhoneCHN();
+            "+8601059356309".IsFixPhoneCHN();
+            "15801121212".IsMobilePhoneCHN();//移动电话
+            "+8615801121212".IsMobilePhoneCHN();
+            "http://www.test.com?id=1".IsUrl();//url
+            "2013-1-1 2:30:50".IsDateTime();//时间
+            "2013-1-1".IsDateISO();//日期
+            "4408041234567890".IsCreditCard();//信用卡号
+            "4408-0412-3456-7890".IsCreditCard();
+            "4408 0412 3456 7890".IsCreditCard();
+            "430211191202161811".IsIDCardCHN();//身份证号码
+
         }
     }
 }

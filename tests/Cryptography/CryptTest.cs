@@ -24,5 +24,15 @@ namespace Sparrow.CommonLibrary.Test.Cryptography
             var result = Crypto.ToHexString(bt);
             Assert.AreEqual(data, result);
         }
+        [Test]
+        public void Test1()
+        {
+
+            var cryptKey = "!@#$%^&*!@#$%^&*";
+            var symmetricCrypto = Crypto.SymmetricCrypto(cryptKey,SymmetricFlag.Rijndael);
+            var ctyptValue = symmetricCrypto.Encrypt("我的密文");
+
+
+        }
     }
 }

@@ -53,6 +53,7 @@ namespace Sparrow.CommonLibrary.Test.Query
             var sql = database.CreateQueryable<UserProfile>()
                 .Select(x => x.Id, x => x.Name)
                 .Where(x => x.Id == 4 || (x.Id >= 1 && x.Id <= 10) || x.Id == null || (x.Id != 3 && x.Id != null))
+                .Where(x => x.Sex == 1)
                 .OutputSqlString(parameter);
 
             Assert.IsNotNullOrEmpty(sql);
@@ -63,7 +64,7 @@ namespace Sparrow.CommonLibrary.Test.Query
         {
             var database = DatabaseHelper.GetHelper("test");
 
-            var list = database.CreateQueryable<UserProfile>()
+            var list = new Queryable<UserProfile>(database)
                 .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
                 .ExecuteList();
 
@@ -104,10 +105,10 @@ namespace Sparrow.CommonLibrary.Test.Query
             var database = DatabaseHelper.GetHelper("test");
 
             var list = database.CreateQueryable<UserProfile>()
-                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
-                .RowLimit(0, 10)
-                .OrderBy(x => x.Id)
-                .ExecuteList();
+                .Where(x => (object)x.Id == (object)new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })//条件
+                .RowLimit(0, 10)//分页
+                .OrderBy(x => x.Id)//排序
+                .ExecuteList();//返回列表
 
             Assert.IsNotNull(list);
         }

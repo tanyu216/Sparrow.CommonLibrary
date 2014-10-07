@@ -62,7 +62,14 @@ namespace Sparrow.CommonLibrary.Query
                                 return In(Expression(methodCall.Arguments[0]), (CollectionExpression)Expression(methodCall.Object));
                             }
                         }
-
+                    }
+                    else if (methodCall.Method.Name == "StartsWith" && methodCall.Method.ReturnType == typeof(bool))
+                    {
+                        return Like(Expression(methodCall.Object), Expression(methodCall.Arguments[0]), true, false);
+                    }
+                    else if (methodCall.Method.Name == "EndsWith" && methodCall.Method.ReturnType == typeof(bool))
+                    {
+                        return Like(Expression(methodCall.Object), Expression(methodCall.Arguments[0]), false, true);
                     }
                     break;
 
@@ -173,7 +180,7 @@ namespace Sparrow.CommonLibrary.Query
             Expression expression = logical.Body as System.Linq.Expressions.BinaryExpression;
             if (expression == null)
                 expression = logical.Body as System.Linq.Expressions.MethodCallExpression;
-            if(expression==null)
+            if (expression == null)
                 throw new ArgumentException("logical不是一个有效的逻辑表达式。");
 
             var logicalExp = Expression(expression) as LogicalBinaryExpression;
@@ -392,9 +399,9 @@ namespace Sparrow.CommonLibrary.Query
         public static LogicalBinaryExpression Like(SqlExpression left, SqlExpression right, bool startWith, bool endWith)
         {
             if (startWith)
-                right = SqlExpression.Add(WildcardsExpression.Instance, right);
-            if (endWith)
                 right = SqlExpression.Add(right, WildcardsExpression.Instance);
+            if (endWith)
+                right = SqlExpression.Add(WildcardsExpression.Instance, right);
 
             return LogicalBinaryExpression.Expression(ExpressionType.Like, left, right);
         }

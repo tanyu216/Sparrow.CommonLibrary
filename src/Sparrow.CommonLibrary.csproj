@@ -90,6 +90,7 @@
     <Compile Include="Database\SqlBuilder\SqlBuilderExtensions.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Database\DatabaseHelper.DataSet.Part.cs" />
     <Compile Include="Entity\DbIncrementMetaPropertyInfo.cs" />
     <Compile Include="Entity\DbMetaInfo.cs" />
     <Compile Include="Entity\DbMetaPropertyInfo.cs" />

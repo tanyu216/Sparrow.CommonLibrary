@@ -17,7 +17,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader ExecuteReader(string commandText)
         {
-            return ExecuteReader(CommandType.Text, commandText, (ParameterCollection)null);
+            var command = BuildDbCommand(CommandType.Text, commandText, (ParameterCollection)null);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -28,7 +29,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader ExecuteReader(string commandText, ParameterCollection parameters)
         {
-            return ExecuteReader(CommandType.Text, commandText, parameters);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -39,7 +41,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader ExecuteReader(string commandText, params object[] parameters)
         {
-            return ExecuteReader(CommandType.Text, commandText, parameters);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -51,7 +54,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader ExecuteReader(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            return ExecuteReader(CommandType.Text, commandText, parameters, transaction);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command, transaction);
         }
 
         /// <summary>
@@ -63,7 +67,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader ExecuteReader(string commandText, DbTransaction transaction, params object[] parameters)
         {
-            return ExecuteReader(CommandType.Text, commandText, parameters, transaction);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command, transaction);
         }
 
         /// <summary>
@@ -99,7 +104,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader SprocExecuteReader(string commandText)
         {
-            return ExecuteReader(CommandType.StoredProcedure, commandText, (ParameterCollection)null);
+            var command = BuildDbCommand(CommandType.StoredProcedure, commandText, (ParameterCollection)null);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -110,7 +116,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader SprocExecuteReader(string commandText, ParameterCollection parameters)
         {
-            return ExecuteReader(CommandType.StoredProcedure, commandText, parameters);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command);
         }
 
         /// <summary>
@@ -122,7 +129,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回IDataReader</returns>
         public IDataReader SprocExecuteReader(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            return ExecuteReader(CommandType.StoredProcedure, commandText, parameters, transaction);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return ExecuteReader(command, transaction);
         }
     }
 }

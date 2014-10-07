@@ -4,6 +4,7 @@ using Sparrow.CommonLibrary.Mapper;
 using System;
 using System.Data;
 using System.Data.Common;
+using Sparrow.CommonLibrary.Common;
 
 namespace Sparrow.CommonLibrary.Database
 {
@@ -18,7 +19,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T ExecuteScalar<T>(string commandText)
         {
-            return ExecuteScalar<T>(CommandType.Text, commandText, (ParameterCollection)null, (DbTransaction)null);
+            var command = BuildDbCommand(CommandType.Text, commandText, (ParameterCollection)null);
+            return DbValueCast.Cast<T>(ExecuteScalar(command));
         }
 
         /// <summary>
@@ -30,7 +32,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T ExecuteScalar<T>(string commandText, ParameterCollection parameters)
         {
-            return ExecuteScalar<T>(CommandType.Text, commandText, parameters);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return DbValueCast.Cast<T>(ExecuteScalar(command));
         }
 
         /// <summary>
@@ -42,7 +45,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T ExecuteScalar<T>(string commandText, params object[] parameters)
         {
-            return ExecuteScalar<T>(CommandType.Text, commandText, parameters);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return DbValueCast.Cast<T>(ExecuteScalar(command));
         }
 
         /// <summary>
@@ -55,7 +59,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T ExecuteScalar<T>(string commandText, DbTransaction transaction, params object[] parameters)
         {
-            return ExecuteScalar<T>(CommandType.Text, commandText, parameters, transaction);
+            var command = BuildDbCommand(CommandType.Text, commandText, parameters);
+            return DbValueCast.Cast<T>(ExecuteScalar(command, transaction));
         }
 
 
@@ -67,7 +72,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T SprocExecuteScalar<T>(string commandText)
         {
-            return ExecuteScalar<T>(CommandType.StoredProcedure, commandText, (ParameterCollection)null, (DbTransaction)null);
+            var command = BuildDbCommand(CommandType.StoredProcedure, commandText, (ParameterCollection)null);
+            return DbValueCast.Cast<T>(ExecuteScalar(command));
         }
 
         /// <summary>
@@ -79,7 +85,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T SprocExecuteScalar<T>(string commandText, ParameterCollection parameters)
         {
-            return ExecuteScalar<T>(CommandType.StoredProcedure, commandText, parameters);
+            var command = BuildDbCommand(CommandType.StoredProcedure, commandText, parameters);
+            return DbValueCast.Cast<T>(ExecuteScalar(command));
         }
 
         /// <summary>
@@ -92,7 +99,8 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>如果是转换失败将抛出异常，表示sql返回的数据不符开发人员指定的类型。所以开发人员需要自己把握异常处理。</returns>
         public T SprocExecuteScalar<T>(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            return ExecuteScalar<T>(CommandType.StoredProcedure, commandText, parameters, transaction);
+            var command = BuildDbCommand(CommandType.StoredProcedure, commandText, parameters);
+            return DbValueCast.Cast<T>(ExecuteScalar(command, transaction));
         }
     }
 }

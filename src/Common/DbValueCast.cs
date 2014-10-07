@@ -6,7 +6,7 @@ using System.Text;
 namespace Sparrow.CommonLibrary.Common
 {
     /// <summary>
-    /// 
+    /// 将DbValue转换为程序要求的数据类型，当值是一个空值(null/DBNull)时返回类型的默认值。
     /// </summary>
     public static class DbValueCast
     {

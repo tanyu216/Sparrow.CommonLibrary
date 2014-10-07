@@ -23,7 +23,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回类型<typeparamref name="T"/>的实例，如果数据库无返回的结集，则返回空。</returns>
         public T ExecuteFirst<T>(string commandText)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, (ParameterCollection)null))
+            using (var reader = ExecuteReader(commandText, (ParameterCollection)null))
             {
                 return Map.Single<T>(reader);
             }
@@ -38,7 +38,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回类型<typeparamref name="T"/>的实例，如果数据库无返回的结集，则返回空。</returns>
         public T ExecuteFirst<T>(string commandText, ParameterCollection parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
+            using (var reader = ExecuteReader(commandText, parameters))
             {
                 return Map.Single<T>(reader);
             }
@@ -53,7 +53,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回类型<typeparamref name="T"/>的实例，如果数据库无返回的结集，则返回空。</returns>
         public T ExecuteFirst<T>(string commandText, params object[] parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
+            using (var reader = ExecuteReader(commandText, parameters))
             {
                 return Map.Single<T>(reader);
             }
@@ -69,7 +69,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回类型<typeparamref name="T"/>的实例，如果数据库无返回的结集，则返回空。</returns>
         public T ExecuteFirst<T>(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
+            using (var reader = ExecuteReader(commandText, parameters, transaction))
             {
                 return Map.Single<T>(reader);
             }
@@ -85,7 +85,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>返回类型<typeparamref name="T"/>的实例，如果数据库无返回的结集，则返回空。</returns>
         public T ExecuteFirst<T>(string commandText, DbTransaction transaction, params object[] parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
+            using (var reader = ExecuteReader(commandText, parameters, transaction))
             {
                 return Map.Single<T>(reader);
             }
@@ -103,7 +103,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> ExecuteList<T>(string commandText)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, (ParameterCollection)null))
+            using (var reader = ExecuteReader(commandText, (ParameterCollection)null))
             {
                 return Map.List<T>(reader);
             }
@@ -118,7 +118,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> ExecuteList<T>(string commandText, ParameterCollection parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
+            using (var reader = ExecuteReader(commandText, parameters))
             {
                 return Map.List<T>(reader);
             }
@@ -133,7 +133,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> ExecuteList<T>(string commandText, params object[] parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters))
+            using (var reader = ExecuteReader(commandText, parameters))
             {
                 return Map.List<T>(reader);
             }
@@ -149,7 +149,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> ExecuteList<T>(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
+            using (var reader = ExecuteReader(commandText, parameters, transaction))
             {
                 return Map.List<T>(reader);
             }
@@ -165,7 +165,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> ExecuteList<T>(string commandText, DbTransaction transaction, params object[] parameters)
         {
-            using (var reader = ExecuteReader(CommandType.Text, commandText, parameters, transaction))
+            using (var reader = ExecuteReader(commandText, parameters, transaction))
             {
                 return Map.List<T>(reader);
             }
@@ -183,7 +183,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> SprocExecuteList<T>(string commandText)
         {
-            using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, (ParameterCollection)null))
+            using (var reader = SprocExecuteReader(commandText, (ParameterCollection)null))
             {
                 return Map.List<T>(reader);
             }
@@ -198,7 +198,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> SprocExecuteList<T>(string commandText, ParameterCollection parameters)
         {
-            using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters))
+            using (var reader = SprocExecuteReader(commandText, parameters))
             {
                 return Map.List<T>(reader);
             }
@@ -214,7 +214,7 @@ namespace Sparrow.CommonLibrary.Database
         /// <returns>IList&lt;<typeparamref name="T"/>&gt; 集合</returns>
         public IList<T> SprocExecuteList<T>(string commandText, ParameterCollection parameters, DbTransaction transaction)
         {
-            using (var reader = ExecuteReader(CommandType.StoredProcedure, commandText, parameters, transaction))
+            using (var reader = SprocExecuteReader(commandText, parameters, transaction))
             {
                 return Map.List<T>(reader);
             }

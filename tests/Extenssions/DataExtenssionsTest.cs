@@ -57,19 +57,14 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         public void DictionaryTest()
         {
             var dt = CreateDataTable();
-            var dic1 = dt.ToDictionary<int, string>();
+            var dic1 = dt.ToDictionary<int, string>();//第0列为key，第1列为value
             var dic2 = dt.ToDictionary<int, string>("Id", "Note");
-            var dic3 = dt.ToDictionary<int, string>(0, 1);
-        }
+            var dic3 = dt.ToDictionary<int, string>(0, 1);//第0列为key，第1列为value
 
-        [Test]
-        public void GetValueTest()
-        {
-            var dt = CreateDataTable();
-            var val1 = dt.GetValues<int>();
-            var val2 = dt.GetValues<int>("Id");
-            var val3 = dt.GetValues<int>(0);
-            var val4 = dt.GetValues<string>(1);
+            var list1 = dt.GetValues<int>();//第0列
+            var list2 = dt.GetValues<int>("Id");
+            var list3 = dt.GetValues<int>(0);//第0列
+            var list4 = dt.GetValues<string>(1);//第1列
         }
     }
 }

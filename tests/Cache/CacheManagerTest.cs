@@ -59,6 +59,8 @@ namespace Sparrow.CommonLibrary.Test.Cache
         public void GetTest()
         {
             var result = CacheManager.Get<object>("key2");
+
+
             Assert.AreEqual(result, "value2");
             result = CacheManager.Get<object>("key1000000000000");
             Assert.IsNull(result);
@@ -102,5 +104,7 @@ namespace Sparrow.CommonLibrary.Test.Cache
         {
             CacheManager.Set("testkey1", "testvalue1", DateTime.Now.AddMinutes(2));
         }
+
     }
+
 }

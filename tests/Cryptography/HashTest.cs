@@ -77,6 +77,15 @@ namespace Sparrow.CommonLibrary.Test.Cryptography
         [Test]
         public void HashTest4()
         {
+
+            //获取一个md5签名对象
+            IHash md5hash = Crypto.Hash(HashFlag.MD5);
+            var md5value = md5hash.SignData("mypassword");
+
+            //获取一个sha1签名对象
+            IHash sha1hash = Crypto.Hash(HashFlag.SHA1);
+            var sha1value = md5hash.SignData("mypassword");
+
         }
         [Test]
         public void HashTest5()
