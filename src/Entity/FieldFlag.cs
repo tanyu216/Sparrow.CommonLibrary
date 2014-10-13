@@ -11,7 +11,7 @@ namespace Sparrow.CommonLibrary.Entity
     public struct FieldFlag
     {
         /// <summary>
-        /// 数组中的一个对象只存32个比特位。
+        /// 数组中的一个对象只存31个比特位。
         /// </summary>
         private const byte ItemSize = 31;
 
@@ -46,7 +46,7 @@ namespace Sparrow.CommonLibrary.Entity
         /// <summary>
         /// 初始化一个可以存放大数据量的数组。
         /// </summary>
-        /// <param name="size">二进制位大小，size = 32 * 返回值数组长度。因为int占用4个字节，所有二进制位大小为32。</param>
+        /// <param name="size">二进制位大小，size = 32 * 返回值数组长度。因为int占用8个字节，所有二进制位大小为32。</param>
         public FieldFlag(int size)
         {
             _size = size;
@@ -117,6 +117,10 @@ namespace Sparrow.CommonLibrary.Entity
         /// 在指定的比特位，将其值标记为 1。
         /// </summary>
         /// <param name="index">比特位位置。</param>
+        /// <remarks>
+        /// 下标为3（第4个比特位）
+        /// 00000000000000000000000000001000
+        /// </remarks>
         public void Mark(int index)
         {
             if (index >= _size)

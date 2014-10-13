@@ -23,32 +23,74 @@ namespace Sparrow.CommonLibrary.Repository
     /// <typeparam name="T"></typeparam>
     public class RepositoryDatabase<T> : IRepository<T> where T : class
     {
-        private readonly DatabaseHelper _database;
+        private readonly DatabaseHelper _dbReader;
+        /// <summary>
+        /// 数据库只读对象
+        /// </summary>
+        protected DatabaseHelper DbReader { get { return _dbReader; } }
 
-        protected DatabaseHelper Database { get { return _database; } }
+        private readonly DatabaseHelper _dbWriter;
+        /// <summary>
+        /// 数据库只写对象
+        /// </summary>
+        protected DatabaseHelper DbWriter { get { return _dbWriter; } }
 
         private readonly IDbMetaInfo dbMetaInfo;
         private readonly IMetaInfo metaInfo;
 
+        /// <summary>
+        /// Repository初始化
+        /// </summary>
+        /// <param name="database">数据库读写访问对象</param>
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
             if (typeof(T) == typeof(DynamicEntity))
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
-            _database = database;
+            _dbReader = database;
+            _dbWriter = database;
             var accessor = Map.GetCheckedAccessor<T>();
             dbMetaInfo = accessor.MetaInfo as IDbMetaInfo;
             metaInfo = accessor.MetaInfo;
         }
 
-        protected ISqlBuilder SqlBuilder { get { return _database.Builder; } }
-
-        protected EntityToSqlStatement EntityToSql { get { return _database.EntityToSql; } }
-
-        protected ParameterCollection CreateParamterCollection()
+        /// <summary>
+        /// Repository初始化
+        /// </summary>
+        /// <param name="databaseReader">数据库读访问对象</param>
+        /// <param name="databaseWriter">数据库写访问对象</param>
+        public RepositoryDatabase(Database.DatabaseHelper databaseReader, Database.DatabaseHelper databaseWriter)
+            : this(databaseReader)
         {
-            return _database.CreateParamterCollection();
+            if (databaseReader.DbProvider.ProviderName != databaseWriter.DbProvider.ProviderName)
+                throw new ArgumentException("数据库读写连接对象的驱动不一致");
+
+            _dbWriter = databaseWriter;
         }
 
+        /// <summary>
+        /// sql语句生成对象（依据不同数据库驱动生成符合各数据库语法的sql语句）
+        /// </summary>
+        protected ISqlBuilder SqlBuilder { get { return _dbReader.Builder; } }
+
+        /// <summary>
+        /// 数据实体转换成可执行的Sql语句对象
+        /// </summary>
+        protected EntityToSqlStatement EntityToSql { get { return _dbReader.EntityToSql; } }
+
+        /// <summary>
+        /// 创建一个数据库参数对象
+        /// </summary>
+        /// <returns></returns>
+        protected ParameterCollection CreateParamterCollection()
+        {
+            return _dbReader.CreateParamterCollection();
+        }
+
+        /// <summary>
+        /// 获取实体对象中成员属性映射的数据库字段名称
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
         protected string FieldName(Expression<Func<T, object>> field)
         {
             var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(field).Member;
@@ -170,15 +212,25 @@ namespace Sparrow.CommonLibrary.Repository
 
         #region DoExecute
 
-        protected int DoExecute(string sql, ParameterCollection parameterCollection, IDictionary<string, T> incrementEntity)
+        protected int DoExecute(string sql, ParameterCollection parameterCollection)
+        {
+            return DoExecute(sql, parameterCollection, null, false);
+        }
+
+        protected int DoExecute(string sql, ParameterCollection parameterCollection, bool byDbWriter)
+        {
+            return DoExecute(sql, parameterCollection, null, byDbWriter);
+        }
+
+        protected int DoExecute(string sql, ParameterCollection parameterCollection, IDictionary<string, T> incrementEntity, bool byDbWriter)
         {
             if (string.IsNullOrEmpty(sql))
                 return 0;
             if (incrementEntity == null || incrementEntity.Count == 0)
             {
-                return _database.ExecuteNonQuery(sql, parameterCollection);
+                return (byDbWriter ? DbWriter : DbReader).ExecuteNonQuery(sql, parameterCollection);
             }
-            using (var reader = _database.ExecuteReader(sql, parameterCollection))
+            using (var reader = (byDbWriter ? DbWriter : DbReader).ExecuteReader(sql, parameterCollection))
             {
                 ReceiveIncrement(incrementEntity, reader);
                 return reader.RecordsAffected;
@@ -201,7 +253,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = BuildDmlSql(entity, DataState.New, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Insert(IEnumerable<T> entities)
@@ -217,7 +269,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.New, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Update(T entity)
@@ -232,7 +284,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, DataState.Modify, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Update(IEnumerable<T> entities)
@@ -248,7 +300,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.Modify, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Save(T entity)
@@ -263,7 +315,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Save(IEnumerable<T> entities)
@@ -279,7 +331,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity);
+            return DoExecute(sql, parameters, incrementEntity, true);
         }
 
         public int Delete(T entity)
@@ -291,7 +343,7 @@ namespace Sparrow.CommonLibrary.Repository
             var expl = new EntityExplain<T>(entity);
             var sql = EntityToSql.GenerateDelete(expl, parameters);
             //
-            return DoExecute(sql, parameters, null);
+            return DoExecute(sql, parameters, null, true);
         }
 
         public int Delete(Expression<Func<T, bool>> logical)
@@ -302,7 +354,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = SqlBuilder.DeleteFormat(metaInfo.Name, LogicalBinaryExpression.Expression(logical).OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
-            return DoExecute(sql, parameters, null);
+            return DoExecute(sql, parameters, null, true);
         }
 
         public int Delete(LogicalBinaryExpression logical)
@@ -313,7 +365,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = SqlBuilder.DeleteFormat(metaInfo.Name, logical.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
-            return DoExecute(sql, parameters, null);
+            return DoExecute(sql, parameters, null, true);
         }
 
         #endregion
@@ -322,12 +374,12 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IList<T> GetList()
         {
-            return new Queryable<T>(_database).ExecuteList();
+            return new Queryable<T>(DbReader).ExecuteList();
         }
 
         public IList<T> GetList(int startIndex, int rowCount)
         {
-            return new Queryable<T>(_database).RowLimit(startIndex, rowCount).ExecuteList();
+            return new Queryable<T>(DbReader).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
         public IList<T> GetList(Expression<Func<T, bool>> logical)
@@ -335,12 +387,12 @@ namespace Sparrow.CommonLibrary.Repository
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            return new Queryable<T>(_database).Where(logical).ExecuteList();
+            return new Queryable<T>(DbReader).Where(logical).ExecuteList();
         }
 
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount)
         {
-            return new Queryable<T>(_database).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
+            return new Queryable<T>(DbReader).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
         public IList<T> GetList(LogicalBinaryExpression logical)
@@ -348,12 +400,12 @@ namespace Sparrow.CommonLibrary.Repository
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            return new Queryable<T>(_database).Where(logical).ExecuteList();
+            return new Queryable<T>(DbReader).Where(logical).ExecuteList();
         }
 
         public IList<T> GetList(LogicalBinaryExpression logical, int startIndex, int rowCount)
         {
-            return new Queryable<T>(_database).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
+            return new Queryable<T>(DbReader).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
         public T Get(Expression<Func<T, bool>> logical)
@@ -361,7 +413,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
+            using (var read = new Queryable<T>(DbReader).Where(logical).ExecuteReader())
             {
                 return Map.Single<T>(read);
             }
@@ -380,7 +432,7 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new MapperException("复合主键的实体对象，无法使用该方法。");
 
             var condition = SqlExpression.Equal(dbMetaInfo.GetKeys()[0], id);
-            using (var read = new Queryable<T>(_database).Where(condition).ExecuteReader())
+            using (var read = new Queryable<T>(DbReader).Where(condition).ExecuteReader())
             {
                 return Map.Single<T>(read);
             }
@@ -391,7 +443,7 @@ namespace Sparrow.CommonLibrary.Repository
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            using (var read = new Queryable<T>(_database).Where(logical).ExecuteReader())
+            using (var read = new Queryable<T>(DbReader).Where(logical).ExecuteReader())
             {
                 return Map.Single<T>(read);
             }
@@ -404,157 +456,157 @@ namespace Sparrow.CommonLibrary.Repository
         public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Sum(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Sum<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Sum(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Sum<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Sum(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Min<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Min(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Min<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Min(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Min<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Min(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Max<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Max(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Max<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Max(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Max<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Max(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Avg<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Avg(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Avg<TValue>(Expression<Func<T, object>> field, Expression<Func<T, bool>> condition)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Avg(field)
                 .Where(condition)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public TValue Avg<TValue>(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Avg(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<TValue>(sql, parameters);
+            return DbReader.ExecuteScalar<TValue>(sql, parameters);
         }
 
         public int Count(System.Linq.Expressions.Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Count(field)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<int>(sql, parameters);
+            return DbReader.ExecuteScalar<int>(sql, parameters);
         }
 
         public int Count(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Count(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<int>(sql, parameters);
+            return DbReader.ExecuteScalar<int>(sql, parameters);
         }
 
         public int Count(System.Linq.Expressions.Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Count(field)
                 .Where(logical)
                 .OutputSqlString(parameters);
-            return Database.ExecuteScalar<int>(sql, parameters);
+            return DbReader.ExecuteScalar<int>(sql, parameters);
         }
 
         public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Sum(valueField)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -563,13 +615,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Sum(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -578,13 +630,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbySum<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Sum(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -593,12 +645,12 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Min(valueField)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -607,13 +659,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Min(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -622,13 +674,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMin<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Min(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -637,12 +689,12 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Max(valueField)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -651,13 +703,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Max(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -666,13 +718,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyMax<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Max(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -681,12 +733,12 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Avg(valueField)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -695,13 +747,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Avg(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -710,13 +762,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, TValue> GroupbyAvg<TKey, TValue>(Expression<Func<T, object>> keyField, Expression<Func<T, object>> valueField, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(keyField)
                 .Avg(valueField)
                 .Where(logical)
                 .GroupBy(keyField)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, TValue>();
             }
@@ -725,12 +777,12 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(field)
                 .Count(field)
                 .GroupBy(field)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, int>();
             }
@@ -739,13 +791,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, Expression<Func<T, bool>> logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(field)
                 .Count(field)
                 .Where(logical)
                 .GroupBy(field)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, int>();
             }
@@ -754,13 +806,13 @@ namespace Sparrow.CommonLibrary.Repository
         public IDictionary<TKey, int> GroupbyCount<TKey>(Expression<Func<T, object>> field, LogicalBinaryExpression logical)
         {
             var parameters = CreateParamterCollection();
-            string sql = new Queryable<T>(Database)
+            string sql = new Queryable<T>(DbReader)
                 .Select(field)
                 .Count(field)
                 .Where(logical)
                 .GroupBy(field)
                 .OutputSqlString(parameters);
-            using (var reader = Database.ExecuteReader(sql, parameters))
+            using (var reader = DbReader.ExecuteReader(sql, parameters))
             {
                 return reader.ToDictionary<TKey, int>();
             }
