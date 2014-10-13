@@ -44,8 +44,12 @@ namespace Sparrow.CommonLibrary.Repository
         /// <param name="database">数据库读写访问对象</param>
         public RepositoryDatabase(Database.DatabaseHelper database)
         {
+            if (database == null)
+                throw new ArgumentNullException("database");
+
             if (typeof(T) == typeof(DynamicEntity))
                 throw new ArgumentException(string.Format("泛型T不能是{0}", typeof(DynamicEntity).FullName));
+
             _dbReader = database;
             _dbWriter = database;
             var accessor = Map.GetCheckedAccessor<T>();
@@ -61,6 +65,9 @@ namespace Sparrow.CommonLibrary.Repository
         public RepositoryDatabase(Database.DatabaseHelper databaseReader, Database.DatabaseHelper databaseWriter)
             : this(databaseReader)
         {
+            if (databaseWriter == null)
+                throw new ArgumentNullException("databaseWriter");
+
             if (databaseReader.DbProvider.ProviderName != databaseWriter.DbProvider.ProviderName)
                 throw new ArgumentException("数据库读写连接对象的驱动不一致");
 
