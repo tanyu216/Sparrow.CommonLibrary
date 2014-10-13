@@ -55,6 +55,7 @@
     <Compile Include="Entity\DynamicEntityTest.cs" />
     <Compile Include="Entity\EntityExplainTest.cs" />
     <Compile Include="Entity\EntityTest.cs" />
+    <Compile Include="Entity\FieldFlagTest.cs" />
     <Compile Include="Extenssions\CollectionExtenssionsTest.cs" />
     <Compile Include="Extenssions\ConvertExtenssionsTest.cs" />
     <Compile Include="Extenssions\DataExtenssionsTest.cs" />

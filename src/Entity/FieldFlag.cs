@@ -11,11 +11,11 @@ namespace Sparrow.CommonLibrary.Entity
     public struct FieldFlag
     {
         /// <summary>
-        /// 数组中的一个对象只存8个比特位。
+        /// 数组中的一个对象只存32个比特位。
         /// </summary>
-        private const byte ItemSize = 8;
+        private const byte ItemSize = 31;
 
-        private readonly byte[] _values;
+        private readonly int[] _values;
         private readonly int _size;
         /// <summary>
         /// 
@@ -46,11 +46,11 @@ namespace Sparrow.CommonLibrary.Entity
         /// <summary>
         /// 初始化一个可以存放大数据量的数组。
         /// </summary>
-        /// <param name="size">二进制位大小，size = 8 * 返回值数组长度。因为ushort占用两个字节，所有二进制位大小为8。</param>
+        /// <param name="size">二进制位大小，size = 32 * 返回值数组长度。因为int占用4个字节，所有二进制位大小为32。</param>
         public FieldFlag(int size)
         {
             _size = size;
-            _values = new byte[(int)Math.Ceiling((double)size / ItemSize)];
+            _values = new int[(int)Math.Ceiling((double)size / ItemSize)];
         }
 
         /// <summary>
@@ -59,18 +59,18 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="index">比特位的下标。</param>
         /// <param name="arrayIndex">数组下标。一个很大的值需要拆分成一个数组保存，如：参数<paramref name="index"/>等于 9 它大于8了，所以这个值会放在数组下标为1的byte中的第0个比特位。</param>
         /// <returns>计算出的这个比特位的值</returns>
-        private static byte BitCompute(int index, out int arrayIndex)
+        private static int BitCompute(int index, out int arrayIndex)
         {
-            byte bit;
+            int bit;
             if (index >= ItemSize)
             {
                 arrayIndex = index / ItemSize;
-                bit = (byte)(1 << (index - (ItemSize << (arrayIndex - 1))));
+                bit = 1 << (index - (ItemSize << (arrayIndex - 1)));
             }
             else
             {
                 arrayIndex = 0;
-                bit = (byte)(1 << index);
+                bit = 1 << index;
             }
             return bit;
         }
@@ -91,10 +91,10 @@ namespace Sparrow.CommonLibrary.Entity
         /// <returns>指定比特位已被标记时返回true，false则表示未被标记。</returns>
         public bool HasMarked(int index)
         {
-            if (index > _size)
+            if (index >= _size)
                 throw new IndexOutOfRangeException();
             int i;
-            byte bit = BitCompute(index, out i);
+            int bit = BitCompute(index, out i);
             return (_values[i] & bit) > 0;
         }
 
@@ -119,11 +119,11 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="index">比特位位置。</param>
         public void Mark(int index)
         {
-            if (index > _size)
+            if (index >= _size)
                 throw new IndexOutOfRangeException();
             int i;
-            byte bit = BitCompute(index, out i);
-            _values[i] = (byte)(_values[i] | bit);
+            int bit = BitCompute(index, out i);
+            _values[i] = _values[i] | bit;
         }
 
         /// <summary>
@@ -132,13 +132,13 @@ namespace Sparrow.CommonLibrary.Entity
         /// <param name="index">比特位位置。</param>
         public void UnMark(int index)
         {
-            if (index > _size)
+            if (index >= _size)
                 throw new IndexOutOfRangeException();
             int i;
-            byte bit = BitCompute(index, out i);
+            int bit = BitCompute(index, out i);
             if ((_values[i] & bit) == 0)
                 return;
-            _values[i] = (byte)(_values[i] ^ (byte)~bit);
+            _values[i] = _values[i] ^ ~bit;
 
         }
 
