@@ -219,25 +219,20 @@ namespace Sparrow.CommonLibrary.Repository
 
         #region DoExecute
 
-        protected int DoExecute(string sql, ParameterCollection parameterCollection)
+        protected int DoExecuteByDbWriter(string sql, ParameterCollection parameterCollection)
         {
-            return DoExecute(sql, parameterCollection, null, false);
+            return DoExecuteByDbWriter(sql, parameterCollection, null);
         }
 
-        protected int DoExecute(string sql, ParameterCollection parameterCollection, bool byDbWriter)
-        {
-            return DoExecute(sql, parameterCollection, null, byDbWriter);
-        }
-
-        protected int DoExecute(string sql, ParameterCollection parameterCollection, IDictionary<string, T> incrementEntity, bool byDbWriter)
+        protected int DoExecuteByDbWriter(string sql, ParameterCollection parameterCollection, IDictionary<string, T> incrementEntity)
         {
             if (string.IsNullOrEmpty(sql))
                 return 0;
             if (incrementEntity == null || incrementEntity.Count == 0)
             {
-                return (byDbWriter ? DbWriter : DbReader).ExecuteNonQuery(sql, parameterCollection);
+                return DbWriter.ExecuteNonQuery(sql, parameterCollection);
             }
-            using (var reader = (byDbWriter ? DbWriter : DbReader).ExecuteReader(sql, parameterCollection))
+            using (var reader = DbWriter.ExecuteReader(sql, parameterCollection))
             {
                 ReceiveIncrement(incrementEntity, reader);
                 return reader.RecordsAffected;
@@ -260,7 +255,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = BuildDmlSql(entity, DataState.New, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Insert(IEnumerable<T> entities)
@@ -276,7 +271,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.New, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Update(T entity)
@@ -291,7 +286,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, DataState.Modify, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Update(IEnumerable<T> entities)
@@ -307,7 +302,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, DataState.Modify, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Save(T entity)
@@ -322,7 +317,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entity, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Save(IEnumerable<T> entities)
@@ -338,7 +333,7 @@ namespace Sparrow.CommonLibrary.Repository
             IDictionary<string, T> incrementEntity = null;
             var sql = BuildDmlSql(entities, parameters, ref incrementEntity);
             //
-            return DoExecute(sql, parameters, incrementEntity, true);
+            return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
 
         public int Delete(T entity)
@@ -350,7 +345,7 @@ namespace Sparrow.CommonLibrary.Repository
             var expl = new EntityExplain<T>(entity);
             var sql = EntityToSql.GenerateDelete(expl, parameters);
             //
-            return DoExecute(sql, parameters, null, true);
+            return DoExecuteByDbWriter(sql, parameters, null);
         }
 
         public int Delete(Expression<Func<T, bool>> logical)
@@ -361,7 +356,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = SqlBuilder.DeleteFormat(metaInfo.Name, LogicalBinaryExpression.Expression(logical).OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
-            return DoExecute(sql, parameters, null, true);
+            return DoExecuteByDbWriter(sql, parameters, null);
         }
 
         public int Delete(LogicalBinaryExpression logical)
@@ -372,7 +367,7 @@ namespace Sparrow.CommonLibrary.Repository
             var parameters = CreateParamterCollection();
             var sql = SqlBuilder.DeleteFormat(metaInfo.Name, logical.OutputSqlString(SqlBuilder, parameters), SqlOptions.None);
             //
-            return DoExecute(sql, parameters, null, true);
+            return DoExecuteByDbWriter(sql, parameters, null);
         }
 
         #endregion
