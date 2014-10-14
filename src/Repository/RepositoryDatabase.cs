@@ -27,13 +27,13 @@ namespace Sparrow.CommonLibrary.Repository
         /// <summary>
         /// 数据库只读对象
         /// </summary>
-        protected DatabaseHelper DbReader { get { return _dbReader; } }
+        public DatabaseHelper DbReader { get { return _dbReader; } }
 
         private readonly DatabaseHelper _dbWriter;
         /// <summary>
         /// 数据库只写对象
         /// </summary>
-        protected DatabaseHelper DbWriter { get { return _dbWriter; } }
+        public DatabaseHelper DbWriter { get { return _dbWriter; } }
 
         private readonly IDbMetaInfo dbMetaInfo;
         private readonly IMetaInfo metaInfo;
