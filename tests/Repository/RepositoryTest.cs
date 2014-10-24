@@ -117,23 +117,5 @@ namespace Sparrow.CommonLibrary.Test.Repository
 
         }
 
-        [Test]
-        public void SqlTest()
-        {
-            var sql = "update Account set money+=@money where id=@id";
-
-            var db = DatabaseHelper.GetHelper("test");
-            var repos = new RepositoryDatabase<UserProfile>(db);
-
-
-            var paras = db.CreateParamterCollection();
-            var param1 = paras.Append("money", 10);
-            param1.Size = 10;
-            param1.Direction = System.Data.ParameterDirection.Output;
-
-            paras.Append("id", 1);
-
-            base.DoExeucte(sql,paras);
-        }
     }
 }

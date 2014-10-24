@@ -26,5 +26,17 @@ namespace Sparrow.CommonLibrary.Test.Web
 
 
         }
+        
+        [Test]
+        public void Test2()
+        {
+            var httpClient = new HttpClient("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=ACCESS_TOKEN");
+            var str = "{\"action\":\"long2short\",\"long_url\":\"http://wap.koudaitong.com/v2/showcase/goods?alias=128wi9shh&spm=h56083&redirect_count=1\"}";
+            using (var response = httpClient.Post(str))
+            {
+                var result = response.GetOutputString();
+                Assert.IsNotNull(result);
+            }
+        }
     }
 }

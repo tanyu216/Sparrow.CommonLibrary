@@ -164,16 +164,30 @@ namespace Sparrow.CommonLibrary.Net
             }
 
             var forms = NameValueSerialize(data);
+
+        }
+
+        /// <summary>
+        /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
+        /// </summary>
+        /// <param name="request">HttpWebRequest实例对象</param>
+        protected virtual void LoadFormData(HttpWebRequest request, string data)
+        {
+            if (data == null)
+            {
+                return;
+            }
+
             using (var reqStream = request.GetRequestStream())
             {
                 if (CompressData)
                 {
                     request.Headers.Add("Content-Encoding", "gzip");
-                    CompressByGZip(forms, reqStream);
+                    CompressByGZip(data, reqStream);
                 }
                 else
                 {
-                    var content = Encoding.Default.GetBytes(forms);
+                    var content = Encoding.Default.GetBytes(data);
                     reqStream.Write(content, 0, content.Length);
                 }
             }
@@ -186,7 +200,7 @@ namespace Sparrow.CommonLibrary.Net
         /// <returns>Web请求返回结果</returns>
         protected virtual ResponseResult SubmitRequest(string method)
         {
-            return SubmitRequest(method, null);
+            return SubmitRequest(method, (string)null);
         }
 
         /// <summary>
@@ -195,6 +209,16 @@ namespace Sparrow.CommonLibrary.Net
         /// <param name="method">Web请求方式</param>
         /// <returns>Web请求返回结果</returns>
         protected virtual ResponseResult SubmitRequest(string method, NameValueCollection data)
+        {
+            return SubmitRequest(method, NameValueSerialize(data));
+        }
+
+        /// <summary>
+        /// 提交一个Web请求
+        /// </summary>
+        /// <param name="method">Web请求方式</param>
+        /// <returns>Web请求返回结果</returns>
+        protected virtual ResponseResult SubmitRequest(string method, string data)
         {
             var request = CreateRequest(method);
             InitRequest(request);
@@ -258,6 +282,16 @@ namespace Sparrow.CommonLibrary.Net
         }
 
         /// <summary>
+        /// 以PUT传值方式向目标服务器发出Http请求。
+        /// </summary>
+        /// <param name="data">向目标服务发送的数据</param>
+        /// <returns>封装后的Web请求返回结果</returns>
+        public ResponseResult Put(string data)
+        {
+            return SubmitRequest("PUT", data);
+        }
+
+        /// <summary>
         /// 以DELETE传值方式向目标服务器发出Http请求。
         /// </summary>
         /// <returns>封装后的Web请求返回结果</returns>
@@ -276,6 +310,15 @@ namespace Sparrow.CommonLibrary.Net
             return SubmitRequest("POST", data);
         }
 
+        /// <summary>
+        /// 以POST的方式向目标服务器发出Http请求。
+        /// </summary>
+        /// <param name="data">向目标服务发送的数据</param>
+        /// <returns>封装后的Web请求返回结果</returns>
+        public ResponseResult Post(string data)
+        {
+            return SubmitRequest("POST", data);
+        }
     }
 
     /// <summary>
@@ -301,7 +344,27 @@ namespace Sparrow.CommonLibrary.Net
         /// <summary>
         /// http响应内容编码方式
         /// </summary>
-        public Encoding Encoding { get { return Encoding.GetEncoding(Response.CharacterSet); } }
+        public Encoding Encoding
+        {
+            get
+            {
+                var encoding = Response.CharacterSet;
+                if (string.IsNullOrEmpty(encoding))
+                {
+                    var contentType = Response.Headers["Content-Type"];
+                    foreach (var item in contentType.Split(';'))
+                    {
+                        if (item.Trim().StartsWith("encoding", StringComparison.OrdinalIgnoreCase) == false)
+                            continue;
+                        encoding = item.Split('=')[1].Trim();
+                        break;
+                    }
+                }
+                if (string.IsNullOrEmpty(encoding))
+                    encoding = System.Text.Encoding.UTF8.WebName;
+                return Encoding.GetEncoding(encoding);
+            }
+        }
 
         /// <summary>
         /// 响应的内容类型，text/html、application/json
