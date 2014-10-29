@@ -332,7 +332,7 @@ namespace Sparrow.CommonLibrary.Net
 
             //时间戳
             string strBoundary = "----------" + DateTime.Now.Ticks.ToString("x");
-            byte[] boundaryBytes = Encoding.ASCII.GetBytes("/r/n--" + strBoundary + "/r/n");
+            byte[] boundaryBytes = Encoding.ASCII.GetBytes("\r\n--" + strBoundary + "\r\n");
             //请求头部信息
             string strPostHeader = new StringBuilder()
                 .Append("--")
