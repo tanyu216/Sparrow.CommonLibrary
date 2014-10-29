@@ -319,6 +319,72 @@ namespace Sparrow.CommonLibrary.Net
         {
             return SubmitRequest("POST", data);
         }
+
+        /// <summary>
+        /// 向目标服务提交一个文件流
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public ResponseResult PostFileStream(Stream stream, string filename)
+        {
+            var request = CreateRequest("POST");
+            InitRequest(request);
+
+            //时间戳
+            string strBoundary = "----------" + DateTime.Now.Ticks.ToString("x");
+            byte[] boundaryBytes = Encoding.ASCII.GetBytes("/r/n--" + strBoundary + "/r/n");
+            //请求头部信息
+            string strPostHeader = new StringBuilder()
+                .Append("--")
+                .Append(strBoundary)
+                .Append("\r\n")
+                .Append("Content-Disposition: form-data; name=\"")
+                .Append("file")
+                .Append("\"; filename=\"")
+                .Append(filename)
+                .Append("\"")
+                .Append("\r\n")
+                .Append("Content-Type: ")
+                .Append("application/octet-stream")
+                .Append("\r\n")
+                .Append("\r\n").ToString();
+            byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
+            request.AllowWriteStreamBuffering = false;
+            request.ContentType = "multipart/form-data; boundary=" + strBoundary;
+            long length = stream.Length + postHeaderBytes.Length + boundaryBytes.Length;
+            request.ContentLength = length;
+
+            var requestStream = request.GetRequestStream();
+            //发送请求头部消息
+            requestStream.Write(postHeaderBytes, 0, postHeaderBytes.Length);
+            //
+            var size = 0;
+            var bufferLength = 4096;
+            byte[] buffer = new byte[bufferLength];
+
+            do
+            {
+                size = stream.Read(buffer, 0, bufferLength);
+                if (size == 0)
+                    break;
+                requestStream.Write(buffer, 0, size);
+            } while (true);
+            requestStream.Write(boundaryBytes, 0, boundaryBytes.Length);
+            requestStream.Close();
+
+            try
+            {
+                return Retry.DoExecute<ResponseResult>(() => CreateReponseResult((HttpWebResponse)request.GetResponse()));
+            }
+            catch (WebException ex)
+            {
+                if ((HttpWebResponse)ex.Response == null)
+                {
+                    throw ex;
+                }
+                return CreateReponseResult((HttpWebResponse)ex.Response);
+            }
+        }
     }
 
     /// <summary>

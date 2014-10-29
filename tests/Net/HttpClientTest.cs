@@ -26,7 +26,7 @@ namespace Sparrow.CommonLibrary.Test.Web
 
 
         }
-        
+
         [Test]
         public void Test2()
         {
@@ -37,6 +37,16 @@ namespace Sparrow.CommonLibrary.Test.Web
                 var result = response.GetOutputString();
                 Assert.IsNotNull(result);
             }
+        }
+
+        [Test]
+        public void Test3()
+        {
+            var httpClient = new HttpClient("http://image.clding.com/image/img_add");
+            var fs = System.IO.File.OpenRead(@"C:\Users\tanyu_000\Desktop\QQ截图20141029160629.png");
+            var result = httpClient.PostFileStream(fs, "QQ截图20141029160629.png");
+            var str = result.GetOutputString();
+            Assert.IsNotNull(str);
         }
     }
 }
