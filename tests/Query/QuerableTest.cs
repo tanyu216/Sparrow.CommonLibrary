@@ -60,6 +60,20 @@ namespace Sparrow.CommonLibrary.Test.Query
         }
 
         [Test]
+        public void QueryableTest4()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+            var parameter = database.CreateParamterCollection();
+
+            var sql = database.CreateQueryable<UserProfile>()
+                .Select(x => x.Id, x => x.Name)
+                .Where(x => x.Name.Contains("1"))
+                .OutputSqlString(parameter);
+
+            Assert.IsNotNullOrEmpty(sql);
+        }
+
+        [Test]
         public void QueryableListTest1()
         {
             var database = DatabaseHelper.GetHelper("test");

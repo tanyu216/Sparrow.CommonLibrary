@@ -46,6 +46,11 @@ namespace Sparrow.CommonLibrary.Query
                     var methodCall = ((MethodCallExpression)expression);
                     if (methodCall.Method.Name == "Contains" && methodCall.Method.ReturnType == typeof(bool))
                     {
+                        //System.String的Contants方法。
+                        if (methodCall.Method.ReflectedType == typeof(System.String))
+                        {
+                            return Like(Expression(methodCall.Object), Expression(methodCall.Arguments[0]), true, true);
+                        }
                         //System.Linq.Enumerable的Contants方法。注：这是一个扩展方法
                         if (methodCall.Method.ReflectedType == typeof(System.Linq.Enumerable))
                         {
