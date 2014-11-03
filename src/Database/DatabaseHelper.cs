@@ -130,12 +130,12 @@ namespace Sparrow.CommonLibrary.Database
                     var sqlStat = (string)item.Command;
                     if (item.Parameters == null || item.Parameters.Length == 0)
                     {
-                        sql.Append(sqlStat);
+                        sql.Append(sqlStat).AppendLine();
                     }
                     else
                     {
                         var paras = paramters.Fill(item.Parameters);
-                        sql.AppendFormat(sqlStat, paras);
+                        sql.AppendFormat(sqlStat, paras).AppendLine();
                     }
                     continue;
                 }
