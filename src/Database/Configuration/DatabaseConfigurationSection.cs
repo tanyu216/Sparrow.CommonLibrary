@@ -28,6 +28,8 @@ namespace Sparrow.CommonLibrary.Database.Configuration
         public DatabaseConfigurationSection()
         {
             _properties = new ConfigurationPropertyCollection();
+
+            var providers = new ProviderElementCollection();
             _clientProperty1 = new ConfigurationProperty("providers", typeof(ProviderElementCollection), null, ConfigurationPropertyOptions.None);
             _properties.Add(_clientProperty1);
         }

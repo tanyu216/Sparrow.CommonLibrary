@@ -15,7 +15,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
                 return ConfigurationElementCollectionType.BasicMap;
             }
         }
-
+        
         public new ProviderElement this[string name]
         {
             get { return (ProviderElement)BaseGet(name); }

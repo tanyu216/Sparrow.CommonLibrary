@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +48,41 @@ namespace Sparrow.CommonLibrary.Test.Web
             var result = httpClient.PostFileStream(fs, "QQ截图20141029160629.png");
             var str = result.GetOutputString();
             Assert.IsNotNull(str);
+        }
+
+        [Test]
+        public void Test4()
+        {
+
+            //根据url获取远程文件流
+            //var httpClient2 = new HttpClient("http://img3.clding.com/2014/11/3/130594800410817364776211_120.jpg");
+            var httpClient2 = new HttpClient("http://www.clding.com/111.jpg");
+            using (var result2 = httpClient2.Get())
+            {
+                var stream = result2.GetOutputStream();
+                using (var ms = new System.IO.MemoryStream())
+                {
+                    var buffer = new Byte[4096];
+                    var count = 0;
+                    while ((count = stream.Read(buffer, 0, 4096)) > 0)
+                    {
+                        ms.Write(buffer, 0, count);
+                    }
+                    ms.Position = 0;
+                    //上传到微信
+                    var httpClient = new HttpClient("http://image.clding.com/image/img_add");
+                    httpClient.Timeout = 20 * 1000;
+                    using (var result = httpClient.PostFileStream(ms, "stream.jpg"))
+                    {
+                        if (result.StatusCode == HttpStatusCode.OK)
+                        {
+                            var str = result.GetOutputString();
+                            //解析数据 返回media_id 
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

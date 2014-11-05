@@ -48,15 +48,6 @@ namespace Sparrow.CommonLibrary.Database.Configuration
         public void LoadConfig()
         {
             var configuration = DatabaseConfigurationSection.GetSection();
-            if (configuration == null)
-            {
-                configuration = new DatabaseConfigurationSection();
-                configuration.Providers = new ProviderElementCollection();
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.SqlClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.SqlServerStatementBuilder) } });
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.MySqlClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.MySqlStatementBuilder) } });
-                configuration.Providers.Add(new ProviderElement() { Name = "System.Data.OracleClient", Builder = new BuilderElement() { Type = typeof(SqlBuilder.OracleStatementBuilder) } });
-            }
-
             LoadConfig(configuration);
         }
 
@@ -74,6 +65,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
                     _databaseTypes[element.Name] = element.Database.Type;
 
             }
+
         }
 
         private ConcurrentDictionary<string, ISqlBuilder> _sqlbuilderInstances;
@@ -93,6 +85,15 @@ namespace Sparrow.CommonLibrary.Database.Configuration
             if (_sqlbuilderInstances.TryGetValue(name, out builder))
                 return builder;
 
+            switch (name)
+            {
+                case "System.Data.SqlClient":
+                    return SqlBuilder.SqlServerStatementBuilder.Default;
+                case "System.Data.MySqlClient":
+                    return SqlBuilder.MySqlStatementBuilder.Default;
+                case "System.Data.OracleClient":
+                    return SqlBuilder.OracleStatementBuilder.Default;
+            }
             return null;
         }
 
