@@ -54,7 +54,7 @@ namespace Sparrow.CommonLibrary.Database.Configuration
         public void LoadConfig(DatabaseConfigurationSection configuration)
         {
             if (configuration == null)
-                throw new ArgumentNullException("configuration");
+                return;
 
             foreach (ProviderElement element in configuration.Providers)
             {
