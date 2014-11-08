@@ -22,7 +22,7 @@ namespace Sparrow.CommonLibrary.Common
         {
             _variant = new DynamicKeyValueContainer<string, string>();
             //
-            _variant.Add("%appdir%", (x) => System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
+            _variant.Add("%appdir%", (x) => FilterPathEnd(System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase));
             //windir|systemroot|temp返回的是同一个值（主要是与windows操作系统的习惯保持一致）
             _variant.Add("%windir%", (x) => Environment.GetFolderPath(Environment.SpecialFolder.Windows));
             _variant.Add("%systemroot%", (x) => Environment.GetFolderPath(Environment.SpecialFolder.Windows));
@@ -36,6 +36,15 @@ namespace Sparrow.CommonLibrary.Common
             _variant.Add("%day%", (x) => DateTime.Now.ToString("dd"));
             _variant.Add("%hour%", (x) => DateTime.Now.ToString("HH"));
             _variant.Add("%minute%", (x) => DateTime.Now.ToString("mm"));
+        }
+
+        private string FilterPathEnd(string path)
+        {
+            if (path.EndsWith("\\"))
+                return path.Substring(0, path.Length - 1);
+            if (path.EndsWith("/"))
+                return path.Substring(0, path.Length - 1);
+            return path;
         }
 
         private void ValidVariantName(string variantName)
