@@ -138,16 +138,16 @@ namespace Sparrow.CommonLibrary.Common
                 //不带扩展名的文件
                 if (string.IsNullOrEmpty(ext))
                 {
-                    if (Regex.IsMatch(path, "\\d+$"))
-                        path = Regex.Replace(path, "\\d+$", startIndex.ToString());
+                    if (Regex.IsMatch(path, "_\\d+$"))
+                        path = Regex.Replace(path, "_\\d+$", "_" + startIndex.ToString());
                     else
                         path = string.Concat(path, "_", startIndex.ToString());
                 }
                 else
                 {
-                    var pattern = string.Concat("\\d+\\", ext, "$");
+                    var pattern = string.Concat("_\\d+\\", ext, "$");
                     if (Regex.IsMatch(path, pattern))
-                        path = Regex.Replace(path, pattern, string.Concat(startIndex.ToString(), ext));
+                        path = Regex.Replace(path, pattern, string.Concat("_", startIndex.ToString(), ext));
                     else
                         path = new StringBuilder(path).Insert(path.Length - ext.Length, "_" + startIndex.ToString()).ToString();
                 }

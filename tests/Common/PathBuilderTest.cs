@@ -20,5 +20,14 @@ namespace Sparrow.CommonLibrary.Test.Common
 
             Assert.IsNotNullOrEmpty(path);
         }
+        [Test]
+        public void Test2()
+        {
+            var pbuilder = new PathBuilder();
+            var path = pbuilder.RebuildNextPath(@"D:\clding\trunk\projects\ClDing\Tests\ClDing.Utility.Tests\bin\Debug\cldinglog\error\2014\141109.log");
+            var path2 = pbuilder.RebuildNextPathByFileSize(@"D:\clding\trunk\projects\ClDing\Tests\ClDing.Utility.Tests\bin\Debug\cldinglog\error\2014\141109.log", "1MB");
+            Assert.IsNotNullOrEmpty(path);
+            Assert.IsNotNullOrEmpty(path2);
+        }
     }
 }
