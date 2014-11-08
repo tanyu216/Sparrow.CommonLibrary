@@ -217,15 +217,8 @@ namespace Sparrow.CommonLibrary.Common
     /// <typeparam name="T">缓冲区对象泛型</typeparam>
     public class BufferedFlushEventArgs<T> : EventArgs
     {
-        /// <summary>
-        /// 缓存区的元素集合
-        /// </summary>
         public IList<T> List { get; private set; }
 
-        /// <summary>
-        /// 初始线
-        /// </summary>
-        /// <param name="list">缓存区的元素集合</param>
         public BufferedFlushEventArgs(IList<T> list)
         {
             this.List = list;

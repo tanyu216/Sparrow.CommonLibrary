@@ -15,11 +15,14 @@ namespace Sparrow.CommonLibrary.Common
     {
         private readonly DynamicKeyValueContainer<string, string> _variant;
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public PathBuilder()
         {
             _variant = new DynamicKeyValueContainer<string, string>();
             //
-            _variant.Add("%appdir%", (x) => Environment.GetFolderPath(Environment.SpecialFolder.Startup));
+            _variant.Add("%appdir%", (x) => System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
             //windir|systemroot|temp返回的是同一个值（主要是与windows操作系统的习惯保持一致）
             _variant.Add("%windir%", (x) => Environment.GetFolderPath(Environment.SpecialFolder.Windows));
             _variant.Add("%systemroot%", (x) => Environment.GetFolderPath(Environment.SpecialFolder.Windows));
@@ -31,7 +34,7 @@ namespace Sparrow.CommonLibrary.Common
             _variant.Add("%year%", (x) => DateTime.Now.ToString("yyyy"));
             _variant.Add("%month%", (x) => DateTime.Now.ToString("MM"));
             _variant.Add("%day%", (x) => DateTime.Now.ToString("dd"));
-            _variant.Add("%hour%", (x) => DateTime.Now.ToString("hh"));
+            _variant.Add("%hour%", (x) => DateTime.Now.ToString("HH"));
             _variant.Add("%minute%", (x) => DateTime.Now.ToString("mm"));
         }
 
@@ -108,7 +111,6 @@ namespace Sparrow.CommonLibrary.Common
         /// 生成一个新的文件路径（新路径在原有的路径上加上一个从1开始的序号）。
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="fileSizeLimit"></param>
         /// <returns></returns>
         public string RebuildNextPath(string path)
         {

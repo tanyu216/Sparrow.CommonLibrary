@@ -15,6 +15,7 @@ namespace Sparrow.CommonLibrary.Test.Common
         public void Test()
         {
             var pbuilder = new PathBuilder();
+            pbuilder.SetVariant("%test%", x => "123");
             var path = pbuilder.BuildWithVariant("%appdir%\\sprlog\\%year%_%month%\\%day%log.log");
 
             Assert.IsNotNullOrEmpty(path);
