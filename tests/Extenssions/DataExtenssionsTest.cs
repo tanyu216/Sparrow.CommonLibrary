@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sparrow.CommonLibrary.Extenssions;
+using Sparrow.CommonLibrary.Database;
 
 namespace Sparrow.CommonLibrary.Test.Extenssions
 {
@@ -65,6 +66,17 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
             var list2 = dt.GetValues<int>("Id");
             var list3 = dt.GetValues<int>(0);//第0列
             var list4 = dt.GetValues<string>(1);//第1列
+        }
+
+        [Test]
+        public void DictionaryTest2()
+        {
+            using (var dt = DatabaseHelper.GetHelper("test").ExecuteReader("select id,name from UserProfile(nolock)"))
+            {
+                var dic2 = dt.ToDictionary<int, string>("Id", "name");
+                Assert.IsNotNull(dic2);
+                Assert.IsTrue(dic2.Count > 0);
+            }
         }
     }
 }

@@ -28,15 +28,21 @@ namespace Sparrow.CommonLibrary.Repository
 
         IList<T> GetList();
         IList<T> GetList(int startIndex, int rowCount);
+        IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending);
+        IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2);
+        IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3);
         IList<T> GetList(Expression<Func<T, bool>> logical);
         IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount);
-        IList<T> GetList(LogicalBinaryExpression logical);
-        IList<T> GetList(LogicalBinaryExpression logical, int startIndex, int rowCount);
-
+        IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending);
+        IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2);
+        IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3);
+        
         T Get(object id);
         T Get(Expression<Func<T, bool>> logical);
-        T Get(LogicalBinaryExpression logical);
-
+        T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending);
+        T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2);
+        T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3);
+        
         #endregion
 
         #region Sum, Min, Max, Count, Avg, Count, Groupby

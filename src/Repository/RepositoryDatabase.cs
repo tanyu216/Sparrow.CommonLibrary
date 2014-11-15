@@ -384,6 +384,51 @@ namespace Sparrow.CommonLibrary.Repository
             return new Queryable<T>(DbReader).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
+        public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending)
+        {
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            return new Queryable<T>(DbReader)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .ExecuteList();
+        }
+
+        public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
+        {
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            return new Queryable<T>(DbReader)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .OrderBy(orderby2, descending2)
+                .ExecuteList();
+        }
+
+        public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
+        {
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            if (orderby3 == null)
+                throw new ArgumentNullException("orderby3");
+
+            return new Queryable<T>(DbReader)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .OrderBy(orderby2, descending2)
+                .OrderBy(orderby3, descending3)
+                .ExecuteList();
+        }
+
         public IList<T> GetList(Expression<Func<T, bool>> logical)
         {
             if (logical == null)
@@ -394,20 +439,67 @@ namespace Sparrow.CommonLibrary.Repository
 
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount)
         {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
             return new Queryable<T>(DbReader).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
         }
 
-        public IList<T> GetList(LogicalBinaryExpression logical)
+        public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending)
         {
             if (logical == null)
                 throw new ArgumentNullException("logical");
 
-            return new Queryable<T>(DbReader).Where(logical).ExecuteList();
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            return new Queryable<T>(DbReader)
+                .Where(logical)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .ExecuteList();
         }
 
-        public IList<T> GetList(LogicalBinaryExpression logical, int startIndex, int rowCount)
+        public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
         {
-            return new Queryable<T>(DbReader).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            return new Queryable<T>(DbReader)
+                .Where(logical)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .OrderBy(orderby2, descending2)
+                .ExecuteList();
+        }
+
+        public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
+        {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            if (orderby3 == null)
+                throw new ArgumentNullException("orderby3");
+
+            return new Queryable<T>(DbReader)
+                .Where(logical)
+                .RowLimit(startIndex, rowCount)
+                .OrderBy(orderby, descending)
+                .OrderBy(orderby2, descending2)
+                .OrderBy(orderby3, descending3)
+                .ExecuteList();
         }
 
         public T Get(Expression<Func<T, bool>> logical)
@@ -416,6 +508,57 @@ namespace Sparrow.CommonLibrary.Repository
                 throw new ArgumentNullException("logical");
 
             using (var read = new Queryable<T>(DbReader).Where(logical).ExecuteReader())
+            {
+                return Map.Single<T>(read);
+            }
+        }
+
+        public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending)
+        {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            using (var read = new Queryable<T>(DbReader).Where(logical).OrderBy(orderby, descending).ExecuteReader())
+            {
+                return Map.Single<T>(read);
+            }
+        }
+
+        public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
+        {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            using (var read = new Queryable<T>(DbReader).Where(logical).OrderBy(orderby, descending).OrderBy(orderby2, descending2).ExecuteReader())
+            {
+                return Map.Single<T>(read);
+            }
+        }
+
+        public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
+        {
+            if (logical == null)
+                throw new ArgumentNullException("logical");
+
+            if (orderby == null)
+                throw new ArgumentNullException("orderby");
+
+            if (orderby2 == null)
+                throw new ArgumentNullException("orderby2");
+
+            if (orderby3 == null)
+                throw new ArgumentNullException("orderby3");
+
+            using (var read = new Queryable<T>(DbReader).Where(logical).OrderBy(orderby, descending).OrderBy(orderby2, descending2).OrderBy(orderby3, descending3).ExecuteReader())
             {
                 return Map.Single<T>(read);
             }
@@ -435,17 +578,6 @@ namespace Sparrow.CommonLibrary.Repository
 
             var condition = SqlExpression.Equal(dbMetaInfo.GetKeys()[0], id);
             using (var read = new Queryable<T>(DbReader).Where(condition).ExecuteReader())
-            {
-                return Map.Single<T>(read);
-            }
-        }
-
-        public T Get(LogicalBinaryExpression logical)
-        {
-            if (logical == null)
-                throw new ArgumentNullException("logical");
-
-            using (var read = new Queryable<T>(DbReader).Where(logical).ExecuteReader())
             {
                 return Map.Single<T>(read);
             }

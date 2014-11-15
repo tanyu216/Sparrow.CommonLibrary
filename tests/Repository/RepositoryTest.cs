@@ -79,6 +79,12 @@ namespace Sparrow.CommonLibrary.Test.Repository
             repos.Save(userprofile);
         }
 
+        private int GetId(){
+            return 1;
+        }
+
+        private int ID { get { return 1; } }
+
         [Test]
         public void QueryTest()
         {
@@ -89,6 +95,8 @@ namespace Sparrow.CommonLibrary.Test.Repository
             //where Sex=1 and Name like 'test%'
             var list2 = repos.GetList(x => x.Sex == 1 && x.Name.StartsWith("test"));
             var list3 = repos.GetList(x => x.Id > 1 && x.Id < 10 && (x.Sex == 1 || x.Sex == 2));
+            //var list4 = repos.GetList(x => x.Id > GetId());
+            //var list5 = repos.GetList(x => x.Id > ID);
 
             Assert.IsNotNull(list1);
             Assert.Greater(list1.Count, 0);
@@ -115,6 +123,23 @@ namespace Sparrow.CommonLibrary.Test.Repository
 
             var maxValue = repos.Max<int>(x => x.Id, x => x.Id > 1 && x.Id < 1000 && x.Sex == 1);
 
+        }
+
+        [Test]
+        public void QueryTest3()
+        {
+            var db = DatabaseHelper.GetHelper("test");
+            var repos = new RepositoryDatabase<UserProfile>(db);
+
+            var list1 = repos.GetList(x => (object)x.Id == new[] { 1, 2, 3, 4, 5 });
+            //where Sex=1 and Name like 'test%'
+            var list2 = repos.GetList(x => x.Sex == 1 && x.Name.StartsWith("test"), 1, 10, x => x.Id, true);
+            var list3 = repos.GetList(x => x.Id > 1 && x.Id < 10 && (x.Sex == 1 || x.Sex == 2), 1, 10, x => x.Id, true, x => x.Id, true, x => x.Id, true);
+
+            Assert.IsNotNull(list1);
+            Assert.Greater(list1.Count, 0);
+            Assert.IsNotNull(list1);
+            Assert.Greater(list2.Count, 0);
         }
 
     }

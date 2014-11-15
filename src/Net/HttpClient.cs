@@ -125,6 +125,7 @@ namespace Sparrow.CommonLibrary.Net
             var request = (HttpWebRequest)WebRequest.Create(Url);
             request.Method = method;
             request.AllowAutoRedirect = false;
+            request.Proxy = null;
             return request;
         }
 
