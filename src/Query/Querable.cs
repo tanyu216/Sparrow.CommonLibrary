@@ -365,7 +365,7 @@ namespace Sparrow.CommonLibrary.Query
                     groupbyExpression,//group by name....
                     havingExpression,//having count(name)>1 ...
                     orderbyExpression,//order id
-                    distinct ? Options & SqlOptions.Distinct : Options
+                    distinct ? Options | SqlOptions.Distinct : Options
                     );
             }
             else
@@ -379,7 +379,7 @@ namespace Sparrow.CommonLibrary.Query
                     orderbyExpression,//order id
                     startIndex,
                     rowCount,
-                    distinct ? Options & SqlOptions.Distinct : Options
+                    distinct ? Options | SqlOptions.Distinct : Options
                     );
             }
         }

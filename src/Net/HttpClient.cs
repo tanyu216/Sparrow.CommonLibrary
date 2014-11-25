@@ -157,6 +157,7 @@ namespace Sparrow.CommonLibrary.Net
         /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
         /// </summary>
         /// <param name="request">HttpWebRequest实例对象</param>
+        /// <param name="data"></param>
         protected virtual void LoadFormData(HttpWebRequest request, NameValueCollection data)
         {
             if (data == null)
@@ -166,12 +167,26 @@ namespace Sparrow.CommonLibrary.Net
 
             var forms = NameValueSerialize(data);
 
+            using (var reqStream = request.GetRequestStream())
+            {
+                if (CompressData)
+                {
+                    request.Headers.Add("Content-Encoding", "gzip");
+                    CompressByGZip(forms, reqStream, Encoding.ASCII);
+                }
+                else
+                {
+                    var content = Encoding.ASCII.GetBytes(forms);
+                    reqStream.Write(content, 0, content.Length);
+                }
+            }
         }
 
         /// <summary>
         /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
         /// </summary>
         /// <param name="request">HttpWebRequest实例对象</param>
+        /// <param name="data"></param>
         protected virtual void LoadFormData(HttpWebRequest request, string data)
         {
             if (data == null)
@@ -184,11 +199,13 @@ namespace Sparrow.CommonLibrary.Net
                 if (CompressData)
                 {
                     request.Headers.Add("Content-Encoding", "gzip");
-                    CompressByGZip(data, reqStream);
+                    request.ContentType = "charset=" + Encoding.UTF8.WebName;
+                    CompressByGZip(data, reqStream, Encoding.UTF8);
                 }
                 else
                 {
-                    var content = Encoding.Default.GetBytes(data);
+                    var content = Encoding.UTF8.GetBytes(data);
+                    request.ContentType = "charset=" + Encoding.UTF8.WebName;
                     reqStream.Write(content, 0, content.Length);
                 }
             }
@@ -208,6 +225,7 @@ namespace Sparrow.CommonLibrary.Net
         /// 提交一个Web请求
         /// </summary>
         /// <param name="method">Web请求方式</param>
+        /// <param name="data"></param>
         /// <returns>Web请求返回结果</returns>
         protected virtual ResponseResult SubmitRequest(string method, NameValueCollection data)
         {
@@ -218,6 +236,7 @@ namespace Sparrow.CommonLibrary.Net
         /// 提交一个Web请求
         /// </summary>
         /// <param name="method">Web请求方式</param>
+        /// <param name="data"></param>
         /// <returns>Web请求返回结果</returns>
         protected virtual ResponseResult SubmitRequest(string method, string data)
         {
@@ -254,11 +273,12 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         /// <param name="encodedText">url编码后的表单数据</param>
         /// <param name="output">输出流</param>
-        protected virtual void CompressByGZip(string encodedText, Stream output)
+        /// <param name="encoding"></param>
+        protected virtual void CompressByGZip(string encodedText, Stream output, Encoding encoding)
         {
             using (var gs = new GZipStream(output, CompressionMode.Compress))
             {
-                var data = Encoding.Default.GetBytes(encodedText);
+                var data = encoding.GetBytes(encodedText);
                 gs.Write(data, 0, data.Length);
             }
         }
@@ -325,6 +345,7 @@ namespace Sparrow.CommonLibrary.Net
         /// 向目标服务提交一个文件流
         /// </summary>
         /// <param name="stream"></param>
+        /// <param name="filename"></param>
         /// <returns></returns>
         public ResponseResult PostFileStream(Stream stream, string filename)
         {

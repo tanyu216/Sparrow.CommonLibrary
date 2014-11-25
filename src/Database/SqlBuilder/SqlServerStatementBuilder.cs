@@ -38,7 +38,7 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         private static string LockOption(SqlOptions options)
         {
             var optVal = (int)options;
-            if ((optVal & (int)SqlOptions.None) > 0)
+            if ((optVal & (int)SqlOptions.NoLock) > 0)
                 return KeyWordNoLock;
             if ((optVal & (int)SqlOptions.RowLock) > 0)
                 return KeyWordRowLock;
