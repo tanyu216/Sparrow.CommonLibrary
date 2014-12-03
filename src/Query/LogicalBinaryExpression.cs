@@ -250,7 +250,7 @@ namespace Sparrow.CommonLibrary.Query
             {
                 if (Right == null)
                     return Left.OutputSqlString(builder, output);
-                return string.Concat("(", Left.OutputSqlString(builder, output), ")", Operator, "(", Right.OutputSqlString(builder, output), ")");
+                return string.Concat("((", Left.OutputSqlString(builder, output), ")", Operator, "(", Right.OutputSqlString(builder, output), "))");
             }
         }
     }
