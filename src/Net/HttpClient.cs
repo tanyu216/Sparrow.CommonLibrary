@@ -429,13 +429,17 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         public string Status { get { return Response.StatusDescription; } }
 
+        private Encoding _encoding;
         /// <summary>
-        /// http响应内容编码方式
+        /// 获取或设置HTTP响应内容编码方式
         /// </summary>
         public Encoding Encoding
         {
             get
             {
+                if (_encoding != null)
+                    return _encoding;
+
                 var encoding = Response.CharacterSet;
                 if (string.IsNullOrEmpty(encoding))
                 {
@@ -449,9 +453,11 @@ namespace Sparrow.CommonLibrary.Net
                     }
                 }
                 if (string.IsNullOrEmpty(encoding))
-                    encoding = System.Text.Encoding.UTF8.WebName;
-                return Encoding.GetEncoding(encoding);
+                    return _encoding = _encoding ?? System.Text.Encoding.UTF8;
+                else
+                    return _encoding = _encoding ?? Encoding.GetEncoding(encoding);
             }
+            set { _encoding = value; }
         }
 
         /// <summary>
