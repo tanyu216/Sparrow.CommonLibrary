@@ -84,5 +84,42 @@ namespace Sparrow.CommonLibrary.Test.Web
                 }
             }
         }
+
+        [Test]
+        public void Test5()
+        {
+            var httpClient2 = new HttpClient("https://api.weixin.qq.com/cgi-bin/menu/create?access_token=DobAnJEMoj6Rf6QU9XhqR9zbgGY_FqZA03eGkumpXPz1qcq53gLEJzHb5kUz-iYwRO7tFCsz4IhK_R8MbbYr4bAoCAbLvf1SaZe2XW9Te8Y");
+            string weixin1 = "";
+            weixin1 += "{\n";
+            weixin1 += "\"button\":[\n";
+            weixin1 += "{\n";
+            weixin1 += "\"type\":\"click\",\n";
+            weixin1 += "\"name\":\"今日歌曲\",\n";
+            weixin1 += "\"key\":\"V1001_TODAY_MUSIC123eee\"\n";
+            weixin1 += "},\n";
+            weixin1 += "{\n";
+            weixin1 += "\"type\":\"click\",\n";
+            weixin1 += "\"name\":\"歌手简介\",\n";
+            weixin1 += "\"key\":\"V1001_TODAY_SINGER123eee\"\n";
+            weixin1 += "},\n";
+            weixin1 += "{\n";
+            weixin1 += "\"name\":\"菜单\",\n";
+            weixin1 += "\"sub_button\":[\n";
+            weixin1 += "{\n";
+            weixin1 += "\"type\":\"click\",\n";
+            weixin1 += "\"name\":\"hello word\",\n";
+            weixin1 += "\"key\":\"V1001_HELLO_WORLD123eee\"\n";
+            weixin1 += "},\n";
+            weixin1 += "{\n";
+            weixin1 += "\"type\":\"click\",\n";
+            weixin1 += "\"name\":\"赞一下我们\",\n";
+            weixin1 += "\"key\":\"V1001_GOOD123eee\"\n";
+            weixin1 += "}]\n";
+            using (var result2 = httpClient2.Post(weixin1))
+            {
+                var result = result2.GetOutputString();
+                Assert.IsNotNull(result);
+            }
+        }
     }
 }

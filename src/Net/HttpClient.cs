@@ -18,6 +18,11 @@ namespace Sparrow.CommonLibrary.Net
     /// </summary>
     public class HttpClient
     {
+        /// <summary>
+        /// 请求编码方式
+        /// </summary>
+        public Encoding Encoding { get; set; }
+
         private NameValueCollection _headers;
         /// <summary>
         /// 自定义Http请求的头
@@ -87,6 +92,7 @@ namespace Sparrow.CommonLibrary.Net
 
             Url = url;
             Timeout = 6 * 1000;
+            Encoding = Encoding.UTF8;
         }
 
         /// <summary>
@@ -158,35 +164,6 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         /// <param name="request">HttpWebRequest实例对象</param>
         /// <param name="data"></param>
-        protected virtual void LoadFormData(HttpWebRequest request, NameValueCollection data)
-        {
-            if (data == null)
-            {
-                return;
-            }
-
-            var forms = NameValueSerialize(data);
-
-            using (var reqStream = request.GetRequestStream())
-            {
-                if (CompressData)
-                {
-                    request.Headers.Add("Content-Encoding", "gzip");
-                    CompressByGZip(forms, reqStream, Encoding.ASCII);
-                }
-                else
-                {
-                    var content = Encoding.ASCII.GetBytes(forms);
-                    reqStream.Write(content, 0, content.Length);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 将请求的QueryString和表单数据载入至HttpWebRequest对象中
-        /// </summary>
-        /// <param name="request">HttpWebRequest实例对象</param>
-        /// <param name="data"></param>
         protected virtual void LoadFormData(HttpWebRequest request, string data)
         {
             if (data == null)
@@ -199,13 +176,11 @@ namespace Sparrow.CommonLibrary.Net
                 if (CompressData)
                 {
                     request.Headers.Add("Content-Encoding", "gzip");
-                    request.ContentType = "charset=" + Encoding.UTF8.WebName;
-                    CompressByGZip(data, reqStream, Encoding.UTF8);
+                    CompressByGZip(data, reqStream, Encoding);
                 }
                 else
                 {
-                    var content = Encoding.UTF8.GetBytes(data);
-                    request.ContentType = "charset=" + Encoding.UTF8.WebName;
+                    var content = Encoding.GetBytes(data);
                     reqStream.Write(content, 0, content.Length);
                 }
             }
@@ -370,7 +345,7 @@ namespace Sparrow.CommonLibrary.Net
                 .Append("application/octet-stream")
                 .Append("\r\n")
                 .Append("\r\n").ToString();
-            byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
+            byte[] postHeaderBytes = Encoding.GetBytes(strPostHeader);
             request.AllowWriteStreamBuffering = false;
             request.ContentType = "multipart/form-data; boundary=" + strBoundary;
             long length = stream.Length + postHeaderBytes.Length + boundaryBytes.Length;
