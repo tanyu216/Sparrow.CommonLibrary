@@ -76,7 +76,17 @@ namespace Sparrow.CommonLibrary.Query
                     {
                         return Like(Expression(methodCall.Object), Expression(methodCall.Arguments[0]), false, true);
                     }
-                    break;
+                    else
+                    {
+                        if (methodCall.Method.ReturnType.IsValueType ||
+                            methodCall.Method.ReturnType == typeof(System.String))
+                        {
+                            var obj = LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(LqExpressionType.Convert, methodCall, typeof(object))).Compile()();
+                            return Constant(obj);
+                        }
+                    }
+
+                    throw new NotSupportedException("不支持的函数调用。");
 
                 case LqExpressionType.Equal:
                     var left = Expression(((Binary)expression).Left);
@@ -130,6 +140,13 @@ namespace Sparrow.CommonLibrary.Query
                     return Expression(((UnaryExpression)expression).Operand);
 
                 case LqExpressionType.MemberAccess:
+
+                    if (((MemberExpression)expression).Expression == null)
+                    {
+                        var obj = LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(LqExpressionType.Convert, expression, typeof(object))).Compile()();
+                        return Constant(obj);
+                    }
+
                     if (((MemberExpression)expression).Expression.NodeType == LqExpressionType.Parameter)
                     {
                         var propertyInfo = (PropertyInfo)PropertyExpression.ExtractMemberExpression(expression).Member;

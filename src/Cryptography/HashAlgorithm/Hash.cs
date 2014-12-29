@@ -90,27 +90,27 @@ namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
 
         public bool VerifySign(byte[] buffer, byte[] sign)
         {
-            return Compare(SignData(buffer), sign) == 0;
+            return EqualsCompare(SignData(buffer), sign);
         }
 
         public bool VerifySign(string s, byte[] sign)
         {
-            return Compare(SignData(s), sign) == 0;
+            return EqualsCompare(SignData(s), sign);
         }
 
         public bool VerifySign(string s, string sign)
         {
-            return Compare(SignData(s), Crypto.FromHexString(sign)) == 0;
+            return EqualsCompare(SignData(s), Crypto.FromHexString(sign));
         }
 
         public bool VerifySign(System.IO.Stream inputStream, byte[] sign)
         {
-            return Compare(SignData(inputStream), sign) == 0;
+            return EqualsCompare(SignData(inputStream), sign);
         }
 
         public bool VerifySign(System.IO.Stream inputStream, string sign)
         {
-            return Compare(SignData(inputStream), Crypto.FromHexString(sign)) == 0;
+            return EqualsCompare(SignData(inputStream), Crypto.FromHexString(sign));
         }
 
         protected virtual System.Security.Cryptography.HashAlgorithm Create()
@@ -120,18 +120,23 @@ namespace Sparrow.CommonLibrary.Cryptography.HashAlgorithm
             return System.Security.Cryptography.HashAlgorithm.Create(AlgorithmName);
         }
 
-        [DllImport("msvcrt.dll")]
-        private static extern IntPtr memcmp(byte[] b1, byte[] b2, IntPtr count);
-
         /// <summary>
         /// byte数据比较
         /// </summary>
         /// <param name="b1">字节数组1</param>
         /// <param name="b2">字节数组2</param>
-        /// <returns>如果两个数组相同，返回0；如果数组1小于数组2，返回小于0的值；如果数组1大于数组2，返回大于0的值。</returns>
-        protected int Compare(byte[] b1, byte[] b2)
+        /// <returns></returns>
+        protected bool EqualsCompare(byte[] b1, byte[] b2)
         {
-            return memcmp(b1, b2, new IntPtr(b1.Length)).ToInt32();
+            if (b1.Length != b2.Length)
+                return false;
+            int i = 0;
+            do
+            {
+                if (b1[i] != b2[i])
+                    return false;
+            } while (++i < b1.Length);
+            return true;
         }
 
     }

@@ -28,7 +28,7 @@ namespace Sparrow.CommonLibrary.Test.Web
 
         }
 
-        [Test]
+        //[Test]
         public void Test2()
         {
             var httpClient = new HttpClient("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=ACCESS_TOKEN");
@@ -40,7 +40,7 @@ namespace Sparrow.CommonLibrary.Test.Web
             }
         }
 
-        [Test]
+        //[Test]
         public void Test3()
         {
             var httpClient = new HttpClient("http://image.clding.com/image/img_add");
@@ -50,7 +50,7 @@ namespace Sparrow.CommonLibrary.Test.Web
             Assert.IsNotNull(str);
         }
 
-        [Test]
+        //[Test]
         public void Test4()
         {
 
@@ -85,7 +85,7 @@ namespace Sparrow.CommonLibrary.Test.Web
             }
         }
 
-        [Test]
+        //[Test]
         public void Test5()
         {
             var httpClient2 = new HttpClient("https://api.weixin.qq.com/cgi-bin/menu/create?access_token=DobAnJEMoj6Rf6QU9XhqR9zbgGY_FqZA03eGkumpXPz1qcq53gLEJzHb5kUz-iYwRO7tFCsz4IhK_R8MbbYr4bAoCAbLvf1SaZe2XW9Te8Y");

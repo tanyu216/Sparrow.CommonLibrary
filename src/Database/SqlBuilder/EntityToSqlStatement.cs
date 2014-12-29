@@ -40,6 +40,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         public virtual string GenerateInsert(IEntityExplain entity, ParameterCollection output)
         {
+            if (entity.AnySetted() == false)
+                return null;
+
             bool hasIncrement;
             return GenerateInsert(entity, output, false, out hasIncrement);
         }
@@ -54,6 +57,12 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         public virtual string GenerateInsert(IEntityExplain entity, ParameterCollection output, bool includeIncrement, out bool hasIncrement, string incrementFieldName = null)
         {
+            if (entity.AnySetted() == false)
+            {
+                hasIncrement = false;
+                return null;
+            }
+
             var fields = entity.GetSettedFields();
             var values = entity.GetFieldValues(fields);
             if (includeIncrement && entity.Increment != null)
@@ -77,10 +86,13 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         public virtual string GenerateUpdate(IEntityExplain entity, ParameterCollection output)
         {
+            if (entity.AnySetted() == false)
+                return null;
+
             var fields = entity.GetSettedFields();
-            if (fields == null || fields.Any() == false)
-                throw new ArgumentException("实体对象缺少主键值。");
             var conditions = entity.GetFieldValues(entity.GetKeys());
+            if (conditions == null || conditions.Any() == false)
+                throw new ArgumentException("实体对象缺少主键值。");
             var values = entity.GetFieldValues(fields.Where(x => entity.IsKey(x) == false));
             return _stmBuilder.Update(entity, values, conditions, output, SqlOptions.None);
         }
@@ -93,6 +105,9 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         public virtual string GenerateInsertOrUpdate(IEntityExplain entity, ParameterCollection output)
         {
+            if (entity.AnySetted() == false)
+                return null;
+
             bool hasIncrement;
             return GenerateInsertOrUpdate(entity, output, false, out hasIncrement);
         }
@@ -107,6 +122,11 @@ namespace Sparrow.CommonLibrary.Database.SqlBuilder
         /// <returns></returns>
         public virtual string GenerateInsertOrUpdate(IEntityExplain entity, ParameterCollection output, bool includeIncrement, out bool hasIncrement, string incrementFieldName = null)
         {
+            if (entity.AnySetted() == false)
+            {
+                hasIncrement = false;
+                return null;
+            }
             // 有增量标识的实体对象的特殊处理
             if (entity.Increment != null)
             {

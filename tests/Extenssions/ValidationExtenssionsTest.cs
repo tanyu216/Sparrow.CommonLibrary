@@ -48,7 +48,7 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
         {
             Assert.IsTrue("59356309".IsFixPhoneCHN());
             Assert.IsTrue("8659356309".IsFixPhoneCHN());
-            Assert.IsTrue("+8659356309".IsFixPhoneCHN());
+            Assert.IsFalse("+8659356309".IsFixPhoneCHN());
             Assert.IsTrue("01059356309".IsFixPhoneCHN());
             Assert.IsTrue("8601059356309".IsFixPhoneCHN());
             Assert.IsTrue("+8601059356309".IsFixPhoneCHN());

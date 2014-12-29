@@ -111,7 +111,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
 
             Assert.IsNotNull(accessor.MetaInfo.Name);
             Assert.AreEqual(accessor.MetaInfo.GetPropertyNames()[3], "Email");
-            Assert.AreEqual(accessor.MetaInfo.PropertyCount, 5);
+            Assert.AreEqual(accessor.MetaInfo.PropertyCount, 6);
 
             Assert.IsTrue(((IDbMetaInfo)accessor.MetaInfo).IsKey("Id"));
             Assert.IsFalse(((IDbMetaInfo)accessor.MetaInfo).IsKey("Sex"));

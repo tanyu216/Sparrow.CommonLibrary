@@ -59,10 +59,17 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
         protected T Create(object[] initData)
         {
             T obj = objAccessor.Create();
+            if (obj is IMappingTrigger)
+                ((IMappingTrigger)obj).Begin();
+
             for (var i = 0; i < initData.Length; i++)
             {
                 propertyAccessors[i].SetValue(obj, initData[i]);
             }
+
+            if (obj is IMappingTrigger)
+                ((IMappingTrigger)obj).End();
+
             return obj;
         }
 

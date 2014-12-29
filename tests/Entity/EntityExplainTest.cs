@@ -25,7 +25,7 @@ namespace Sparrow.CommonLibrary.Test.Entity
             user.Name = "test";
             user.Email = "test@hotmail.com";
 
-            Assert.AreEqual(accessor.MetaInfo.PropertyCount, 5);
+            Assert.AreEqual(accessor.MetaInfo.PropertyCount, 6);
             Assert.AreEqual(dbMetaInfo.KeyCount, 1);
             Assert.AreEqual(accessor.MetaInfo.GetPropertyNames()[0], "Id");
             Assert.AreEqual(accessor.MetaInfo.GetPropertyNames()[1], "Name");

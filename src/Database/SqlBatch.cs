@@ -111,6 +111,11 @@ namespace Sparrow.CommonLibrary.Database
             return this;
         }
 
+        /// <summary>
+        /// 清空集合
+        /// </summary>
+        public void Clear() { _list.Clear(); }
+
         #region IEnumerable Members
 
         public IEnumerator<SqlBatchItem> GetEnumerator()

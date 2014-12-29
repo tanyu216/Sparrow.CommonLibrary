@@ -47,7 +47,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <returns></returns>
         public static bool IsFixPhoneCHN(this string str)
         {
-            return Regex.IsMatch(str, @"^((\+86|0?86)?-)?(\d{3,4}-?)?\d{7,8}$");
+            return Regex.IsMatch(str, @"^((\+?(86|086)(-|\s)?)?\d{3,4}(-|\s)?)?\d{7,8}$");
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Sparrow.CommonLibrary.Extenssions
         /// <returns></returns>
         public static bool IsMobilePhoneCHN(this string str)
         {
-            return Regex.IsMatch(str, @"^((\+86|0?86|86)?-?)?1\d{10}$");
+            return Regex.IsMatch(str, @"^(\+?(086|86)(-|\s)?)?1\d{10}$");
         }
 
         /// <summary>

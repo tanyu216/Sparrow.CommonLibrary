@@ -128,6 +128,78 @@ namespace Sparrow.CommonLibrary.Test.Query
         }
 
         [Test]
+        public void QueryableListTest4()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => x.Birthday < DateTime.Now)
+                .ExecuteList();
+
+        }
+
+
+        private int GetId()
+        {
+            return 1;
+        }
+        [Test]
+        public void QueryableListTest5()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => x.Id > GetId())
+                .ExecuteList();
+
+        }
+
+        private int MinId { get { return 1; } }
+        [Test]
+        public void QueryableListTest6()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => x.Id > MinId)
+                .ExecuteList();
+
+        }
+
+        [Test]
+        public void QueryableListTest7()
+        {
+            QueryableListTest7_1(1);
+        }
+
+        private void QueryableListTest7_1(int id)
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => x.Id > id)
+                .ExecuteList();
+        }
+
+        public class Test8
+        {
+            public static int GetId()
+            {
+                return 3;
+            }
+        }
+        [Test]
+        public void QueryableListTest8()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => x.Id > Test8.GetId())
+                .ExecuteList();
+
+        }
+
+        [Test]
         public void QueryablePageOfListTest1()
         {
             var database = DatabaseHelper.GetHelper("test");

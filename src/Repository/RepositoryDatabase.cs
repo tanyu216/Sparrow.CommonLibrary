@@ -109,19 +109,38 @@ namespace Sparrow.CommonLibrary.Repository
         }
 
         #region BuildDmlSql
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="output"></param>
+        /// <param name="incrementEntity"></param>
+        /// <returns></returns>
         protected string BuildDmlSql(T entity, ParameterCollection output, ref IDictionary<string, T> incrementEntity)
         {
             var expl = new EntityExplain<T>(entity);
             return BuildDmlSql(expl, expl.OperationState, output, ref incrementEntity);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="state"></param>
+        /// <param name="output"></param>
+        /// <param name="incrementEntity"></param>
+        /// <returns></returns>
         protected string BuildDmlSql(T entity, DataState state, ParameterCollection output, ref IDictionary<string, T> incrementEntity)
         {
             var expl = new EntityExplain<T>(entity);
             return BuildDmlSql(expl, state, output, ref incrementEntity);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="output"></param>
+        /// <param name="incrementEntity"></param>
+        /// <returns></returns>
         protected string BuildDmlSql(IEnumerable<T> entities, ParameterCollection output, ref IDictionary<string, T> incrementEntity)
         {
             StringBuilder sql = new StringBuilder();
@@ -131,7 +150,14 @@ namespace Sparrow.CommonLibrary.Repository
             }
             return sql.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="state"></param>
+        /// <param name="output"></param>
+        /// <param name="incrementEntity"></param>
+        /// <returns></returns>
         protected string BuildDmlSql(IEnumerable<T> entities, DataState state, ParameterCollection output, ref IDictionary<string, T> incrementEntity)
         {
             StringBuilder sql = new StringBuilder();
@@ -218,12 +244,23 @@ namespace Sparrow.CommonLibrary.Repository
         #endregion
 
         #region DoExecute
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterCollection"></param>
+        /// <returns></returns>
         protected int DoExecuteByDbWriter(string sql, ParameterCollection parameterCollection)
         {
             return DoExecuteByDbWriter(sql, parameterCollection, null);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterCollection"></param>
+        /// <param name="incrementEntity"></param>
+        /// <returns></returns>
         protected int DoExecuteByDbWriter(string sql, ParameterCollection parameterCollection, IDictionary<string, T> incrementEntity)
         {
             if (string.IsNullOrEmpty(sql))
@@ -242,7 +279,11 @@ namespace Sparrow.CommonLibrary.Repository
         #endregion
 
         #region IRepository<T>.DML
-
+        /// <summary>
+        /// 将实体生成一条Insert语句到数据库执行
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public int Insert(T entity)
         {
             if (entity == null)
@@ -257,7 +298,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 将实体生成一组Insert语句到数据库执行
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public int Insert(IEnumerable<T> entities)
         {
             if (entities == null)
@@ -273,7 +318,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 将实体生成一条Update语句到数据库执行
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public int Update(T entity)
         {
             if (entity == null)
@@ -288,7 +337,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 将实体生成一组Update语句到数据库执行
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public int Update(IEnumerable<T> entities)
         {
             if (entities == null)
@@ -304,7 +357,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 将实体保存到数据库，如果实体存在（依据主键）则执行Update否则执行Insert
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public int Save(T entity)
         {
             if (entity == null)
@@ -319,7 +376,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 将实体保存到数据库，如果实体存在（依据主键）则执行Update否则执行Insert
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public int Save(IEnumerable<T> entities)
         {
             if (entities == null)
@@ -335,7 +396,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, incrementEntity);
         }
-
+        /// <summary>
+        /// 依据实体主键，生成Delete语句到数据库执行。
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public int Delete(T entity)
         {
             if (entity == null)
@@ -347,7 +412,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, null);
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，生成Delete语句到数据库执行。
+        /// </summary>
+        /// <param name="logical">Lambda表达式</param>
+        /// <returns></returns>
         public int Delete(Expression<Func<T, bool>> logical)
         {
             if (logical == null)
@@ -358,7 +427,11 @@ namespace Sparrow.CommonLibrary.Repository
             //
             return DoExecuteByDbWriter(sql, parameters, null);
         }
-
+        /// <summary>
+        /// 依据表达式，生成Delete语句到数据库执行。
+        /// </summary>
+        /// <param name="logical">Sparrow.Query.SqlExpression表达式</param>
+        /// <returns></returns>
         public int Delete(LogicalBinaryExpression logical)
         {
             if (logical == null)
@@ -373,17 +446,32 @@ namespace Sparrow.CommonLibrary.Repository
         #endregion
 
         #region IRepository<T>.Database.Query
-
+        /// <summary>
+        /// 获取表中的所有数据
+        /// </summary>
+        /// <returns></returns>
         public IList<T> GetList()
         {
             return new Queryable<T>(DbReader).ExecuteList();
         }
-
+        /// <summary>
+        /// 获取表中指定行的数据
+        /// </summary>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <returns></returns>
         public IList<T> GetList(int startIndex, int rowCount)
         {
             return new Queryable<T>(DbReader).RowLimit(startIndex, rowCount).ExecuteList();
         }
-
+        /// <summary>
+        /// 获取表中指定行的数据
+        /// </summary>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending)
         {
             if (orderby == null)
@@ -394,7 +482,16 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby, descending)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 获取表中指定行的数据
+        /// </summary>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
         {
             if (orderby == null)
@@ -409,7 +506,18 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby2, descending2)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 获取表中指定行的数据
+        /// </summary>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby3">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending3">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
         {
             if (orderby == null)
@@ -428,7 +536,11 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby3, descending3)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，查询表中的数据
+        /// </summary>
+        /// <param name="logical">Lambda条件表达式，如：x=&gt;x.id&gt;3 &amp;&amp; x.id&lt;5 || (object)x.id==new[]{12,13,18}  </param>
+        /// <returns></returns>
         public IList<T> GetList(Expression<Func<T, bool>> logical)
         {
             if (logical == null)
@@ -436,15 +548,29 @@ namespace Sparrow.CommonLibrary.Repository
 
             return new Queryable<T>(DbReader).Where(logical).ExecuteList();
         }
-
+        /// <summary>
+        /// 据Lambda表达式，查询表中的数据
+        /// </summary>
+        /// <param name="logical">Lambda条件表达式，如：x=&gt;x.id&gt;3 &amp;&amp; x.id&lt;5 || (object)x.id==new[]{12,13,18}  </param>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <returns></returns>
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount)
         {
             if (logical == null)
                 throw new ArgumentNullException("logical");
-
+            
             return new Queryable<T>(DbReader).Where(logical).RowLimit(startIndex, rowCount).ExecuteList();
         }
-
+        /// <summary>
+        /// 据Lambda表达式，查询表中的数据
+        /// </summary>
+        /// <param name="logical">Lambda条件表达式，如：x=&gt;x.id&gt;3 &amp;&amp; x.id&lt;5 || (object)x.id==new[]{12,13,18}  </param>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending)
         {
             if (logical == null)
@@ -459,7 +585,17 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby, descending)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 据Lambda表达式，查询表中的数据
+        /// </summary>
+        /// <param name="logical">Lambda条件表达式，如：x=&gt;x.id&gt;3 &amp;&amp; x.id&lt;5 || (object)x.id==new[]{12,13,18}  </param>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
         {
             if (logical == null)
@@ -478,7 +614,19 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby2, descending2)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 据Lambda表达式，查询表中的数据
+        /// </summary>
+        /// <param name="logical">Lambda条件表达式，如：x=&gt;x.id&gt;3 &amp;&amp; x.id&lt;5 || (object)x.id==new[]{12,13,18}  </param>
+        /// <param name="startIndex">数据起始行，从0开始</param>
+        /// <param name="rowCount">返回的总行数</param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby3">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending3">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public IList<T> GetList(Expression<Func<T, bool>> logical, int startIndex, int rowCount, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
         {
             if (logical == null)
@@ -501,7 +649,11 @@ namespace Sparrow.CommonLibrary.Repository
                 .OrderBy(orderby3, descending3)
                 .ExecuteList();
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，获取表中一行数据
+        /// </summary>
+        /// <param name="logical">Lambda表达式，如：x=&gt;x.Name&gt;"123" &amp;&amp; x.sex=1  </param>
+        /// <returns></returns>
         public T Get(Expression<Func<T, bool>> logical)
         {
             if (logical == null)
@@ -512,7 +664,13 @@ namespace Sparrow.CommonLibrary.Repository
                 return Map.Single<T>(read);
             }
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，获取表中一行数据
+        /// </summary>
+        /// <param name="logical">Lambda表达式，如：x=&gt;x.Name&gt;"123" &amp;&amp; x.sex=1 </param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending)
         {
             if (logical == null)
@@ -526,7 +684,15 @@ namespace Sparrow.CommonLibrary.Repository
                 return Map.Single<T>(read);
             }
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，获取表中一行数据
+        /// </summary>
+        /// <param name="logical">Lambda表达式，如：x=&gt;x.Name&gt;"123" &amp;&amp; x.sex=1 </param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2)
         {
             if (logical == null)
@@ -543,7 +709,17 @@ namespace Sparrow.CommonLibrary.Repository
                 return Map.Single<T>(read);
             }
         }
-
+        /// <summary>
+        /// 依据Lambda表达式，获取表中一行数据
+        /// </summary>
+        /// <param name="logical">Lambda表达式，如：x=&gt;x.Name&gt;"123" &amp;&amp; x.sex=1 </param>
+        /// <param name="orderby">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby2">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending2">排序方式（true倒序，false升序）</param>
+        /// <param name="orderby3">Lambda指定排序字段，如：x=&gt;x.id</param>
+        /// <param name="descending3">排序方式（true倒序，false升序）</param>
+        /// <returns></returns>
         public T Get(Expression<Func<T, bool>> logical, Expression<Func<T, object>> orderby, bool descending, Expression<Func<T, object>> orderby2, bool descending2, Expression<Func<T, object>> orderby3, bool descending3)
         {
             if (logical == null)
@@ -563,7 +739,11 @@ namespace Sparrow.CommonLibrary.Repository
                 return Map.Single<T>(read);
             }
         }
-
+        /// <summary>
+        /// 依据主键获取表中的数据（不支持复合主键）
+        /// </summary>
+        /// <param name="id">主键值</param>
+        /// <returns></returns>
         public T Get(object id)
         {
             if (id == null)

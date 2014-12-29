@@ -75,6 +75,21 @@ namespace Sparrow.CommonLibrary.Net
         }
 
         /// <summary>
+        /// Cookie容器
+        /// </summary>
+        public CookieContainer Cookies { get; set; }
+
+        /// <summary>
+        /// 是否允许302跳转
+        /// </summary>
+        public bool AllowAutoRedirect { get; set; }
+
+        /// <summary>
+        /// http请求代理
+        /// </summary>
+        public IWebProxy Proxy { get; set; }
+
+        /// <summary>
         /// http url
         /// </summary>
         protected readonly string Url;
@@ -105,11 +120,11 @@ namespace Sparrow.CommonLibrary.Net
             if (values != null)
             {
                 var builder = new StringBuilder();
-                foreach (var key in values.AllKeys)
+                for (var i = 0; i < values.Count; i++)
                 {
-                    builder.Append(HttpUtility.UrlEncode(key))
+                    builder.Append(HttpUtility.UrlEncode(values.AllKeys[i]))
                         .Append('=')
-                        .Append(HttpUtility.UrlEncode(values[key]))
+                        .Append(HttpUtility.UrlEncode(values[i]))
                         .Append('&');
                 }
                 if (builder[builder.Length - 1] == '&')
@@ -130,8 +145,8 @@ namespace Sparrow.CommonLibrary.Net
         {
             var request = (HttpWebRequest)WebRequest.Create(Url);
             request.Method = method;
-            request.AllowAutoRedirect = false;
-            request.Proxy = null;
+            request.AllowAutoRedirect = AllowAutoRedirect;
+            request.Proxy = Proxy;
             return request;
         }
 
@@ -146,6 +161,10 @@ namespace Sparrow.CommonLibrary.Net
             request.Headers.Add("Accept-Charset", Encoding.UTF8.WebName);
             request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据 
             request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            if (Cookies != null)
+            {
+                request.CookieContainer = Cookies;
+            }
 
             if (request.RequestUri.AbsoluteUri.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
@@ -164,7 +183,7 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         /// <param name="request">HttpWebRequest实例对象</param>
         /// <param name="data"></param>
-        protected virtual void LoadFormData(HttpWebRequest request, string data)
+        protected virtual void LoadRequestData(HttpWebRequest request, string data)
         {
             if (data == null)
             {
@@ -217,7 +236,7 @@ namespace Sparrow.CommonLibrary.Net
         {
             var request = CreateRequest(method);
             InitRequest(request);
-            LoadFormData(request, data);
+            LoadRequestData(request, data);
 
             try
             {
@@ -382,6 +401,56 @@ namespace Sparrow.CommonLibrary.Net
                 return CreateReponseResult((HttpWebResponse)ex.Response);
             }
         }
+
+        #region 简单的url请求封装
+        /// <summary>
+        /// 发起一个简单的GET请求，获取请求响应的数据
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <returns></returns>
+        public static string Get(string url)
+        {
+            var httpClient = new HttpClient(url);
+            using (var result = httpClient.Get())
+            {
+                if (result.StatusCode == HttpStatusCode.OK)
+                    return result.GetOutputString();
+            }
+            return null;
+        }
+        /// <summary>
+        /// 发起一个简单的POST请求，获取请求响应的数据
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <param name="data">编码后的form表单，或json字符串。</param>
+        /// <returns></returns>
+        public static string Post(string url, string data)
+        {
+            var httpClient = new HttpClient(url);
+            using (var result = httpClient.Post(data))
+            {
+                if (result.StatusCode == HttpStatusCode.OK)
+                    return result.GetOutputString();
+            }
+            return null;
+        }
+        /// <summary>
+        /// 发起一个简单的POST请求，获取请求响应的数据
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <param name="data">form表单。</param>
+        /// <returns></returns>
+        public static string Post(string url, NameValueCollection data)
+        {
+            var httpClient = new HttpClient(url);
+            using (var result = httpClient.Post(data))
+            {
+                if (result.StatusCode == HttpStatusCode.OK)
+                    return result.GetOutputString();
+            }
+            return null;
+        }
+        #endregion
     }
 
     /// <summary>

@@ -90,6 +90,8 @@ namespace Sparrow.CommonLibrary.Test.Cryptography
         [Test]
         public void HashTest5()
         {
+            var sign = Crypto.ToHexString(Crypto.Hash(HashFlag.SHA1).SignData("123"));
+            Crypto.Hash(HashFlag.SHA1).VerifySign("123", sign);
         }
         [Test]
         public void HashTest6()

@@ -17,6 +17,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
         public virtual short Sex { get; set; }
         public virtual string Email { get; set; }
         public virtual string FixPhone { get; set; }
+        public virtual DateTime Birthday { get; set; }
 
         public static IObjectAccessor<UserProfile> GetObjectAccessor()
         {
@@ -26,6 +27,7 @@ namespace Sparrow.CommonLibrary.Test.Mapper
                 .AppendProperty(x => x.Sex, "Sex")
                 .AppendProperty(x => x.Email, "Email")
                 .AppendProperty(x => x.FixPhone, "FixPhone")
+                .AppendProperty(x => x.Birthday, "Birthday")
                 .CompleteWithEntity();
 
         }
