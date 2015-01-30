@@ -141,6 +141,16 @@ namespace Sparrow.CommonLibrary.Extenssions
             int val2;
             if (int.TryParse(val, out val2))
                 return val2;
+            else
+            {
+                try
+                {
+                    double val3;
+                    if (double.TryParse(val, out val3))
+                        return (int)val3;
+                }
+                catch { }
+            }
             return defVal;
         }
         /// <summary>
@@ -153,6 +163,78 @@ namespace Sparrow.CommonLibrary.Extenssions
             int result;
             if (int.TryParse(val, out result))
                 return result;
+            else
+            {
+                try
+                {
+                    double val3;
+                    if (double.TryParse(val, out val3))
+                        return (int)val3;
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region To long
+
+        /// <summary>
+        /// 将字符转换成System.Int64类型
+        /// </summary>
+        /// <param name="val">System.String</param>
+        /// <returns>如果转换失败将返回 System.Int64的默认值</returns>
+        public static long ToLong(this string val)
+        {
+            return val.ToLong(default(long));
+        }
+        /// <summary>
+        /// 将字符转换成System.Int64类型
+        /// </summary>
+        /// <param name="val">System.String</param>
+        /// <param name="defVal">在转换成 T 失败时，返回的默认值</param>
+        /// <returns>如果转换失败将返回 defVal</returns>
+        public static long ToLong(this string val, long defVal)
+        {
+            if (val == null)
+                return defVal;
+
+            int val2;
+            if (int.TryParse(val, out val2))
+                return val2;
+            else
+            {
+                try
+                {
+                    double val3;
+                    if (double.TryParse(val, out val3))
+                        return (long)val3;
+                }
+                catch { }
+            }
+            return defVal;
+        }
+        /// <summary>
+        /// 将字符转换成可空的System.Int64类型
+        /// </summary>
+        /// <param name="val">System.String</param>
+        /// <returns>如果转换失败将返回 Null</returns>
+        public static long? ToNullableLong(this string val)
+        {
+            long result;
+            if (long.TryParse(val, out result))
+                return result;
+            else
+            {
+                try
+                {
+                    double val3;
+                    if (double.TryParse(val, out val3))
+                        return (long)val3;
+                }
+                catch { }
+            }
             return null;
         }
 

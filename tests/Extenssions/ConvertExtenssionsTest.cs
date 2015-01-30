@@ -41,6 +41,9 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
 
             int val = "1".ToInt();
             decimal val2 = "1.2".ToDecimal();
+            var val3 = "1".ToLong();
+            val3 = "1.".ToLong();
+            val3 = "1.1".ToLong();
             DateTime date = "2014-1-1".ToDateTime();
             bool b = "true".ToBoolean();
 
