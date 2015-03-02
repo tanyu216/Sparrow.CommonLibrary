@@ -224,10 +224,10 @@ namespace Sparrow.CommonLibrary.Net
                     var rawdata = item.Item1 as byte[];
                     if (rawdata != null)
                         request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(rawdata, item.Item2));
-                    else if (item.Item1 is string && System.IO.File.Exists(item.Item1.ToString()) == false)
+                    else if (item.Item1 is string && System.IO.File.Exists(item.Item1.ToString()))
                         request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(item.Item1.ToString(), item.Item2));
                     else
-                        throw new WebException("安全证书数据不正大确。");
+                        throw new WebException("安全证书数据不正确。");
                 }
             }
 
