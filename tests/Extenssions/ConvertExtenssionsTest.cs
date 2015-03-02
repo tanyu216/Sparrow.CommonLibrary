@@ -44,6 +44,7 @@ namespace Sparrow.CommonLibrary.Test.Extenssions
             var val3 = "1".ToLong();
             val3 = "1.".ToLong();
             val3 = "1.1".ToLong();
+            val3 = "1502040128461283454".ToLong();
             DateTime date = "2014-1-1".ToDateTime();
             bool b = "true".ToBoolean();
 

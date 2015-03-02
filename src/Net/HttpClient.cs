@@ -45,6 +45,51 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         public int Timeout { get; set; }
 
+        private List<Tuple<object, string>> _Certs;
+        /// <summary>
+        /// 签名证书
+        /// </summary>
+        public List<Tuple<object, string>> Certs
+        {
+            get
+            {
+                if (_Certs.Count > 0)
+                    return _Certs.ToList();
+                else
+                    return new List<Tuple<object, string>>(0);
+            }
+        }
+        /// <summary>
+        /// 增加安全证书
+        /// </summary>
+        /// <param name="certFile">证书文件名称</param>
+        /// <param name="password">证书密码</param>
+        public void AddCertificates(string certFile, string password)
+        {
+            if (_Certs == null)
+                _Certs = new List<Tuple<object, string>>();
+
+            if (System.IO.File.Exists(certFile) == false)
+                throw new FileNotFoundException("指定的证书路径不包含证书文件。", certFile);
+
+            _Certs.Add(new Tuple<object, string>(certFile, password));
+        }
+        /// <summary>
+        /// 增加安全证书
+        /// </summary>
+        /// <param name="rawdata">证书文件数据</param>
+        /// <param name="password">证书密码</param>
+        public void AddCertificates(byte[] rawdata, string password)
+        {
+            if (_Certs == null)
+                _Certs = new List<Tuple<object, string>>();
+
+            if (rawdata == null)
+                throw new ArgumentNullException("rawdata");
+
+            _Certs.Add(new Tuple<object, string>(rawdata, password));
+        }
+
         /// <summary>
         /// HttpClient默认的浏览器
         /// </summary>
@@ -171,6 +216,21 @@ namespace Sparrow.CommonLibrary.Net
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((a, b, c, d) => true);
                 request.ProtocolVersion = HttpVersion.Version10;
             }
+
+            if (_Certs != null && _Certs.Count > 0)
+            {
+                foreach (var item in _Certs)
+                {
+                    var rawdata = item.Item1 as byte[];
+                    if (rawdata != null)
+                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(rawdata, item.Item2));
+                    else if (item.Item1 is string && System.IO.File.Exists(item.Item1.ToString()) == false)
+                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(item.Item1.ToString(), item.Item2));
+                    else
+                        throw new WebException("安全证书数据不正大确。");
+                }
+            }
+
             if (_headers != null)
             {
                 request.Headers.Add(_headers);

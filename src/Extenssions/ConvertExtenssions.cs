@@ -200,8 +200,8 @@ namespace Sparrow.CommonLibrary.Extenssions
             if (val == null)
                 return defVal;
 
-            int val2;
-            if (int.TryParse(val, out val2))
+            long val2;
+            if (long.TryParse(val, out val2))
                 return val2;
             else
             {
