@@ -204,6 +204,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual System.Data.IDataReader ExecuteReader(System.Data.Common.DbCommand command)
         {
+            if (command == null)
+                return DataReaderWrapper.Empty;
+
             using (var conn = GetWrapperedConnection())
             {
                 PrepareCommand(command, conn);
@@ -214,6 +217,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual System.Data.DataSet ExecuteDataSet(System.Data.Common.DbCommand command)
         {
+            if (command == null)
+                return new DataSet();
+
             using (var da = DbProvider.DbProviderFactory.CreateDataAdapter())
             {
                 using (var conn = GetWrapperedConnection())
@@ -230,6 +236,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual object ExecuteScalar(System.Data.Common.DbCommand command)
         {
+            if (command == null)
+                return null;
+
             using (var conn = GetWrapperedConnection())
             {
                 PrepareCommand(command, conn);
@@ -240,6 +249,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual int ExecuteNonQuery(System.Data.Common.DbCommand command)
         {
+            if (command == null)
+                return 0;
+
             using (var conn = GetWrapperedConnection())
             {
                 PrepareCommand(command, conn);
@@ -250,6 +262,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual System.Data.IDataReader ExecuteReader(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
         {
+            if (command == null)
+                return DataReaderWrapper.Empty;
+
             PrepareCommand(command, dbTransaction);
             return command.ExecuteReader();
         }
@@ -257,6 +272,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual System.Data.DataSet ExecuteDataSet(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
         {
+            if (command == null)
+                return new DataSet();
+
             PrepareCommand(command, dbTransaction);
             var da = DbProvider.DbProviderFactory.CreateDataAdapter();
             da.SelectCommand = command;
@@ -268,6 +286,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual object ExecuteScalar(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
         {
+            if (command == null)
+                return null;
+
             PrepareCommand(command, dbTransaction);
             return command.ExecuteScalar();
         }
@@ -275,6 +296,9 @@ namespace Sparrow.CommonLibrary.Database
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual int ExecuteNonQuery(System.Data.Common.DbCommand command, System.Data.Common.DbTransaction dbTransaction)
         {
+            if (command == null)
+                return 0;
+
             PrepareCommand(command, dbTransaction);
             return command.ExecuteNonQuery();
         }
