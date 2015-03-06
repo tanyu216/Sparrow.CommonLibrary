@@ -214,6 +214,8 @@ namespace Sparrow.CommonLibrary.Net
             if (request.RequestUri.AbsoluteUri.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((a, b, c, d) => true);
+                //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+                request.KeepAlive = false;
                 request.ProtocolVersion = HttpVersion.Version10;
             }
 
@@ -225,7 +227,7 @@ namespace Sparrow.CommonLibrary.Net
                     if (rawdata != null)
                         request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(rawdata, item.Item2));
                     else if (item.Item1 is string && System.IO.File.Exists(item.Item1.ToString()))
-                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(item.Item1.ToString(), item.Item2));
+                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate2(item.Item1.ToString(), item.Item2, System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.MachineKeySet | System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.PersistKeySet));
                     else
                         throw new WebException("安全证书数据不正确。");
                 }
@@ -627,4 +629,5 @@ namespace Sparrow.CommonLibrary.Net
 
         #endregion
     }
+
 }
