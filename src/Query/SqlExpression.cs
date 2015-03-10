@@ -32,6 +32,21 @@ namespace Sparrow.CommonLibrary.Query
         /// <returns></returns>
         public abstract string OutputSqlString(ISqlBuilder builder, ParameterCollection output);
 
+        private static bool IsEnumerator(Type type)
+        {
+            if (type.IsArray || type == typeof(IList) || type == typeof(ArrayList) || type == typeof(ICollection) || type == typeof(IEnumerable))
+                return true;
+            else if (type == typeof(object))
+                return false;
+            else
+            {
+                foreach (var baseType in type.GetInterfaces())
+                    if (IsEnumerator(type))
+                        return true;
+            }
+            return false;
+        }
+
         internal static SqlExpression Expression(System.Linq.Expressions.Expression expression)
         {
             if (expression == null)
@@ -83,6 +98,16 @@ namespace Sparrow.CommonLibrary.Query
                         {
                             var obj = LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(LqExpressionType.Convert, methodCall, typeof(object))).Compile()();
                             return Constant(obj);
+                        }
+                        else if (IsEnumerator(methodCall.Method.ReturnType))
+                        {
+                            var obj = LqExpression.Lambda<Func<object>>(LqExpression.MakeUnary(LqExpressionType.Convert, methodCall, typeof(object))).Compile()();
+                            var exps = new CollectionExpression();
+                            foreach (object item in (IEnumerable)obj)
+                            {
+                                exps.Add(Constant(item));
+                            }
+                            return exps;
                         }
                     }
 
