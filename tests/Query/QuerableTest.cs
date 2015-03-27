@@ -199,6 +199,24 @@ namespace Sparrow.CommonLibrary.Test.Query
 
         }
 
+        private static int[] List1()
+        {
+            return new[] { 1, 2, 3, 4, 5, 6 };
+        }
+        [Test]
+        public void QueryableListTest9()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var list = database.CreateQueryable<UserProfile>()
+                .Where(x => (object)x.Id == List1())
+                .ExecuteList();
+            //var type = List1().GetType();
+            //Assert.IsTrue(type.IsArray);
+            //Assert.IsTrue(type.IsSubclassOf(typeof(IEnumerable)));
+            //Assert.IsFalse(type.IsSubclassOf(typeof(TestCaseData)));
+        }
+
         [Test]
         public void QueryablePageOfListTest1()
         {

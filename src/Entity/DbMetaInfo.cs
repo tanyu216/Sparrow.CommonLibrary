@@ -73,7 +73,6 @@ namespace Sparrow.CommonLibrary.Entity
                     {
                         return;
                     }
-                    isReorganize = true;
 
                     _increment = (DbIncrementMetaPropertyInfo)GetProperties().FirstOrDefault(x => x is DbIncrementMetaPropertyInfo);
 
@@ -82,6 +81,8 @@ namespace Sparrow.CommonLibrary.Entity
                         if (property is DbMetaPropertyInfo && ((DbMetaPropertyInfo)property).IsKey)
                             keyList.Add(((DbMetaPropertyInfo)property).PropertyName);
                     _keys = keyList.ToArray();
+
+                    isReorganize = true;
                 }
             }
         }

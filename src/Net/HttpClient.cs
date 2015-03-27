@@ -215,7 +215,7 @@ namespace Sparrow.CommonLibrary.Net
             {
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((a, b, c, d) => true);
                 //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
-                request.KeepAlive = false;
+                //request.KeepAlive = false;
                 request.ProtocolVersion = HttpVersion.Version10;
             }
 
