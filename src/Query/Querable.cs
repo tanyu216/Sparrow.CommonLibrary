@@ -433,6 +433,21 @@ namespace Sparrow.CommonLibrary.Query
             return database.ExecuteList<TEntity>(sql, parameters, dbTransaction);
         }
 
+        public TType ExecuteScalar<TType>()
+        {
+            var parameters = database.CreateParamterCollection();
+            var sql = OutputSqlString(parameters);
+            return database.ExecuteScalar<TType>(sql, parameters);
+        }
+
+        public object ExecuteScalar()
+        {
+            var parameters = database.CreateParamterCollection();
+            var sql = OutputSqlString(parameters);
+            var cmd = database.BuildDbCommand(CommandType.Text, sql, parameters);
+            return database.ExecuteScalar(cmd);
+        }
+
         #endregion
 
         private string GetFieldName(Expression<Func<T, object>> field)
