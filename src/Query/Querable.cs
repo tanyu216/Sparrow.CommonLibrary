@@ -231,6 +231,9 @@ namespace Sparrow.CommonLibrary.Query
                         throw new ArgumentException("value集合未包含两个元素。");
                     logical = SqlExpression.Between(field, values.First(), values.Skip(1).First());
                     break;
+                case Operator.NotIn:
+                    logical = SqlExpression.NotIn(field, value);
+                    break;
                 default:
                     throw new NotSupportedException(string.Format("不受支持的{0}", op));
             }

@@ -38,6 +38,10 @@ namespace Sparrow.CommonLibrary.Query
                     if (!(right is CollectionExpression))
                         throw new ArgumentException("right不是一个集合表达式。");
                     return new InExpression() { Left = left, Right = (CollectionExpression)right };
+                case ExpressionType.NotIn:
+                    if (!(right is CollectionExpression))
+                        throw new ArgumentException("right不是一个集合表达式。");
+                    return new NotInExpression() { Left = left, Right = (CollectionExpression)right };
                 case ExpressionType.Between:
                     if (!(right is CollectionExpression))
                         throw new ArgumentException("right不是一个集合表达式。");
@@ -99,6 +103,24 @@ namespace Sparrow.CommonLibrary.Query
             public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
             {
                 return string.Concat(Left.OutputSqlString(builder, output), " IN (", Right.OutputSqlString(builder, output), ")");
+            }
+        }
+
+        private class NotInExpression : LogicalBinaryExpression
+        {
+            public override ExpressionType NodeType
+            {
+                get { return ExpressionType.NotEqual; }
+            }
+
+            protected override string Operator
+            {
+                get { return " NOT IN "; }
+            }
+
+            public override string OutputSqlString(Database.SqlBuilder.ISqlBuilder builder, Database.ParameterCollection output)
+            {
+                return string.Concat(Left.OutputSqlString(builder, output), " NOT IN (", Right.OutputSqlString(builder, output), ")");
             }
         }
 

@@ -53,6 +53,10 @@ namespace Sparrow.CommonLibrary.Query
         /// <summary>
         /// 区间。示例：col BETWEEN 1 AND 10
         /// </summary>
-        Between = 10
+        Between = 10,
+        /// <summary>
+        /// 不包含。示例：col NOT IN (1,2,3,4,5)
+        /// </summary>
+        NotIn = 11
     }
 }

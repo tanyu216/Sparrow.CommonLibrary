@@ -138,7 +138,16 @@ namespace Sparrow.CommonLibrary.Query
                     return LessThanOrEqual(Expression(((Binary)expression).Left), Expression(((Binary)expression).Right));
 
                 case LqExpressionType.NotEqual:
-                    return NotEqual(Expression(((Binary)expression).Left), Expression(((Binary)expression).Right));
+                    var left2 = Expression(((Binary)expression).Left);
+                    var right2 = Expression(((Binary)expression).Right);
+
+                    if (left2 is CollectionExpression)
+                        return NotIn(right2, (CollectionExpression)left2);
+
+                    if (right2 is CollectionExpression)
+                        return NotIn(left2, (CollectionExpression)right2);
+
+                    return NotEqual(left2, right2);
 
                 case LqExpressionType.OrElse:
                     return OrElse(Expression(((Binary)expression).Left), Expression(((Binary)expression).Right));
@@ -426,6 +435,31 @@ namespace Sparrow.CommonLibrary.Query
         public static LogicalBinaryExpression In<T>(System.Linq.Expressions.Expression<Func<T, object>> field, params object[] values)
         {
             return In(Field<T>(field), new CollectionExpression(values.Select(x => Constant(x))));
+        }
+
+        public static LogicalBinaryExpression NotIn(SqlExpression left, SqlExpression right)
+        {
+            if (left is DbNullExpression)
+                return IsNotNull(right);
+
+            if (right is DbNullExpression)
+                return IsNotNull(left);
+
+            return LogicalBinaryExpression.Expression(ExpressionType.NotIn, left, right);
+        }
+
+        public static LogicalBinaryExpression NotIn(string fieldName, params  object[] value)
+        {
+            if (value == null)
+                return IsNotNull(fieldName);
+            return NotIn(SqlExpression.Field(fieldName), new CollectionExpression(value.Select(x => Constant(x))));
+        }
+
+        public static LogicalBinaryExpression NotIn<T>(System.Linq.Expressions.Expression<Func<T, object>> field, params  object[] value)
+        {
+            if (value == null)
+                return IsNotNull(field);
+            return NotIn(Field<T>(field), new CollectionExpression(value.Select(x => Constant(x))));
         }
 
         public static LogicalBinaryExpression Between(SqlExpression left, SqlExpression value1, SqlExpression value2)

@@ -39,6 +39,10 @@ namespace Sparrow.CommonLibrary.Query
         /// </summary>
         In,
         /// <summary>
+        /// 不包含集合
+        /// </summary>
+        NotIn,
+        /// <summary>
         /// 除法运算
         /// </summary>
         Divide,

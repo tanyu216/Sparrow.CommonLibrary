@@ -138,6 +138,18 @@ namespace Sparrow.CommonLibrary.Test.Query
 
         }
 
+        [Test]
+        public void QueryableScalarTest1()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var count = database.CreateQueryable<UserProfile>()
+                .Count(x => x.Id)
+                .Where(x => x.Birthday < DateTime.Now)
+                .ExecuteScalar<int>();
+
+        }
+
 
         private int GetId()
         {
@@ -211,6 +223,24 @@ namespace Sparrow.CommonLibrary.Test.Query
             var list = database.CreateQueryable<UserProfile>()
                 .Where(x => (object)x.Id == List1())
                 .ExecuteList();
+            //var type = List1().GetType();
+            //Assert.IsTrue(type.IsArray);
+            //Assert.IsTrue(type.IsSubclassOf(typeof(IEnumerable)));
+            //Assert.IsFalse(type.IsSubclassOf(typeof(TestCaseData)));
+        }
+        [Test]
+        public void QueryableListTest10()
+        {
+            var database = DatabaseHelper.GetHelper("test");
+
+            var query = database.CreateQueryable<UserProfile>()
+                .Where(x => (object)x.Id != List1());
+
+            ParameterCollection p = database.CreateParamterCollection();
+            var sql = query.OutputSqlString(p);
+
+            Assert.IsNotNull(sql);
+                //.ExecuteList();
             //var type = List1().GetType();
             //Assert.IsTrue(type.IsArray);
             //Assert.IsTrue(type.IsSubclassOf(typeof(IEnumerable)));
