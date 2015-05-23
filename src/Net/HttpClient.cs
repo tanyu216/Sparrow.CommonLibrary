@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Sparrow.CommonLibrary.Retrying;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Sparrow.CommonLibrary.Net
 {
@@ -45,18 +46,18 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         public int Timeout { get; set; }
 
-        private List<Tuple<object, string>> _Certs;
+        private List<X509Certificate> _Certs;
         /// <summary>
         /// 签名证书
         /// </summary>
-        public List<Tuple<object, string>> Certs
+        public List<X509Certificate> Certs
         {
             get
             {
                 if (_Certs.Count > 0)
                     return _Certs.ToList();
                 else
-                    return new List<Tuple<object, string>>(0);
+                    return new List<X509Certificate>(0);
             }
         }
         /// <summary>
@@ -64,30 +65,12 @@ namespace Sparrow.CommonLibrary.Net
         /// </summary>
         /// <param name="certFile">证书文件名称</param>
         /// <param name="password">证书密码</param>
-        public void AddCertificates(string certFile, string password)
+        public void AddCertificates(X509Certificate cer)
         {
             if (_Certs == null)
-                _Certs = new List<Tuple<object, string>>();
+                _Certs = new List<X509Certificate>();
 
-            if (System.IO.File.Exists(certFile) == false)
-                throw new FileNotFoundException("指定的证书路径不包含证书文件。", certFile);
-
-            _Certs.Add(new Tuple<object, string>(certFile, password));
-        }
-        /// <summary>
-        /// 增加安全证书
-        /// </summary>
-        /// <param name="rawdata">证书文件数据</param>
-        /// <param name="password">证书密码</param>
-        public void AddCertificates(byte[] rawdata, string password)
-        {
-            if (_Certs == null)
-                _Certs = new List<Tuple<object, string>>();
-
-            if (rawdata == null)
-                throw new ArgumentNullException("rawdata");
-
-            _Certs.Add(new Tuple<object, string>(rawdata, password));
+            _Certs.Add(cer);
         }
 
         /// <summary>
@@ -223,19 +206,28 @@ namespace Sparrow.CommonLibrary.Net
             {
                 foreach (var item in _Certs)
                 {
-                    var rawdata = item.Item1 as byte[];
-                    if (rawdata != null)
-                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate(rawdata, item.Item2));
-                    else if (item.Item1 is string && System.IO.File.Exists(item.Item1.ToString()))
-                        request.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate2(item.Item1.ToString(), item.Item2, System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.MachineKeySet | System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.PersistKeySet));
-                    else
-                        throw new WebException("安全证书数据不正确。");
+                    request.ClientCertificates.Add(item);
                 }
             }
 
             if (_headers != null)
             {
-                request.Headers.Add(_headers);
+                for (var i = 0; i < _headers.Count; i++)
+                {
+                    var key = _headers.Keys[i];
+                    if (key == "Referer")
+                    {
+                        ((HttpWebRequest)request).Referer = _headers[i];
+                    }
+                    else if (key == "Accept")
+                    {
+                        ((HttpWebRequest)request).Accept = _headers[i];
+                    }
+                    else
+                    {
+                        request.Headers.Add(key, _headers[i]);
+                    }
+                }
             }
             request.UserAgent = UserAgent;
         }

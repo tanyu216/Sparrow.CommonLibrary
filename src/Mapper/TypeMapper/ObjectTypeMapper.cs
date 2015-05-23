@@ -64,7 +64,8 @@ namespace Sparrow.CommonLibrary.Mapper.TypeMappers
 
             for (var i = 0; i < initData.Length; i++)
             {
-                propertyAccessors[i].SetValue(obj, initData[i]);
+                if (initData[i] != null)
+                    propertyAccessors[i].SetValue(obj, initData[i]);
             }
 
             if (obj is IMappingTrigger)
