@@ -63,8 +63,7 @@ namespace Sparrow.CommonLibrary.Net
         /// <summary>
         /// 增加安全证书
         /// </summary>
-        /// <param name="certFile">证书文件名称</param>
-        /// <param name="password">证书密码</param>
+        /// <param name="cer">证书</param>
         public void AddCertificates(X509Certificate cer)
         {
             if (_Certs == null)

@@ -291,6 +291,20 @@ namespace Sparrow.CommonLibrary.Test.Query
             var logicalExp6 = SqlExpression.Expression<UserProfile>(x => list.Contains(x.Name));
         }
 
+        [Test]
+        public void QueryTest000()
+        {
+            var sql = @"SELECT A.HID,A.HotelName,A.HotelStar,A.DefaultImgUrl,HotelIntroduction,A.Lat,A.Lng,A.CityID,A.RegionalInfo,T.LowPrice LowFee,T.Price ListPrice,T.ReturnAmount,A.HasWeixinSite,A.HotelFacilitie FROM HotelInfo(NOLOCK) A 
+JOIN (
+    SELECT Hid,LowPrice,Price,ReturnAmount
+        FROM HotelSearch(NOLOCK) B 
+        WHERE B.Hid >= 100000  and B.zhidingvisible = 1) T  ON A.Hid = T.Hid AND A.HotelStatus = 1   ";
+
+            var database = DatabaseHelper.GetHelper("test");
+            var list = database.ExecuteList<HotelSimpleInfoModel>(sql);
+
+        }
+
         private void TestExpression<T>(Expression<Func<T, bool>> expression)
         {
             var value = Expression.Lambda<Func<object>>(Expression.MakeUnary(System.Linq.Expressions.ExpressionType.Convert, ((System.Linq.Expressions.BinaryExpression)expression.Body).Right, typeof(object))).Compile()();

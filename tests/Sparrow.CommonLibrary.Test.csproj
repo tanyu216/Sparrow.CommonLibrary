@@ -67,6 +67,7 @@
     <Compile Include="Mapper\UserProfile3.cs" />
     <Compile Include="Net\HttpClientTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\HotelSimpleInfoModel.cs" />
     <Compile Include="Query\QuerableTest.cs" />
     <Compile Include="Common\BufferedTest.cs" />
     <Compile Include="Common\PathBuilderTest.cs" />
