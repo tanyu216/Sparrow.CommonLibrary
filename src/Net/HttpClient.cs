@@ -117,6 +117,11 @@ namespace Sparrow.CommonLibrary.Net
         public IWebProxy Proxy { get; set; }
 
         /// <summary>
+        /// 是否是json传输
+        /// </summary>
+        public bool IsJsonContentType { get; set; }
+
+        /// <summary>
         /// http url
         /// </summary>
         protected readonly string Url;
@@ -184,8 +189,13 @@ namespace Sparrow.CommonLibrary.Net
         protected virtual void InitRequest(HttpWebRequest request)
         {
             request.Timeout = Timeout;
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Headers.Add("Accept-Charset", Encoding.UTF8.WebName);
+
+            if (IsJsonContentType)
+                request.ContentType = "application/json; charset=" + this.Encoding.WebName;
+            else
+                request.ContentType = "application/x-www-form-urlencoded; charset=" + this.Encoding.WebName;
+
+            request.Headers.Add("Accept-Charset", this.Encoding.WebName);
             request.Headers.Add("Accept-Encoding", "gzip,deflate");//始终接受压缩格式的数据 
             request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
             if (Cookies != null)
